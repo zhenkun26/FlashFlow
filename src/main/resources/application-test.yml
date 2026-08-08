@@ -1,0 +1,10 @@
+flashflow:
+  inventory:
+    strategy: CONDITIONAL_ATOMIC
+    optimistic-max-retries: 3
+  ordering:
+    transaction-max-retries: 20
+  expiration:
+    order-ttl: PT2S
+    batch-size: 20
+    scheduling-enabled: false

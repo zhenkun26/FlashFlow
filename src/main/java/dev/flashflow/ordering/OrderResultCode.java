@@ -1,0 +1,15 @@
+package dev.flashflow.ordering;
+
+public enum OrderResultCode {
+    CREATED,
+    SOLD_OUT,
+    ACTIVITY_NOT_ACTIVE,
+    EXISTING_EFFECTIVE_ORDER,
+    IDEMPOTENT_REPLAY,
+    IDEMPOTENCY_CONFLICT,
+    RETRYABLE_CONTENTION,
+    INVALID_REQUEST,
+    NOT_FOUND,
+    INTERNAL_ERROR
+}
+

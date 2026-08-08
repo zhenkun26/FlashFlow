@@ -1,0 +1,24 @@
+services:
+  mysql:
+    image: mysql:8.4.6
+    environment:
+      MYSQL_DATABASE: flashflow
+      MYSQL_USER: flashflow
+      MYSQL_PASSWORD: flashflow
+      MYSQL_ROOT_PASSWORD: root
+      TZ: UTC
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+00:00
+      - --transaction-isolation=REPEATABLE-READ
+    ports:
+      - "${FLASHFLOW_MYSQL_PORT:-3306}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uflashflow", "-pflashflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 15s
+    volumes:
+      - ./docker/mysql-data:/var/lib/mysql

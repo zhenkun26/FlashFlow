@@ -1,0 +1,10 @@
+flashflow:
+  expiration:
+    scheduling-enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+

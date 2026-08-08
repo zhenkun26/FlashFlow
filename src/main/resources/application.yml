@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: flashflow
+  datasource:
+    url: ${FLASHFLOW_DB_URL:jdbc:mysql://127.0.0.1:3306/flashflow?useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=UTC}
+    username: ${FLASHFLOW_DB_USER:flashflow}
+    password: ${FLASHFLOW_DB_PASSWORD:flashflow}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 2
+      connection-timeout: 3000
+  flyway:
+    enabled: true
+  jackson:
+    time-zone: UTC
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
+
+flashflow:
+  inventory:
+    strategy: CONDITIONAL_ATOMIC
+    optimistic-max-retries: 3
+  ordering:
+    transaction-max-retries: 5
+  expiration:
+    order-ttl: PT10M
+    batch-size: 100
+    scheduling-enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level %logger{36} request_id=%X{requestId:-} idempotency_key=%X{idempotencyKey:-} order_id=%X{orderId:-} user_id=%X{userId:-} sku_id=%X{activitySkuId:-} payment_tx=%X{providerTransactionId:-} - %msg%n"
