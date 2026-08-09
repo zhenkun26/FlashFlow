@@ -42,6 +42,6 @@ These PASS statuses are execution evidence, not source-inspection claims. V1.5, 
 | OpenSpec strict validation | PASS | 9/9 change-plus-main items passed before archive; 8/8 main specifications passed after archive |
 | Clean revision / V3 readiness | PASS | All required implementation gates were rerun after commit `178b602`; see [V2.1 local report](2026-08-09-v2-1-local.md) |
 | OpenSpec sync/archive | PASS | Six deltas synchronized into main specs and the completed change was reviewed for archival |
-| Commit / push / publication | NOT_RUN | Implementation commit exists; archive commit and push are the remaining publication steps |
+| Commit / push / publication | PASS | V2.1 implementation `178b602` and archive `8a36c85` were pushed to `origin/main` |
 
 V2.1 leaves the public runtime synchronous. Its Broker probe is local compatibility evidence, not an application-traffic test or a production reliability, delay-SLA, throughput, or capacity claim.

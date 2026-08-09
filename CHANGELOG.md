@@ -21,6 +21,7 @@ FlashFlow follows evidence-backed milestone releases. Performance figures below 
 
 - All six capability deltas were synchronized to the main specifications after the revision-bound 80-test, synchronous compatibility, manifest, RocketMQ, and strict OpenSpec gates passed.
 - Archived change: `2026-08-09-build-v2-1-v3-readiness-foundation`.
+- Published the tested implementation and synchronized archive to `origin/main`; local Broker evidence remains compatibility characterization rather than a production claim.
 
 ## V2 — 2026-08-09
 
