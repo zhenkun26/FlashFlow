@@ -25,6 +25,8 @@ flashflow:
     optimistic-max-retries: 3
   ordering:
     transaction-max-retries: 5
+    claim-race-max-retries: 1
+    transaction-sequence: ${FLASHFLOW_ORDERING_TRANSACTION_SEQUENCE:STOCK_FIRST}
   expiration:
     order-ttl: PT10M
     batch-size: 100

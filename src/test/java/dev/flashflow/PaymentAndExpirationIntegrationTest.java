@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import dev.flashflow.expiration.ExpirationService;
 import dev.flashflow.ordering.OrderApplicationService;
 import dev.flashflow.ordering.OrderResult;
+import dev.flashflow.ordering.OrderResultCode;
 import dev.flashflow.ordering.PlaceOrderCommand;
 import dev.flashflow.payment.PaymentApplicationService;
 import dev.flashflow.payment.PaymentCallbackCommand;
@@ -48,6 +49,16 @@ class PaymentAndExpirationIntegrationTest extends MySqlIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM compensation_case", Integer.class)).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT available_stock FROM activity_sku_stock WHERE id='s1'", Integer.class))
                 .isEqualTo(1);
+
+        OrderResult retry = orders.place(new PlaceOrderCommand("u1", "s1", "k2"));
+        assertThat(retry.code()).isEqualTo(OrderResultCode.CREATED);
+        assertThat(retry.orderId()).isNotEqualTo(order.orderId());
+        assertThat(orders.place(new PlaceOrderCommand("u1", "s1", "k3")).code())
+                .isEqualTo(OrderResultCode.EXISTING_EFFECTIVE_ORDER);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM purchase_claim WHERE user_id='u1'", Integer.class))
+                .isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT available_stock FROM activity_sku_stock WHERE id='s1'", Integer.class))
+                .isZero();
     }
 
     @Test
@@ -66,4 +77,3 @@ class PaymentAndExpirationIntegrationTest extends MySqlIntegrationTest {
                 new BigDecimal("99.00"), "CNY", LocalDateTime.now());
     }
 }
-

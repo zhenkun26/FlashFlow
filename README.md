@@ -34,14 +34,17 @@ Payment application                 |
      |                              |
      +--------- explicit transaction boundaries --------+
                                                             |
-         order -> stock -> reservation -> claim/aux locks   |
+       new order: stock -> order -> claim -> reservation    |
+ existing order: order -> stock -> reservation -> claim    |
                                                             v
                                                      MySQL/InnoDB
 ```
 
-The safe order transaction persists idempotency, order, purchase claim, reservation, stock movement, and the result atomically. Payment and expiration both lock the order first; whichever transaction commits first determines the legal terminal outcome.
+The safe new-order transaction reserves stock before inserting stock-referencing child rows, then persists the order, purchase claim, reservation, stock movement, and result atomically. Payment and expiration operate on existing orders and lock the order first; whichever transaction commits first determines the legal terminal outcome.
 
-See [transaction boundaries](docs/architecture/transaction-boundaries.md), [database experiments](docs/database-labs/v1-locking-experiments.md), and [decisions](docs/DECISIONS.md).
+See [transaction boundaries](docs/architecture/transaction-boundaries.md), [database experiments](docs/database-labs/v1-locking-experiments.md), [V1.5 matrix reproduction](docs/database-labs/v1-5-experiment-matrix.md), and [decisions](docs/DECISIONS.md).
+
+Release-by-release changes and their evidence boundaries are recorded in the [changelog](CHANGELOG.md).
 
 ## Local run
 
@@ -90,4 +93,4 @@ k6 run -e SKU_ID=demo-sku -e VUS=20 -e DURATION=30s load-tests/synchronous-order
 
 Every experiment report must include machine/container limits, dataset, duration, concurrency, result counts, latency percentiles, conflict counts, final stock balances, and invariant results. Local Docker results are not evidence of production high availability or a universal QPS figure.
 
-Current execution evidence is recorded in [verification status](docs/verification/current-status.md). No check is considered passed merely because its source file exists.
+Current execution evidence is recorded in [verification status](docs/verification/current-status.md), the [dated V1.5 local report](docs/verification/2026-08-09-v1-5-local.md), and the [dated V1.6 stock-first report](docs/verification/2026-08-09-v1-6-local.md). No check is considered passed merely because its source file exists.

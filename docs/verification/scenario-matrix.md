@@ -1,6 +1,6 @@
 # Specification scenario matrix
 
-The mapped Java tests passed on 2026-08-08 as part of the 20-test Maven suite. The HTTP characterization and final SQL balances are recorded in `2026-08-08-v1-local.md`.
+The mapped Java tests passed on 2026-08-09 as part of the 31-test Maven suite. The controlled HTTP matrix and committed SQL balances are recorded in `2026-08-09-v1-5-local.md`.
 
 ## synchronous-ordering
 
@@ -13,7 +13,7 @@ The mapped Java tests passed on 2026-08-08 as part of the 20-test Maven suite. T
 | Concurrent duplicate requests | `ConcurrentIdempotencyIntegrationTest.sameKeyAndSameUserProduceOneBusinessEffect` |
 | Key reused with different payload | `OrderIntegrationTest.rejectsInactiveSoldOutExistingAndConflictingIdempotency` |
 | User already has an effective order | `OrderIntegrationTest.rejectsInactiveSoldOutExistingAndConflictingIdempotency` |
-| User retries after unpaid closure | `PaymentAndExpirationIntegrationTest.expirationWinsAndRepeatedLatePaymentCreatesOneCompensationCase` plus a follow-up order assertion to add if the existing evidence proves insufficient |
+| User retries after unpaid closure | `PaymentAndExpirationIntegrationTest.expirationWinsAndRepeatedLatePaymentCreatesOneCompensationCase` directly places a new order and verifies one new effective claim after release |
 | Different users compete for the same SKU | `StrategyInvariantIntegrationTest.safeStrategiesPreserveInvariantsUnderExcessDemand` |
 | Response is lost after commit | `OrderIntegrationTest.createsAndReplaysOneCommittedOrder` models retry of a committed result |
 
@@ -54,7 +54,7 @@ The mapped Java tests passed on 2026-08-08 as part of the 20-test Maven suite. T
 | Lab reproduces overselling | `UnsafeInterleavingTest.deterministicBarrierReproducesLostUpdate` |
 | Normal runtime requests unsafe strategy | `UnsafeStrategyGuardTest.rejectsUnsafeStrategyWithoutLabProfile` |
 | Strategy faces excess demand | `StrategyInvariantIntegrationTest.safeStrategiesPreserveInvariantsUnderExcessDemand` |
-| Optimistic conflicts exceed retry budget | bounded whole-transaction retry returns `RETRYABLE_CONTENTION`; HTTP load evidence includes the mapped 503 overload response count |
+| Optimistic conflicts exceed retry budget | `StrategyInvariantIntegrationTest.deterministicOptimisticConflictExhaustsBudgetWithoutPartialEffects` |
 | Payment and expiration ordering is controlled | the two ordered payment/expiration integration tests |
-| Correct strategy run completes | strategy invariant suite and `ExperimentReporter` |
-| Verification cannot execute | `current-status.md` defines and preserves the `BLOCKED` policy; it was not triggered in the final run |
+| Correct strategy run completes | strategy invariant suite and the passing `ExperimentEvidenceReporter` matrix evidence |
+| Verification cannot execute | `ExperimentEvidenceReporterTest` verifies `BLOCKED`; failed startup attempts during development were retained as `BLOCKED`, not promoted to `PASS` |

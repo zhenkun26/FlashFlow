@@ -1,0 +1,116 @@
+package dev.flashflow;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import dev.flashflow.verification.experiment.ExperimentEvidenceReporter;
+import dev.flashflow.verification.experiment.ExperimentManifest;
+import dev.flashflow.verification.experiment.ExperimentRunEvidence;
+import dev.flashflow.verification.experiment.VerificationStatus;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+class ExperimentEvidenceReporterTest {
+    @TempDir Path temporaryDirectory;
+
+    @Test
+    void readsReconcilesAndWritesAppendOnlyEvidence() throws Exception {
+        Path run = Files.createDirectory(temporaryDirectory.resolve("run-1"));
+        Files.writeString(run.resolve("metadata.properties"), """
+                runId=run-1
+                caseId=baseline
+                startedAt=2026-08-09T00:00:00Z
+                endedAt=2026-08-09T00:00:05Z
+                gitRevision=abc123
+                dirtyWorktree=false
+                correctnessGate=PASS
+                correctnessGateReference=gate.log
+                workloadCompleted=true
+                environment.java=21
+                environment.database=MySQL-8.4
+                """);
+        Files.writeString(run.resolve("k6-summary.json"), """
+                {"totalRequests":10,"outcomes":{"CREATED":4,"SOLD_OUT":5,"RETRYABLE_CONTENTION":1,"UNEXPECTED":0},"latencyMillis":{"mean":12.5,"p90":20.0,"p95":25.0,"p99":30.0,"max":35.0}}
+                """);
+        Files.writeString(run.resolve("invariants.tsv"), invariantHeader() + "\n"
+                + "10\t6\t4\t0\t4\t4\t4\t4\t0\t0\t0\t0\t0\t0\n");
+        Files.writeString(run.resolve("resolved.env"), "CASE_ID=baseline\nVUS=10\n");
+        Files.writeString(run.resolve("metrics.prom"), """
+                flashflow_order_attempt_total{outcome="STARTED",strategy="CONDITIONAL_ATOMIC"} 10
+                hikaricp_connections_timeout_total{pool="HikariPool-1"} 0
+                """);
+
+        ExperimentRunEvidence evidence = ExperimentEvidenceReporter.read(run);
+        assertThat(evidence.status()).isEqualTo(VerificationStatus.PASS);
+        assertThat(evidence.warnings()).isEmpty();
+        assertThat(evidence.resolvedInputs()).containsEntry("VUS", "10");
+        assertThat(evidence.operationalMetrics()).hasSize(2);
+        ExperimentEvidenceReporter.write(run, evidence);
+        assertThat(run.resolve("report.md")).content().contains("Status: **PASS**")
+                .contains("Retry, conflict, and pool evidence")
+                .contains("not a production QPS");
+        assertThat(run.resolve("evidence.json")).exists();
+        assertThatThrownBy(() -> ExperimentEvidenceReporter.write(run, evidence))
+                .hasMessageContaining("Refusing to overwrite");
+    }
+
+    @Test
+    void derivesFailBlockedAndNotRunWithoutInflatingEvidence() {
+        assertThat(ExperimentEvidenceReporter.deriveStatus(
+                VerificationStatus.PASS, true, true, true, false)).isEqualTo(VerificationStatus.FAIL);
+        assertThat(ExperimentEvidenceReporter.deriveStatus(
+                VerificationStatus.PASS, true, false, true, true)).isEqualTo(VerificationStatus.BLOCKED);
+        assertThat(ExperimentEvidenceReporter.deriveStatus(
+                VerificationStatus.FAIL, false, false, false, false)).isEqualTo(VerificationStatus.FAIL);
+        assertThat(ExperimentEvidenceReporter.deriveStatus(
+                VerificationStatus.NOT_RUN, false, false, false, false)).isEqualTo(VerificationStatus.NOT_RUN);
+    }
+
+    @Test
+    void reportsDirtyAttributionAndControlledComparisonDifferences() throws Exception {
+        ExperimentRunEvidence left = evidence("left", false, Map.of("java", "21", "database", "MySQL-8.4"));
+        ExperimentRunEvidence right = evidence("right", true, Map.of("java", "26", "database", "MySQL-8.4"));
+        ExperimentManifest.Comparison comparison = new ExperimentManifest.Comparison(
+                "compare-vus", ExperimentManifest.Factor.VUS, List.of("left", "right"));
+
+        assertThat(ExperimentEvidenceReporter.comparison(comparison, left, right))
+                .contains("Declared factor: `VUS`")
+                .contains("java: 21 -> 26");
+
+        Path dirtyRun = Files.createDirectory(temporaryDirectory.resolve("dirty"));
+        Files.writeString(dirtyRun.resolve("metadata.properties"), """
+                runId=dirty
+                caseId=baseline
+                startedAt=2026-08-09T00:00:00Z
+                dirtyWorktree=true
+                correctnessGate=PASS
+                workloadCompleted=true
+                """);
+        ExperimentRunEvidence dirty = ExperimentEvidenceReporter.read(dirtyRun);
+        assertThat(dirty.status()).isEqualTo(VerificationStatus.BLOCKED);
+        assertThat(dirty.warnings()).anyMatch(warning -> warning.contains("dirty"));
+    }
+
+    private static ExperimentRunEvidence evidence(String runId, boolean dirty, Map<String, String> environment) {
+        ExperimentRunEvidence.InvariantEvidence invariants = new ExperimentRunEvidence.InvariantEvidence(
+                10, 5, 5, 0, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0);
+        return new ExperimentRunEvidence(runId, runId, Instant.EPOCH, Instant.EPOCH.plusSeconds(5),
+                "abc", dirty, VerificationStatus.PASS, "gate.log", true, true, 10,
+                Map.of("CREATED", 5L, "SOLD_OUT", 5L), Map.of("p95", 20.0),
+                Map.of("VUS", "10"), Map.of("flashflow_order_attempt_total", 10.0),
+                invariants, VerificationStatus.PASS, List.of(), environment);
+    }
+
+    private static String invariantHeader() {
+        return "initial_stock\tavailable_stock\treserved_stock\tsold_stock\teffective_orders\t"
+                + "effective_claims\treserved_reservations\tmovements\tnegative_or_unbalanced_stocks\t"
+                + "effective_orders_without_claims\tclaims_without_effective_orders\t"
+                + "order_reservation_mismatches\tduplicate_movement_operations\t"
+                + "effective_orders_over_initial_stock";
+    }
+}

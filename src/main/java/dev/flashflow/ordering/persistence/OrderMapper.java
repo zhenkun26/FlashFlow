@@ -84,6 +84,13 @@ public interface OrderMapper {
             """)
     String findClaimedOrderId(@Param("skuId") String skuId, @Param("userId") String userId);
 
+    @Select("""
+            SELECT order_id FROM purchase_claim
+            WHERE activity_sku_id = #{skuId} AND user_id = #{userId}
+            FOR UPDATE
+            """)
+    String findClaimedOrderIdForUpdate(@Param("skuId") String skuId, @Param("userId") String userId);
+
     @Delete("""
             DELETE FROM purchase_claim
             WHERE activity_sku_id = #{skuId} AND user_id = #{userId} AND order_id = #{orderId}
@@ -126,4 +133,3 @@ public interface OrderMapper {
             """)
     List<OrderRow> findExpiredForUpdate(@Param("now") LocalDateTime now, @Param("limit") int limit);
 }
-

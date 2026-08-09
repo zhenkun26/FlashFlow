@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {"id":"baseline","profile":"local","strategy":"CONDITIONAL_ATOMIC","vus":10,"durationSeconds":5,"initialStock":100,"skuDistribution":"SINGLE_HOT","skuCount":1,"poolSize":10,"connectionTimeoutMs":3000,"optimisticMaxRetries":3,"transactionMaxRetries":3,"transactionSequence":"STOCK_FIRST"},
+    {"id":"strategy-pessimistic","profile":"local","strategy":"PESSIMISTIC","vus":10,"durationSeconds":5,"initialStock":100,"skuDistribution":"SINGLE_HOT","skuCount":1,"poolSize":10,"connectionTimeoutMs":3000,"optimisticMaxRetries":3,"transactionMaxRetries":3,"transactionSequence":"STOCK_FIRST"},
+    {"id":"vus-low","profile":"local","strategy":"CONDITIONAL_ATOMIC","vus":5,"durationSeconds":5,"initialStock":100,"skuDistribution":"SINGLE_HOT","skuCount":1,"poolSize":10,"connectionTimeoutMs":3000,"optimisticMaxRetries":3,"transactionMaxRetries":3,"transactionSequence":"STOCK_FIRST"},
+    {"id":"pool-small","profile":"local","strategy":"CONDITIONAL_ATOMIC","vus":10,"durationSeconds":5,"initialStock":100,"skuDistribution":"SINGLE_HOT","skuCount":1,"poolSize":5,"connectionTimeoutMs":3000,"optimisticMaxRetries":3,"transactionMaxRetries":3,"transactionSequence":"STOCK_FIRST"},
+    {"id":"retry-zero","profile":"local","strategy":"CONDITIONAL_ATOMIC","vus":10,"durationSeconds":5,"initialStock":100,"skuDistribution":"SINGLE_HOT","skuCount":1,"poolSize":10,"connectionTimeoutMs":3000,"optimisticMaxRetries":0,"transactionMaxRetries":0,"transactionSequence":"STOCK_FIRST"},
+    {"id":"stock-low","profile":"local","strategy":"CONDITIONAL_ATOMIC","vus":10,"durationSeconds":5,"initialStock":20,"skuDistribution":"SINGLE_HOT","skuCount":1,"poolSize":10,"connectionTimeoutMs":3000,"optimisticMaxRetries":3,"transactionMaxRetries":3,"transactionSequence":"STOCK_FIRST"},
+    {"id":"uniform-four-skus","profile":"local","strategy":"CONDITIONAL_ATOMIC","vus":10,"durationSeconds":5,"initialStock":100,"skuDistribution":"UNIFORM","skuCount":4,"poolSize":10,"connectionTimeoutMs":3000,"optimisticMaxRetries":3,"transactionMaxRetries":3,"transactionSequence":"STOCK_FIRST"},
+    {"id":"stock-first-lab","profile":"lab","strategy":"CONDITIONAL_ATOMIC","vus":10,"durationSeconds":5,"initialStock":100,"skuDistribution":"SINGLE_HOT","skuCount":1,"poolSize":10,"connectionTimeoutMs":3000,"optimisticMaxRetries":3,"transactionMaxRetries":3,"transactionSequence":"STOCK_FIRST"},
+    {"id":"child-first-legacy-lab","profile":"lab","strategy":"CONDITIONAL_ATOMIC","vus":10,"durationSeconds":5,"initialStock":100,"skuDistribution":"SINGLE_HOT","skuCount":1,"poolSize":10,"connectionTimeoutMs":3000,"optimisticMaxRetries":3,"transactionMaxRetries":3,"transactionSequence":"CHILD_FIRST_LEGACY"}
+  ],
+  "comparisons": [
+    {"id":"compare-strategy","factor":"STRATEGY","caseIds":["baseline","strategy-pessimistic"]},
+    {"id":"compare-vus","factor":"VUS","caseIds":["baseline","vus-low"]},
+    {"id":"compare-pool","factor":"POOL_SIZE","caseIds":["baseline","pool-small"]},
+    {"id":"compare-retry-budget","factor":"TRANSACTION_RETRY_BUDGET","caseIds":["baseline","retry-zero"]},
+    {"id":"compare-stock","factor":"STOCK_LEVEL","caseIds":["baseline","stock-low"]},
+    {"id":"compare-sku-shape","factor":"SKU_CONTENTION_SHAPE","caseIds":["baseline","uniform-four-skus"]},
+    {"id":"compare-transaction-sequence","factor":"TRANSACTION_SEQUENCE","caseIds":["child-first-legacy-lab","stock-first-lab"]}
+  ]
+}

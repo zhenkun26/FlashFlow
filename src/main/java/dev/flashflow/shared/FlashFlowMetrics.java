@@ -32,6 +32,18 @@ public final class FlashFlowMetrics {
         Counter.builder("flashflow.inventory.conflict").tag("strategy", strategy).register(registry).increment();
     }
 
+    public void orderAttempt(String strategy) {
+        orderAttemptOutcome(strategy, OrderAttemptOutcome.STARTED);
+    }
+
+    public void orderAttemptOutcome(String strategy, OrderAttemptOutcome outcome) {
+        Counter.builder("flashflow.order.attempt")
+                .tag("strategy", strategy)
+                .tag("outcome", outcome.name())
+                .register(registry)
+                .increment();
+    }
+
     public void paymentOutcome(String code) {
         Counter.builder("flashflow.payment.outcome").tag("code", code).register(registry).increment();
     }

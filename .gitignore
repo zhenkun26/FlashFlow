@@ -7,3 +7,4 @@ docker/mysql-data/
 reports/*.json
 reports/*.html
 
+experiments/runs/
