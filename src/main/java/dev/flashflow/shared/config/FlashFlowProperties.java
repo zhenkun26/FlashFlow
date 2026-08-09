@@ -3,6 +3,7 @@ package dev.flashflow.shared.config;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -13,7 +14,8 @@ import org.springframework.validation.annotation.Validated;
 public record FlashFlowProperties(
         @Valid @NotNull Inventory inventory,
         @Valid @NotNull Ordering ordering,
-        @Valid @NotNull Expiration expiration) {
+        @Valid @NotNull Expiration expiration,
+        @Valid @NotNull Admission admission) {
 
     public record Inventory(
             @NotNull Strategy strategy,
@@ -32,6 +34,13 @@ public record FlashFlowProperties(
             boolean schedulingEnabled) {
     }
 
+    public record Admission(
+            @NotNull AdmissionMode mode,
+            @NotNull Duration heldResolution,
+            @NotBlank String scriptVersion,
+            String identitySecret) {
+    }
+
     public enum Strategy {
         CONDITIONAL_ATOMIC,
         PESSIMISTIC,
@@ -42,5 +51,10 @@ public record FlashFlowProperties(
     public enum TransactionSequence {
         STOCK_FIRST,
         CHILD_FIRST_LEGACY
+    }
+
+    public enum AdmissionMode {
+        MYSQL_ONLY,
+        REDIS_LUA
     }
 }

@@ -2,6 +2,25 @@
 
 FlashFlow follows evidence-backed milestone releases. Performance figures below describe controlled local Docker experiments only; they are not production capacity or availability claims.
 
+## V2 — 2026-08-09
+
+### Added
+
+- Added an explicitly selected Redis Lua admission mode with privacy-preserving identities, bounded per-SKU generation state, replay, per-user activity, capacity, confirmation, safe release, and quarantine transitions.
+- Added fail-closed ordering orchestration, durable MySQL replay before Redis, and after-commit unpaid-closure release while preserving the V1 stock-first MySQL transaction.
+- Added fenced MySQL-authoritative generation reconciliation and append-only reports.
+- Extended Testcontainers, bounded metrics, and the experiment manifest/runner with Redis runtime, script, generation, lifecycle, and reconciliation evidence.
+
+### Boundary
+
+- MySQL remains authoritative; V2 adds no MQ, Outbox, CDC, distributed lock, automatic fail-open behavior, production availability, or production capacity claim.
+- Final full-suite, fault-drill, canonical comparison, OpenSpec sync/archive, and publication status are recorded separately and are not implied by source changes.
+
+### OpenSpec
+
+- Synced all five capability deltas to the main specifications and archived `add-redis-lua-admission-control` as `2026-08-09-add-redis-lua-admission-control` after all 46 tasks and strict validation passed.
+- Released on `main` after the full 60-test MySQL/Redis suite and all six main OpenSpec specifications passed strict validation; local experiment figures remain characterization evidence only.
+
 ## V1.6 — 2026-08-09
 
 ### Changed

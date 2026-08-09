@@ -84,6 +84,28 @@ public final class ExperimentManifestValidator {
                 && !"lab".equals(value.profile())) {
             errors.add(prefix + "legacy child-first sequence requires the lab profile");
         }
+        if (value.admissionMode() == null) {
+            errors.add(prefix + "admissionMode is required");
+        }
+        positive(prefix, "heldResolutionSeconds", value.heldResolutionSeconds(), errors);
+        if (value.scriptVersion() == null || value.scriptVersion().isBlank()) {
+            errors.add(prefix + "scriptVersion is required");
+        }
+        if (value.injectedFailure() == null) {
+            errors.add(prefix + "injectedFailure is required");
+        } else if (value.admissionMode() == FlashFlowProperties.AdmissionMode.MYSQL_ONLY
+                && value.injectedFailure() != ExperimentManifest.InjectedFailure.NONE) {
+            errors.add(prefix + "Redis failure injection requires REDIS_LUA admission");
+        }
+        if (value.admissionMode() == FlashFlowProperties.AdmissionMode.REDIS_LUA) {
+            if (value.redisImage() == null || !value.redisImage().matches("redis:[a-zA-Z0-9._-]+")) {
+                errors.add(prefix + "REDIS_LUA requires a pinned redisImage");
+            }
+            if (value.generation() == null || value.generation().isBlank()
+                    || "none".equalsIgnoreCase(value.generation())) {
+                errors.add(prefix + "REDIS_LUA requires a generation");
+            }
+        }
         if (value.skuDistribution() == null) {
             errors.add(prefix + "skuDistribution is required");
         } else if (value.skuDistribution() == ExperimentManifest.SkuDistribution.SINGLE_HOT
@@ -133,6 +155,16 @@ public final class ExperimentManifestValidator {
     static Set<ExperimentManifest.Factor> changedFactors(
             ExperimentManifest.Case left, ExperimentManifest.Case right) {
         EnumSet<ExperimentManifest.Factor> changed = EnumSet.noneOf(ExperimentManifest.Factor.class);
+        if (left.admissionMode() != right.admissionMode()
+                || left.heldResolutionSeconds() != right.heldResolutionSeconds()
+                || !java.util.Objects.equals(left.redisImage(), right.redisImage())
+                || !java.util.Objects.equals(left.scriptVersion(), right.scriptVersion())
+                || !java.util.Objects.equals(left.generation(), right.generation())) {
+            changed.add(ExperimentManifest.Factor.ADMISSION_MODE);
+        }
+        if (left.injectedFailure() != right.injectedFailure()) {
+            changed.add(ExperimentManifest.Factor.INJECTED_FAILURE);
+        }
         if (left.strategy() != right.strategy()) changed.add(ExperimentManifest.Factor.STRATEGY);
         if (left.vus() != right.vus()) changed.add(ExperimentManifest.Factor.VUS);
         if (left.poolSize() != right.poolSize()

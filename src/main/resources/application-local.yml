@@ -4,3 +4,6 @@ management:
       exposure:
         include: health,info,prometheus
 
+flashflow:
+  admission:
+    mode: ${FLASHFLOW_ADMISSION_MODE:MYSQL_ONLY}

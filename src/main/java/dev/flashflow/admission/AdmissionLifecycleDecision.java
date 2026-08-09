@@ -1,0 +1,6 @@
+package dev.flashflow.admission;
+
+public enum AdmissionLifecycleDecision {
+    CONFIRMED, RELEASED, ALREADY_CONFIRMED, ALREADY_RELEASED, QUARANTINED,
+    STALE_GENERATION, NOT_FOUND, UNAVAILABLE, AMBIGUOUS, VERSION_MISMATCH
+}

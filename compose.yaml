@@ -1,4 +1,16 @@
 services:
+  redis:
+    image: redis:7.4.2-alpine
+    command: ["redis-server", "--appendonly", "no", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "${FLASHFLOW_REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
   mysql:
     image: mysql:8.4.6
     environment:
@@ -21,4 +33,4 @@ services:
       retries: 20
       start_period: 15s
     volumes:
-      - ./docker/mysql-data:/var/lib/mysql
+      - ${FLASHFLOW_MYSQL_DATA_DIR:-./docker/mysql-data}:/var/lib/mysql

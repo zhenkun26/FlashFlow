@@ -45,5 +45,11 @@ public final class ExperimentManifestCli {
         System.out.println("OPTIMISTIC_MAX_RETRIES=" + value.optimisticMaxRetries());
         System.out.println("TRANSACTION_MAX_RETRIES=" + value.transactionMaxRetries());
         System.out.println("TRANSACTION_SEQUENCE=" + value.transactionSequence());
+        System.out.println("ADMISSION_MODE=" + value.admissionMode());
+        System.out.println("HELD_RESOLUTION_SECONDS=" + value.heldResolutionSeconds());
+        System.out.println("REDIS_IMAGE=" + value.redisImage());
+        System.out.println("SCRIPT_VERSION=" + value.scriptVersion());
+        System.out.println("GENERATION=" + value.generation());
+        System.out.println("INJECTED_FAILURE=" + value.injectedFailure());
     }
 }

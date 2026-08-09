@@ -11,6 +11,11 @@ spring:
       connection-timeout: 3000
   flyway:
     enabled: true
+  data:
+    redis:
+      url: ${FLASHFLOW_REDIS_URL:redis://127.0.0.1:6379}
+      connect-timeout: ${FLASHFLOW_REDIS_CONNECT_TIMEOUT:1s}
+      timeout: ${FLASHFLOW_REDIS_COMMAND_TIMEOUT:1s}
   jackson:
     time-zone: UTC
 
@@ -31,8 +36,16 @@ flashflow:
     order-ttl: PT10M
     batch-size: 100
     scheduling-enabled: true
+  admission:
+    mode: ${FLASHFLOW_ADMISSION_MODE:MYSQL_ONLY}
+    held-resolution: ${FLASHFLOW_ADMISSION_HELD_RESOLUTION:PT30S}
+    script-version: ${FLASHFLOW_ADMISSION_SCRIPT_VERSION:v2-1}
+    identity-secret: ${FLASHFLOW_ADMISSION_IDENTITY_SECRET:}
 
 management:
+  health:
+    redis:
+      enabled: ${FLASHFLOW_REDIS_HEALTH_ENABLED:false}
   endpoints:
     web:
       exposure:

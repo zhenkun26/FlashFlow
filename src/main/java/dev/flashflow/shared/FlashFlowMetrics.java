@@ -51,4 +51,22 @@ public final class FlashFlowMetrics {
     public void expirationOutcome(String code) {
         Counter.builder("flashflow.expiration.outcome").tag("code", code).register(registry).increment();
     }
+
+    public void admissionDecision(String decision) {
+        Counter.builder("flashflow.admission.decision").tag("decision", decision).register(registry).increment();
+    }
+
+    public void admissionMySql(String outcome) {
+        Counter.builder("flashflow.admission.mysql").tag("outcome", outcome).register(registry).increment();
+    }
+
+    public void admissionLifecycle(String operation, String outcome) {
+        Counter.builder("flashflow.admission.lifecycle")
+                .tag("operation", operation).tag("outcome", outcome).register(registry).increment();
+    }
+
+    public void reconciliation(String kind, String outcome) {
+        Counter.builder("flashflow.admission.reconciliation")
+                .tag("kind", kind).tag("outcome", outcome).register(registry).increment();
+    }
 }

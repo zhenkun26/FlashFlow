@@ -1,5 +1,11 @@
 package dev.flashflow.ordering;
 
+import dev.flashflow.admission.AdmissionCommand;
+import dev.flashflow.admission.AdmissionDecision;
+import dev.flashflow.admission.AdmissionIdentity;
+import dev.flashflow.admission.AdmissionLifecycleResult;
+import dev.flashflow.admission.AdmissionPort;
+import dev.flashflow.admission.AdmissionResult;
 import dev.flashflow.inventory.InventoryReservationStrategy;
 import dev.flashflow.inventory.InventoryStrategyRegistry;
 import dev.flashflow.inventory.MovementType;
@@ -16,9 +22,11 @@ import dev.flashflow.shared.config.FlashFlowProperties;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.TransientDataAccessException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -36,6 +44,32 @@ public final class OrderApplicationService {
     private final FlashFlowMetrics metrics;
     private final TransactionTemplate transactions;
     private final OrderingTransactionHook transactionHook;
+    private final AdmissionPort admission;
+    private final AdmissionIdentity admissionIdentity;
+
+    @Autowired
+    public OrderApplicationService(
+            OrderMapper orderMapper,
+            InventoryMapper inventoryMapper,
+            InventoryStrategyRegistry strategyRegistry,
+            FlashFlowProperties properties,
+            Clock clock,
+            FlashFlowMetrics metrics,
+            PlatformTransactionManager transactionManager,
+            OrderingTransactionHook transactionHook,
+            AdmissionPort admission,
+            AdmissionIdentity admissionIdentity) {
+        this.orderMapper = orderMapper;
+        this.inventoryMapper = inventoryMapper;
+        this.strategyRegistry = strategyRegistry;
+        this.properties = properties;
+        this.clock = clock;
+        this.metrics = metrics;
+        this.transactions = new TransactionTemplate(transactionManager);
+        this.transactionHook = transactionHook;
+        this.admission = admission;
+        this.admissionIdentity = admissionIdentity;
+    }
 
     public OrderApplicationService(
             OrderMapper orderMapper,
@@ -46,18 +80,49 @@ public final class OrderApplicationService {
             FlashFlowMetrics metrics,
             PlatformTransactionManager transactionManager,
             OrderingTransactionHook transactionHook) {
-        this.orderMapper = orderMapper;
-        this.inventoryMapper = inventoryMapper;
-        this.strategyRegistry = strategyRegistry;
-        this.properties = properties;
-        this.clock = clock;
-        this.metrics = metrics;
-        this.transactions = new TransactionTemplate(transactionManager);
-        this.transactionHook = transactionHook;
+        this(orderMapper, inventoryMapper, strategyRegistry, properties, clock, metrics,
+                transactionManager, transactionHook, new dev.flashflow.admission.MySqlOnlyAdmissionAdapter(),
+                new AdmissionIdentity(properties));
     }
 
     public OrderResult place(PlaceOrderCommand command) {
         Objects.requireNonNull(command, "command");
+        OrderResult durableReplay = replayCompletedIfPresent(command);
+        if (durableReplay != null) {
+            return durableReplay;
+        }
+
+        AdmissionCommand admissionCommand = admissionCommand(command);
+        AdmissionResult admissionResult = admission.acquire(admissionCommand);
+        metrics.admissionDecision(admissionResult.decision().name());
+        if (admissionResult.decision() == AdmissionDecision.USER_ACTIVE) {
+            String existingOrderId = orderMapper.findClaimedOrderId(command.activitySkuId(), command.userId());
+            if (existingOrderId != null) {
+                metrics.admissionMySql("READ_EXISTING");
+                return fromExisting(OrderResultCode.EXISTING_EFFECTIVE_ORDER, existingOrderId,
+                        "User already has an effective order");
+            }
+            metrics.admissionMySql("AVOIDED");
+            return retryableAdmission("Admission is held by another in-progress request");
+        }
+        if (!admissionResult.permitsMySqlAttempt()) {
+            metrics.admissionMySql("AVOIDED");
+            return retryableAdmission("Admission is temporarily unavailable: " + admissionResult.decision());
+        }
+        metrics.admissionMySql("STARTED");
+        try {
+            OrderResult result = placeWithRetry(command);
+            completeAdmission(admissionCommand, admissionResult, result);
+            return result;
+        } catch (RuntimeException exception) {
+            AdmissionLifecycleResult lifecycle = admission.quarantine(
+                    admissionCommand, admissionResult.generation());
+            metrics.admissionLifecycle("QUARANTINE", lifecycle.decision().name());
+            throw exception;
+        }
+    }
+
+    private OrderResult placeWithRetry(PlaceOrderCommand command) {
         InventoryReservationStrategy strategy = strategyRegistry.require(properties.inventory().strategy());
         String strategyName = strategy.kind().name();
         int optimisticConflicts = 0;
@@ -130,6 +195,69 @@ public final class OrderApplicationService {
                 throw new IllegalStateException("Ordering transaction failed", exception);
             }
         }
+    }
+
+    private OrderResult replayCompletedIfPresent(PlaceOrderCommand command) {
+        IdempotencyRow record = orderMapper.findIdempotency(
+                IDEMPOTENCY_OPERATION, command.userId(), command.idempotencyKey());
+        if (record == null || !"COMPLETED".equals(record.status())) {
+            return null;
+        }
+        metrics.idempotencyHit();
+        OrderResult result = replay(command, RequestHash.order(command.userId(), command.activitySkuId()));
+        metrics.orderOutcome(result.code().name());
+        return result;
+    }
+
+    private AdmissionCommand admissionCommand(PlaceOrderCommand command) {
+        Instant deadline = clock.instant().plus(properties.admission().heldResolution());
+        return new AdmissionCommand(command.activitySkuId(),
+                admissionIdentity.admissionId(IDEMPOTENCY_OPERATION, command.userId(), command.idempotencyKey()),
+                admissionIdentity.userDigest(command.activitySkuId(), command.userId()), deadline);
+    }
+
+    private void completeAdmission(
+            AdmissionCommand command, AdmissionResult admissionResult, OrderResult result) {
+        AdmissionLifecycleResult lifecycle;
+        String operation;
+        switch (result.code()) {
+            case CREATED -> {
+                operation = "CONFIRM";
+                lifecycle = admission.confirm(command, admissionResult.generation());
+            }
+            case ACTIVITY_NOT_ACTIVE, EXISTING_EFFECTIVE_ORDER, IDEMPOTENCY_CONFLICT -> {
+                operation = "RELEASE";
+                lifecycle = admission.release(command, admissionResult.generation(), false);
+            }
+            case SOLD_OUT -> {
+                operation = "QUARANTINE";
+                lifecycle = admission.quarantine(command, admissionResult.generation());
+            }
+            default -> {
+                // Retryable and unknown outcomes may share the token with another in-flight
+                // request. Leave it held for durable reconciliation rather than guessing.
+                metrics.admissionLifecycle("DEFER", result.code().name());
+                return;
+            }
+        }
+        metrics.admissionLifecycle(operation, lifecycle.decision().name());
+        boolean completed = ("CONFIRM".equals(operation)
+                && (lifecycle.decision() == dev.flashflow.admission.AdmissionLifecycleDecision.CONFIRMED
+                || lifecycle.decision() == dev.flashflow.admission.AdmissionLifecycleDecision.ALREADY_CONFIRMED))
+                || ("RELEASE".equals(operation)
+                && (lifecycle.decision() == dev.flashflow.admission.AdmissionLifecycleDecision.RELEASED
+                || lifecycle.decision() == dev.flashflow.admission.AdmissionLifecycleDecision.ALREADY_RELEASED))
+                || "QUARANTINE".equals(operation);
+        if (!completed) {
+            AdmissionLifecycleResult quarantined = admission.quarantine(command, admissionResult.generation());
+            metrics.admissionLifecycle("QUARANTINE_AFTER_" + operation, quarantined.decision().name());
+        }
+    }
+
+    private OrderResult retryableAdmission(String message) {
+        OrderResult result = OrderResult.rejected(OrderResultCode.RETRYABLE_CONTENTION, message);
+        metrics.orderOutcome(result.code().name());
+        return result;
     }
 
     static boolean isConnectionAcquisitionFailure(Throwable failure) {

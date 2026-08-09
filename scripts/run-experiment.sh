@@ -16,7 +16,12 @@ experiment_runs_root="${FLASHFLOW_EXPERIMENT_RUNS_ROOT:-$experiment_root/experim
 experiment_maven_repo="${FLASHFLOW_EXPERIMENT_MAVEN_REPO:-/private/tmp/flashflow-m2}"
 experiment_app_port="${FLASHFLOW_EXPERIMENT_APP_PORT:-8080}"
 experiment_mysql_port="${FLASHFLOW_MYSQL_PORT:-3306}"
+experiment_redis_port="${FLASHFLOW_REDIS_PORT:-6379}"
 experiment_uuid="$(uuidgen | tr '[:upper:]' '[:lower:]')"
+experiment_compose_project="flashflowexp${experiment_uuid//-/}"
+experiment_mysql_data_dir="$(mktemp -d "${TMPDIR:-/tmp}/flashflow-experiment-mysql.XXXXXX")"
+export COMPOSE_PROJECT_NAME="$experiment_compose_project"
+export FLASHFLOW_MYSQL_DATA_DIR="$experiment_mysql_data_dir"
 experiment_run_id="$(date -u +%Y%m%dT%H%M%SZ)-${experiment_case_id}-${experiment_uuid}"
 experiment_run_dir="$experiment_runs_root/$experiment_run_id"
 mkdir -p "$experiment_run_dir"
@@ -38,11 +43,18 @@ if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then experiment_dirty=true;
 } > "$experiment_run_dir/metadata.properties"
 
 experiment_app_pid=""
+experiment_compose_started=false
 experiment_cleanup() {
   if [[ -n "$experiment_app_pid" ]] && kill -0 "$experiment_app_pid" 2>/dev/null; then
     kill "$experiment_app_pid" 2>/dev/null || true
     wait "$experiment_app_pid" 2>/dev/null || true
   fi
+  if [[ "$experiment_compose_started" == true ]]; then
+    docker compose down --volumes --remove-orphans >/dev/null 2>&1 || true
+  fi
+  case "$experiment_mysql_data_dir" in
+    "${TMPDIR:-/tmp}"/flashflow-experiment-mysql.*) rm -rf -- "$experiment_mysql_data_dir" ;;
+  esac
 }
 trap experiment_cleanup EXIT
 
@@ -88,12 +100,23 @@ while IFS='=' read -r experiment_key experiment_value; do
     OPTIMISTIC_MAX_RETRIES) resolved_optimistic_retries="$experiment_value" ;;
     TRANSACTION_MAX_RETRIES) resolved_transaction_retries="$experiment_value" ;;
     TRANSACTION_SEQUENCE) resolved_transaction_sequence="$experiment_value" ;;
+    ADMISSION_MODE) resolved_admission_mode="$experiment_value" ;;
+    HELD_RESOLUTION_SECONDS) resolved_held_resolution="$experiment_value" ;;
+    REDIS_IMAGE) resolved_redis_image="$experiment_value" ;;
+    SCRIPT_VERSION) resolved_script_version="$experiment_value" ;;
+    GENERATION) resolved_generation="$experiment_value" ;;
+    INJECTED_FAILURE) resolved_injected_failure="$experiment_value" ;;
   esac
 done < "$experiment_run_dir/resolved.env"
 
 if [[ "${resolved_case_id:-}" != "$experiment_case_id" ]]; then
   experiment_blocked "resolved manifest output is incomplete"
 fi
+if [[ "$resolved_injected_failure" != "NONE" ]]; then
+  experiment_blocked "injected failure $resolved_injected_failure must use the deterministic fault-drill suite"
+fi
+resolved_redis_health=false
+if [[ "$resolved_admission_mode" == "REDIS_LUA" ]]; then resolved_redis_health=true; fi
 
 experiment_gate_status="${CORRECTNESS_GATE_STATUS:-}"
 experiment_gate_reference="${CORRECTNESS_GATE_REFERENCE:-}"
@@ -114,8 +137,12 @@ if [[ "$experiment_gate_status" != "PASS" ]]; then
   exit 1
 fi
 
-FLASHFLOW_MYSQL_PORT="$experiment_mysql_port" docker compose up -d mysql \
-  > "$experiment_run_dir/docker-compose.log" 2>&1 || experiment_blocked "Compose MySQL failed to start; use a safe port override if needed"
+experiment_services=(mysql)
+if [[ "$resolved_admission_mode" == "REDIS_LUA" ]]; then experiment_services+=(redis); fi
+experiment_compose_started=true
+FLASHFLOW_MYSQL_PORT="$experiment_mysql_port" FLASHFLOW_REDIS_PORT="$experiment_redis_port" \
+  docker compose up -d "${experiment_services[@]}" \
+  > "$experiment_run_dir/docker-compose.log" 2>&1 || experiment_blocked "Compose dependencies failed to start; use safe port overrides if needed"
 
 experiment_mysql_healthy=false
 for ((experiment_check=0; experiment_check<120; experiment_check++)); do
@@ -128,6 +155,18 @@ for ((experiment_check=0; experiment_check<120; experiment_check++)); do
 done
 [[ "$experiment_mysql_healthy" == true ]] || experiment_blocked "Compose MySQL did not become healthy"
 
+if [[ "$resolved_admission_mode" == "REDIS_LUA" ]]; then
+  experiment_redis_healthy=false
+  for ((experiment_check=0; experiment_check<120; experiment_check++)); do
+    if docker compose exec -T redis redis-cli ping 2>/dev/null | grep -q PONG; then
+      experiment_redis_healthy=true
+      break
+    fi
+    sleep 0.5
+  done
+  [[ "$experiment_redis_healthy" == true ]] || experiment_blocked "Compose Redis did not become healthy"
+fi
+
 experiment_java_version="$(mvn -version | awk -F': ' '/Java version/ {print $2; exit}' | tr '=' '-')"
 experiment_docker_version="$(docker version --format '{{.Server.Version}}' 2>/dev/null || printf UNKNOWN)"
 experiment_mysql_version="$(docker compose exec -T mysql mysql -N -B -uflashflow -pflashflow -e 'SELECT VERSION()' 2>/dev/null || printf UNKNOWN)"
@@ -135,6 +174,9 @@ experiment_mysql_version="$(docker compose exec -T mysql mysql -N -B -uflashflow
   printf 'environment.java=%s\n' "$experiment_java_version"
   printf 'environment.docker=%s\n' "$experiment_docker_version"
   printf 'environment.mysql=%s\n' "$experiment_mysql_version"
+  printf 'environment.admissionMode=%s\n' "$resolved_admission_mode"
+  printf 'environment.redisImage=%s\n' "$resolved_redis_image"
+  printf 'environment.scriptVersion=%s\n' "$resolved_script_version"
   printf 'environment.os=%s\n' "$(uname -srm | tr '=' '-')"
 } >> "$experiment_run_dir/metadata.properties"
 
@@ -147,6 +189,13 @@ FLASHFLOW_INVENTORY_STRATEGY="$resolved_strategy" \
 FLASHFLOW_INVENTORY_OPTIMISTIC_MAX_RETRIES="$resolved_optimistic_retries" \
 FLASHFLOW_ORDERING_TRANSACTION_MAX_RETRIES="$resolved_transaction_retries" \
 FLASHFLOW_ORDERING_TRANSACTION_SEQUENCE="$resolved_transaction_sequence" \
+FLASHFLOW_ADMISSION_MODE="$resolved_admission_mode" \
+FLASHFLOW_ADMISSION_HELD_RESOLUTION="${resolved_held_resolution}s" \
+FLASHFLOW_ADMISSION_SCRIPT_VERSION="$resolved_script_version" \
+FLASHFLOW_ADMISSION_GENERATION="$resolved_generation" \
+FLASHFLOW_ADMISSION_IDENTITY_SECRET="flashflow-local-experiment-identity-secret-32-chars" \
+FLASHFLOW_REDIS_URL="redis://127.0.0.1:$experiment_redis_port" \
+FLASHFLOW_REDIS_HEALTH_ENABLED="$resolved_redis_health" \
 mvn -q -o -Dmaven.repo.local="$experiment_maven_repo" \
   -Dexec.mainClass=dev.flashflow.FlashFlowApplication exec:java \
   > "$experiment_run_dir/application.log" 2>&1 &
@@ -167,6 +216,23 @@ done
 "$experiment_script_dir/prepare-experiment-data.sh" "$resolved_stock" "$resolved_sku_count" \
   > "$experiment_run_dir/data-preparation.log" 2>&1 || experiment_blocked "disposable dataset preparation failed"
 
+if [[ "$resolved_admission_mode" == "REDIS_LUA" ]]; then
+  mkdir -p "$experiment_run_dir/reconciliation-initial"
+  SPRING_PROFILES_ACTIVE="$resolved_profile" \
+  FLASHFLOW_DB_URL="jdbc:mysql://127.0.0.1:$experiment_mysql_port/flashflow?useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=UTC" \
+  FLASHFLOW_ADMISSION_MODE=REDIS_LUA \
+  FLASHFLOW_ADMISSION_HELD_RESOLUTION="${resolved_held_resolution}s" \
+  FLASHFLOW_ADMISSION_SCRIPT_VERSION="$resolved_script_version" \
+  FLASHFLOW_ADMISSION_GENERATION="$resolved_generation" \
+  FLASHFLOW_ADMISSION_IDENTITY_SECRET="flashflow-local-experiment-identity-secret-32-chars" \
+  FLASHFLOW_REDIS_URL="redis://127.0.0.1:$experiment_redis_port" \
+  mvn -q -o -Dmaven.repo.local="$experiment_maven_repo" -DskipTests \
+    -Dexec.mainClass=dev.flashflow.verification.experiment.AdmissionExperimentCli \
+    -Dexec.args="$experiment_run_dir/reconciliation-initial $resolved_sku_count" exec:java \
+    > "$experiment_run_dir/admission-initial.properties" 2> "$experiment_run_dir/admission-initial.log" \
+    || experiment_blocked "Redis admission generation initialization failed"
+fi
+
 experiment_workload_completed=false
 if BASE_URL="http://127.0.0.1:$experiment_app_port" CASE_ID="$resolved_case_id" VUS="$resolved_vus" \
   DURATION="${resolved_duration}s" SKU_DISTRIBUTION="$resolved_sku_distribution" SKU_COUNT="$resolved_sku_count" \
@@ -180,6 +246,27 @@ curl -fsS "http://127.0.0.1:$experiment_app_port/actuator/prometheus" > "$experi
 docker compose exec -T mysql mysql -B -uflashflow -pflashflow flashflow \
   < "$experiment_script_dir/experiment-invariants.sql" > "$experiment_run_dir/invariants.tsv" \
   || rm -f "$experiment_run_dir/invariants.tsv"
+
+if [[ "$resolved_admission_mode" == "REDIS_LUA" ]]; then
+  mkdir -p "$experiment_run_dir/reconciliation-final"
+  SPRING_PROFILES_ACTIVE="$resolved_profile" \
+  FLASHFLOW_DB_URL="jdbc:mysql://127.0.0.1:$experiment_mysql_port/flashflow?useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=UTC" \
+  FLASHFLOW_ADMISSION_MODE=REDIS_LUA \
+  FLASHFLOW_ADMISSION_HELD_RESOLUTION="${resolved_held_resolution}s" \
+  FLASHFLOW_ADMISSION_SCRIPT_VERSION="$resolved_script_version" \
+  FLASHFLOW_ADMISSION_GENERATION="$resolved_generation" \
+  FLASHFLOW_ADMISSION_IDENTITY_SECRET="flashflow-local-experiment-identity-secret-32-chars" \
+  FLASHFLOW_REDIS_URL="redis://127.0.0.1:$experiment_redis_port" \
+  mvn -q -o -Dmaven.repo.local="$experiment_maven_repo" -DskipTests \
+    -Dexec.mainClass=dev.flashflow.verification.experiment.AdmissionExperimentCli \
+    -Dexec.args="$experiment_run_dir/reconciliation-final $resolved_sku_count" exec:java \
+    > "$experiment_run_dir/admission-evidence.properties" 2> "$experiment_run_dir/admission-final.log" \
+    || experiment_blocked "final Redis reconciliation failed"
+  {
+    docker compose exec -T redis redis-cli INFO memory
+    docker compose exec -T redis redis-cli --scan --pattern 'flashflow:v2:*'
+  } > "$experiment_run_dir/redis-evidence.txt" 2>&1 || experiment_blocked "Redis evidence capture failed"
+fi
 
 if [[ "${CAPTURE_MYSQL_DIAGNOSTICS:-false}" == "true" ]]; then
   {

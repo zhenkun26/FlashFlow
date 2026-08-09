@@ -120,7 +120,9 @@ class OrderingClaimRaceIntegrationTest extends MySqlIntegrationTest {
                 new FlashFlowProperties.Inventory(FlashFlowProperties.Strategy.CONDITIONAL_ATOMIC, 3),
                 new FlashFlowProperties.Ordering(
                         3, claimRaceRetries, FlashFlowProperties.TransactionSequence.STOCK_FIRST),
-                new FlashFlowProperties.Expiration(Duration.ofMinutes(10), 20, false));
+                new FlashFlowProperties.Expiration(Duration.ofMinutes(10), 20, false),
+                new FlashFlowProperties.Admission(
+                        FlashFlowProperties.AdmissionMode.MYSQL_ONLY, Duration.ofSeconds(30), "v2-1", ""));
         return new OrderApplicationService(orderMapper, inventoryMapper, registry, properties,
                 Clock.systemUTC(), metrics, transactionManager, hook);
     }

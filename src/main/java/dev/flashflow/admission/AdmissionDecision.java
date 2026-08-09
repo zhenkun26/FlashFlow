@@ -1,0 +1,6 @@
+package dev.flashflow.admission;
+
+public enum AdmissionDecision {
+    ADMITTED, REPLAY, USER_ACTIVE, NO_TOKEN, NOT_READY, STALE_GENERATION,
+    UNAVAILABLE, AMBIGUOUS, MALFORMED_REPLY, VERSION_MISMATCH, BYPASSED
+}

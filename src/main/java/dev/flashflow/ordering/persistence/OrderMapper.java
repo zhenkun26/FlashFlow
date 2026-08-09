@@ -40,6 +40,14 @@ public interface OrderMapper {
                                    @Param("callerId") String callerId,
                                    @Param("key") String key);
 
+    @Select("""
+            SELECT operation_name, caller_id, idempotency_key, request_hash, status, result_code, resource_id
+            FROM idempotency_record
+            WHERE operation_name = 'CREATE_ORDER' AND resource_id = #{orderId} AND status = 'COMPLETED'
+            LIMIT 1
+            """)
+    IdempotencyRow findOrderIdempotencyByResourceId(String orderId);
+
     @Update("""
             UPDATE idempotency_record
             SET status = 'COMPLETED', result_code = #{resultCode}, resource_id = #{resourceId}, completed_at = #{now}

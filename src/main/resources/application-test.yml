@@ -1,4 +1,6 @@
 flashflow:
+  admission:
+    mode: MYSQL_ONLY
   inventory:
     strategy: CONDITIONAL_ATOMIC
     optimistic-max-retries: 3

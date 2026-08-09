@@ -42,6 +42,9 @@ class ExperimentEvidenceReporterTest {
         Files.writeString(run.resolve("resolved.env"), "CASE_ID=baseline\nVUS=10\n");
         Files.writeString(run.resolve("metrics.prom"), """
                 flashflow_order_attempt_total{outcome="STARTED",strategy="CONDITIONAL_ATOMIC"} 10
+                flashflow_admission_decision_total{decision="BYPASSED"} 10
+                flashflow_admission_mysql_total{outcome="STARTED"} 10
+                flashflow_admission_lifecycle_total{operation="CONFIRM",outcome="BYPASSED"} 10
                 hikaricp_connections_timeout_total{pool="HikariPool-1"} 0
                 """);
 
@@ -49,7 +52,7 @@ class ExperimentEvidenceReporterTest {
         assertThat(evidence.status()).isEqualTo(VerificationStatus.PASS);
         assertThat(evidence.warnings()).isEmpty();
         assertThat(evidence.resolvedInputs()).containsEntry("VUS", "10");
-        assertThat(evidence.operationalMetrics()).hasSize(2);
+        assertThat(evidence.operationalMetrics()).hasSize(5);
         ExperimentEvidenceReporter.write(run, evidence);
         assertThat(run.resolve("report.md")).content().contains("Status: **PASS**")
                 .contains("Retry, conflict, and pool evidence")
@@ -103,7 +106,7 @@ class ExperimentEvidenceReporterTest {
                 "abc", dirty, VerificationStatus.PASS, "gate.log", true, true, 10,
                 Map.of("CREATED", 5L, "SOLD_OUT", 5L), Map.of("p95", 20.0),
                 Map.of("VUS", "10"), Map.of("flashflow_order_attempt_total", 10.0),
-                invariants, VerificationStatus.PASS, List.of(), environment);
+                Map.of(), invariants, VerificationStatus.PASS, List.of(), environment);
     }
 
     private static String invariantHeader() {

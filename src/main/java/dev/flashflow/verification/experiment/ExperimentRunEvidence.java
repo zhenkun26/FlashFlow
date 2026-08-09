@@ -20,6 +20,7 @@ public record ExperimentRunEvidence(
         Map<String, Double> latencyMillis,
         Map<String, String> resolvedInputs,
         Map<String, Double> operationalMetrics,
+        Map<String, String> admissionEvidence,
         InvariantEvidence invariants,
         VerificationStatus status,
         List<String> warnings,

@@ -48,7 +48,8 @@ class StrategyInvariantIntegrationTest extends MySqlIntegrationTest {
         FlashFlowProperties properties = new FlashFlowProperties(
                 new FlashFlowProperties.Inventory(strategy, 20),
                 new FlashFlowProperties.Ordering(20, 1, FlashFlowProperties.TransactionSequence.STOCK_FIRST),
-                new FlashFlowProperties.Expiration(Duration.ofMinutes(10), 20, false));
+                new FlashFlowProperties.Expiration(Duration.ofMinutes(10), 20, false),
+                mysqlOnlyAdmission());
         OrderApplicationService service = new OrderApplicationService(orderMapper, inventoryMapper, registry,
                 properties, Clock.systemUTC(), metrics, transactionManager, new NoOpOrderingTransactionHook());
         int concurrency = 25;
@@ -96,7 +97,8 @@ class StrategyInvariantIntegrationTest extends MySqlIntegrationTest {
         FlashFlowProperties properties = new FlashFlowProperties(
                 new FlashFlowProperties.Inventory(FlashFlowProperties.Strategy.OPTIMISTIC, 2),
                 new FlashFlowProperties.Ordering(0, 1, FlashFlowProperties.TransactionSequence.STOCK_FIRST),
-                new FlashFlowProperties.Expiration(Duration.ofMinutes(10), 20, false));
+                new FlashFlowProperties.Expiration(Duration.ofMinutes(10), 20, false),
+                mysqlOnlyAdmission());
         OrderApplicationService service = new OrderApplicationService(orderMapper, inventoryMapper,
                 new InventoryStrategyRegistry(List.of(alwaysConflicts)), properties,
                 Clock.systemUTC(), metrics, transactionManager, new NoOpOrderingTransactionHook());
@@ -134,7 +136,8 @@ class StrategyInvariantIntegrationTest extends MySqlIntegrationTest {
         FlashFlowProperties properties = new FlashFlowProperties(
                 new FlashFlowProperties.Inventory(FlashFlowProperties.Strategy.CONDITIONAL_ATOMIC, 0),
                 new FlashFlowProperties.Ordering(0, 1, FlashFlowProperties.TransactionSequence.STOCK_FIRST),
-                new FlashFlowProperties.Expiration(Duration.ofMinutes(10), 20, false));
+                new FlashFlowProperties.Expiration(Duration.ofMinutes(10), 20, false),
+                mysqlOnlyAdmission());
         OrderApplicationService service = new OrderApplicationService(orderMapper, inventoryMapper,
                 new InventoryStrategyRegistry(List.of(broken)), properties,
                 Clock.systemUTC(), metrics, transactionManager, new NoOpOrderingTransactionHook());
@@ -153,6 +156,11 @@ class StrategyInvariantIntegrationTest extends MySqlIntegrationTest {
         var counter = meterRegistry.find("flashflow.order.attempt")
                 .tags("strategy", strategy, "outcome", outcome).counter();
         return counter == null ? 0 : counter.count();
+    }
+
+    private static FlashFlowProperties.Admission mysqlOnlyAdmission() {
+        return new FlashFlowProperties.Admission(
+                FlashFlowProperties.AdmissionMode.MYSQL_ONLY, Duration.ofSeconds(30), "v2-1", "");
     }
 
     private double outcome(String code) {

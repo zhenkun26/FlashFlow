@@ -1,6 +1,29 @@
 # Specification scenario matrix
 
-The mapped Java tests passed on 2026-08-09 as part of the 31-test Maven suite. The controlled HTTP matrix and committed SQL balances are recorded in `2026-08-09-v1-5-local.md`.
+The mapped Java tests passed on 2026-08-09 as part of the 60-test Maven suite. V1.5 evidence remains in `2026-08-09-v1-5-local.md`; V2 admission and fault evidence is in `2026-08-09-v2-local.md`.
+
+## redis-admission-control
+
+| Scenario | Mapped test |
+|---|---|
+| Generation is invisible before publication | `RedisLuaAdmissionIntegrationTest.generationIsInvisibleUntilPublishedAndRejectsStaleOperations` |
+| Excess demand remains bounded | `RedisLuaAdmissionIntegrationTest.concurrentAcquireIsBoundedReplaySafeAndOnePerUser` |
+| Lost acquire reply is replayed | `RedisLuaAdmissionIntegrationTest.replayAfterSimulatedLostAcquireReplyDoesNotDecrementAgain` |
+| Missing/unknown state fails closed | `RedisLuaAdmissionIntegrationTest.missingOrVersionMismatchedStateFailsClosed` and `AdmissionCrossStoreFailureIntegrationTest.unavailableAdmissionFailsClosedBeforeMySqlTransaction` |
+| Same key/user creates at most one effect | `RedisOrderingIntegrationTest.concurrentSameKeyAndSameUserConvergeOnOneCommittedEffect` |
+| Paid and unpaid lifecycle differ | `RedisOrderingIntegrationTest.unpaidClosureReleasesConfirmedTokenButPaidOrderKeepsItConsumed` |
+| Redis confirmation fails after MySQL commit | `AdmissionCrossStoreFailureIntegrationTest.mysqlCommitSurvivesAmbiguousRedisConfirmation` |
+| Closure release fails after commit | `ExpirationAdmissionFailureIntegrationTest.ambiguousAfterCommitReleaseDoesNotUndoMysqlClosure` |
+
+## redis-inventory-reconciliation
+
+| Scenario | Mapped test |
+|---|---|
+| Excess/orphaned Redis state | `AdmissionReconciliationIntegrationTest.replacesExcessCapacityAndDropsOrphanedConfirmationWithoutChangingMySql` |
+| Missing confirmation | `AdmissionReconciliationIntegrationTest.restoresMissingConfirmationFromCommittedMySqlFacts` |
+| Ambiguous held token | `AdmissionReconciliationIntegrationTest.ambiguousHeldAdmissionWithholdsCapacityAndLeavesGenerationUnpublished` |
+| Missing capacity and stale terminal state | `AdmissionReconciliationIntegrationTest.restoresMissingCapacityAndDropsTerminalAndProvenNonEffectiveTokens` |
+| Redis unavailable while reconciling | `AdmissionReconciliationFailureTest.redisOutageStillProducesAppendOnlyBlockedEvidence` |
 
 ## synchronous-ordering
 

@@ -18,7 +18,7 @@ class ExperimentManifestValidatorTest {
                 Path.of("experiments/matrix.json").toFile(), ExperimentManifest.class);
 
         assertThat(ExperimentManifestValidator.validate(manifest)).isEmpty();
-        assertThat(manifest.comparisons()).hasSize(7);
+        assertThat(manifest.comparisons()).hasSize(8);
     }
 
     @Test

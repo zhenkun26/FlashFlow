@@ -1,14 +1,16 @@
 # FlashFlow
 
-FlashFlow is a database-first limited-stock ordering laboratory. V1 is intentionally a modular monolith backed only by MySQL/InnoDB so that overselling, idempotency, transaction boundaries, row locks, order state races, and failure recovery can be demonstrated before Redis or messaging is introduced.
+FlashFlow is a database-first limited-stock ordering laboratory. V1 establishes synchronous MySQL/InnoDB correctness; V2 adds a Redis Lua admission layer that sheds excess work while MySQL remains the sole durable business source of truth.
 
-## V1 scope
+## Current V2 scope
 
-- Java 21, Spring Boot, MyBatis, MySQL/InnoDB, Flyway, JUnit, Testcontainers, Micrometer, and k6.
+- Java 21, Spring Boot, MyBatis, MySQL/InnoDB, Redis Lua, Flyway, JUnit, Testcontainers, Micrometer, and k6.
 - One activity SKU and quantity one per order.
 - Synchronous ordering, request idempotency, one effective order per user/SKU, inventory reservation, simulated payment, expiration, and late-payment compensation records.
 - Four inventory strategies: conditional atomic update (normal default), pessimistic lock, optimistic lock, and an unsafe read-then-write laboratory control.
-- No Redis, RocketMQ, Outbox, real payment provider, automated refund execution, microservices, or production-scale claim.
+- Redis admission IDs are privacy-preserving digests; atomic scripts enforce generation, capacity, replay, per-user activity, confirmation, release, and quarantine.
+- Fenced reconciliation rebuilds Redis only from committed MySQL facts and emits append-only evidence.
+- No RocketMQ, Outbox, CDC, real payment provider, automated refund execution, microservices, automatic fail-open, or production-scale claim.
 
 ## Invariants
 
@@ -29,7 +31,10 @@ FlashFlow is a database-first limited-stock ordering laboratory. V1 is intention
 HTTP adapter                 Scheduled adapter
      |                              |
      v                              v
-Ordering application        Expiration application
+durable replay -> Redis admission   Expiration application
+                    |                       |
+                    v                       |
+             Ordering application          |
 Payment application                 |
      |                              |
      +--------- explicit transaction boundaries --------+
@@ -42,7 +47,7 @@ Payment application                 |
 
 The safe new-order transaction reserves stock before inserting stock-referencing child rows, then persists the order, purchase claim, reservation, stock movement, and result atomically. Payment and expiration operate on existing orders and lock the order first; whichever transaction commits first determines the legal terminal outcome.
 
-See [transaction boundaries](docs/architecture/transaction-boundaries.md), [database experiments](docs/database-labs/v1-locking-experiments.md), [V1.5 matrix reproduction](docs/database-labs/v1-5-experiment-matrix.md), and [decisions](docs/DECISIONS.md).
+See [V2 admission architecture](docs/architecture/v2-redis-admission.md), [V2 operations runbook](docs/runbooks/v2-admission-reconciliation.md), [transaction boundaries](docs/architecture/transaction-boundaries.md), [database experiments](docs/database-labs/v1-locking-experiments.md), and [decisions](docs/DECISIONS.md).
 
 Release-by-release changes and their evidence boundaries are recorded in the [changelog](CHANGELOG.md).
 
@@ -57,6 +62,8 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
 If port 3306 is already occupied, set `FLASHFLOW_MYSQL_PORT=3307` for Compose and point `FLASHFLOW_DB_URL` at port 3307 when starting the application.
+
+The commands above explicitly retain `MYSQL_ONLY` behavior. To enable V2, start `mysql redis`, set `FLASHFLOW_ADMISSION_MODE=REDIS_LUA` and a 32+ character `FLASHFLOW_ADMISSION_IDENTITY_SECRET`, then initialize the SKU generation as described in the V2 runbook. Redis failure is fail-closed; it never falls back to an unadmitted MySQL attempt.
 
 Load disposable demonstration data:
 
@@ -93,4 +100,4 @@ k6 run -e SKU_ID=demo-sku -e VUS=20 -e DURATION=30s load-tests/synchronous-order
 
 Every experiment report must include machine/container limits, dataset, duration, concurrency, result counts, latency percentiles, conflict counts, final stock balances, and invariant results. Local Docker results are not evidence of production high availability or a universal QPS figure.
 
-Current execution evidence is recorded in [verification status](docs/verification/current-status.md), the [dated V1.5 local report](docs/verification/2026-08-09-v1-5-local.md), and the [dated V1.6 stock-first report](docs/verification/2026-08-09-v1-6-local.md). No check is considered passed merely because its source file exists.
+Current execution evidence is recorded in [verification status](docs/verification/current-status.md), the [V2 Redis admission local report](docs/verification/2026-08-09-v2-local.md), the [dated V1.5 local report](docs/verification/2026-08-09-v1-5-local.md), and the [dated V1.6 stock-first report](docs/verification/2026-08-09-v1-6-local.md). No check is considered passed merely because its source file exists.

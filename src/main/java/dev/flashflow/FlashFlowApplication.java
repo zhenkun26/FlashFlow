@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         "dev.flashflow.ordering.persistence",
         "dev.flashflow.inventory.persistence",
         "dev.flashflow.payment.persistence",
+        "dev.flashflow.admission.persistence",
         "dev.flashflow.verification.persistence"
 })
 @EnableConfigurationProperties(FlashFlowProperties.class)

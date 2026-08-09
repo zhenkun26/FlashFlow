@@ -20,7 +20,7 @@
     "case": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "profile", "strategy", "vus", "durationSeconds", "initialStock", "skuDistribution", "skuCount", "poolSize", "connectionTimeoutMs", "optimisticMaxRetries", "transactionMaxRetries", "transactionSequence"],
+      "required": ["id", "profile", "strategy", "vus", "durationSeconds", "initialStock", "skuDistribution", "skuCount", "poolSize", "connectionTimeoutMs", "optimisticMaxRetries", "transactionMaxRetries", "transactionSequence", "admissionMode", "heldResolutionSeconds", "redisImage", "scriptVersion", "generation", "injectedFailure"],
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
         "profile": { "enum": ["local", "lab"] },
@@ -34,7 +34,13 @@
         "connectionTimeoutMs": { "type": "integer", "minimum": 1 },
         "optimisticMaxRetries": { "type": "integer", "minimum": 0, "maximum": 20 },
         "transactionMaxRetries": { "type": "integer", "minimum": 0, "maximum": 20 },
-        "transactionSequence": { "enum": ["STOCK_FIRST", "CHILD_FIRST_LEGACY"] }
+        "transactionSequence": { "enum": ["STOCK_FIRST", "CHILD_FIRST_LEGACY"] },
+        "admissionMode": { "enum": ["MYSQL_ONLY", "REDIS_LUA"] },
+        "heldResolutionSeconds": { "type": "integer", "minimum": 1 },
+        "redisImage": { "type": "string", "minLength": 1 },
+        "scriptVersion": { "type": "string", "minLength": 1 },
+        "generation": { "type": "string", "minLength": 1 },
+        "injectedFailure": { "enum": ["NONE", "REDIS_OUTAGE", "AMBIGUOUS_REPLY", "RESTART_STATE_LOSS", "DUPLICATE_LIFECYCLE", "DRIFT_REBUILD"] }
       }
     },
     "comparison": {
@@ -43,7 +49,7 @@
       "required": ["id", "factor", "caseIds"],
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
-        "factor": { "enum": ["STRATEGY", "VUS", "POOL_SIZE", "TRANSACTION_RETRY_BUDGET", "TRANSACTION_SEQUENCE", "STOCK_LEVEL", "SKU_CONTENTION_SHAPE"] },
+        "factor": { "enum": ["ADMISSION_MODE", "INJECTED_FAILURE", "STRATEGY", "VUS", "POOL_SIZE", "TRANSACTION_RETRY_BUDGET", "TRANSACTION_SEQUENCE", "STOCK_LEVEL", "SKU_CONTENTION_SHAPE"] },
         "caseIds": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } }
       }
     }

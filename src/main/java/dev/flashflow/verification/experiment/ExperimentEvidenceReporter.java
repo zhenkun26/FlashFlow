@@ -29,13 +29,18 @@ public final class ExperimentEvidenceReporter {
         Properties metadata = properties(runDirectory.resolve("metadata.properties"));
         VerificationStatus gate = VerificationStatus.valueOf(metadata.getProperty("correctnessGate", "NOT_RUN"));
         boolean workloadCompleted = Boolean.parseBoolean(metadata.getProperty("workloadCompleted", "false"));
+        Map<String, String> resolvedInputs = keyValues(runDirectory.resolve("resolved.env"));
+        boolean redisAdmission = "REDIS_LUA".equals(resolvedInputs.get("ADMISSION_MODE"));
         boolean collectionComplete = Files.isRegularFile(runDirectory.resolve("k6-summary.json"))
                 && Files.isRegularFile(runDirectory.resolve("invariants.tsv"))
-                && Files.isRegularFile(runDirectory.resolve("metrics.prom"));
+                && Files.isRegularFile(runDirectory.resolve("metrics.prom"))
+                && (!redisAdmission || (Files.isRegularFile(runDirectory.resolve("admission-evidence.properties"))
+                        && Files.isRegularFile(runDirectory.resolve("redis-evidence.txt"))
+                        && Files.isDirectory(runDirectory.resolve("reconciliation-final"))));
 
         K6Evidence k6 = readK6(runDirectory.resolve("k6-summary.json"));
-        Map<String, String> resolvedInputs = keyValues(runDirectory.resolve("resolved.env"));
         Map<String, Double> operationalMetrics = readOperationalMetrics(runDirectory.resolve("metrics.prom"));
+        Map<String, String> admissionEvidence = keyValues(runDirectory.resolve("admission-evidence.properties"));
         ExperimentRunEvidence.InvariantEvidence invariants = readInvariants(runDirectory.resolve("invariants.tsv"));
         List<String> warnings = new ArrayList<>();
         boolean dirty = Boolean.parseBoolean(metadata.getProperty("dirtyWorktree", "true"));
@@ -44,6 +49,24 @@ public final class ExperimentEvidenceReporter {
         long classified = k6.outcomes().values().stream().mapToLong(Long::longValue).sum();
         boolean reconciled = classified == k6.totalRequests();
         if (!reconciled) warnings.add("Classified outcomes do not reconcile with total requests.");
+        long admissionDecisions = sumMetrics(operationalMetrics, "flashflow_admission_decision_total");
+        long admissionMysql = sumMetrics(operationalMetrics, "flashflow_admission_mysql_total");
+        long admissionStarted = sumMetricsContaining(
+                operationalMetrics, "flashflow_admission_mysql_total", "outcome=\"STARTED\"");
+        long lifecycle = sumMetrics(operationalMetrics, "flashflow_admission_lifecycle_total");
+        boolean admissionReconciled = admissionDecisions == k6.totalRequests()
+                && admissionMysql == k6.totalRequests() && lifecycle == admissionStarted;
+        if (redisAdmission && invariants != null) {
+            admissionReconciled = admissionReconciled
+                    && sumProperties(admissionEvidence, ".confirmed") == invariants.effectiveOrders()
+                    && sumProperties(admissionEvidence, ".remaining") == invariants.availableStock()
+                    && sumProperties(admissionEvidence, ".held") == 0
+                    && sumProperties(admissionEvidence, ".quarantined") == 0
+                    && resolvedInputs.get("GENERATION").equals(admissionEvidence.get("sku.1.generation"));
+        }
+        if (!admissionReconciled) {
+            warnings.add("Request, admission, MySQL-attempt, and lifecycle counts do not reconcile.");
+        }
         if (invariants == null) warnings.add("Committed-state invariant evidence is unavailable.");
         else if (!invariants.valid()) warnings.add("Committed-state invariants failed.");
         Path diagnosticsError = runDirectory.resolve("mysql-diagnostics-error.log");
@@ -52,7 +75,7 @@ public final class ExperimentEvidenceReporter {
         }
 
         VerificationStatus status = deriveStatus(gate, workloadCompleted, collectionComplete,
-                reconciled, invariants != null && invariants.valid());
+                reconciled && admissionReconciled, invariants != null && invariants.valid());
         return new ExperimentRunEvidence(
                 metadata.getProperty("runId"), metadata.getProperty("caseId"),
                 Instant.parse(metadata.getProperty("startedAt")),
@@ -60,7 +83,8 @@ public final class ExperimentEvidenceReporter {
                 metadata.getProperty("gitRevision", "UNKNOWN"), dirty, gate,
                 metadata.getProperty("correctnessGateReference", "none"), workloadCompleted,
                 collectionComplete, k6.totalRequests(), k6.outcomes(), k6.latencyMillis(),
-                resolvedInputs, operationalMetrics, invariants, status, List.copyOf(warnings), environment(metadata));
+                resolvedInputs, operationalMetrics, admissionEvidence,
+                invariants, status, List.copyOf(warnings), environment(metadata));
     }
 
     public static VerificationStatus deriveStatus(
@@ -160,6 +184,7 @@ public final class ExperimentEvidenceReporter {
         for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
             if (!(line.startsWith("flashflow_order_attempt")
                     || line.startsWith("flashflow_inventory_conflict")
+                    || line.startsWith("flashflow_admission_")
                     || line.startsWith("hikaricp_connections"))) continue;
             int separator = line.lastIndexOf(' ');
             if (separator <= 0) continue;
@@ -193,6 +218,23 @@ public final class ExperimentEvidenceReporter {
         return value;
     }
 
+    private static long sumMetrics(Map<String, Double> metrics, String prefix) {
+        return Math.round(metrics.entrySet().stream().filter(entry -> entry.getKey().startsWith(prefix))
+                .mapToDouble(Map.Entry::getValue).sum());
+    }
+
+    private static long sumMetricsContaining(Map<String, Double> metrics, String prefix, String tag) {
+        return Math.round(metrics.entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(prefix) && entry.getKey().contains(tag))
+                .mapToDouble(Map.Entry::getValue).sum());
+    }
+
+    private static long sumProperties(Map<String, String> values, String suffix) {
+        return values.entrySet().stream().filter(entry -> entry.getKey().startsWith("sku.")
+                        && entry.getKey().endsWith(suffix))
+                .mapToLong(entry -> Long.parseLong(entry.getValue())).sum();
+    }
+
     private static String markdown(ExperimentRunEvidence evidence) {
         StringBuilder text = new StringBuilder("# FlashFlow experiment ").append(evidence.runId()).append("\n\n");
         text.append("Status: **").append(evidence.status()).append("**\n\n");
@@ -213,6 +255,11 @@ public final class ExperimentEvidenceReporter {
         text.append("\n## Retry, conflict, and pool evidence\n\n| Metric | Value |\n|---|---:|\n");
         evidence.operationalMetrics().forEach((key, value) -> text.append('|').append(key).append('|')
                 .append(value).append("|\n"));
+        if (!evidence.admissionEvidence().isEmpty()) {
+            text.append("\n## Redis admission and reconciliation evidence\n\n| Evidence | Value |\n|---|---|\n");
+            evidence.admissionEvidence().forEach((key, value) -> text.append('|').append(key)
+                    .append('|').append(value).append("|\n"));
+        }
         text.append("\n## Committed state\n\n");
         if (evidence.invariants() == null) text.append("Invariant evidence unavailable.\n");
         else {
