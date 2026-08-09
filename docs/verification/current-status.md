@@ -38,10 +38,10 @@ These PASS statuses are execution evidence, not source-inspection claims. V1.5, 
 | Explicit synchronous `MYSQL_ONLY` selection | PASS | 24 core compatibility tests passed |
 | Command and expiration deterministic drills | PASS | Contract, ledger, duplicate/interruption, synchronous race, publication ambiguity, delayed trigger, and scanner race cases passed |
 | Manifest / Compose | PASS | 11 manifest cases validated and the final messaging-spike Compose configuration resolved |
-| RocketMQ 5.3.4 compatibility | PASS | Final append-only report `reports/messaging/20260809T092454Z-rocketmq-spike` recorded registration, `SEND_OK`, matching consumption, and `SYNC_FLUSH` |
-| OpenSpec strict validation | PASS | 7/7 active change and main specifications passed |
-| Clean revision / V3 readiness | BLOCKED | Results belong to a dirty worktree based on `02d224f`; see [V2.1 local report](2026-08-09-v2-1-local.md) |
-| OpenSpec sync/archive | NOT_RUN | Separate workflow after review and a clean revision-bound rerun |
-| Commit / push / publication | NOT_RUN | Separate authorization required |
+| RocketMQ 5.3.4 compatibility | PASS | Revision-bound report `reports/messaging/20260809T095421Z-rocketmq-spike` recorded registration, `SEND_OK`, matching consumption, and `SYNC_FLUSH` |
+| OpenSpec strict validation | PASS | 9/9 change-plus-main items passed before archive; 8/8 main specifications passed after archive |
+| Clean revision / V3 readiness | PASS | All required implementation gates were rerun after commit `178b602`; see [V2.1 local report](2026-08-09-v2-1-local.md) |
+| OpenSpec sync/archive | PASS | Six deltas synchronized into main specs and the completed change was reviewed for archival |
+| Commit / push / publication | NOT_RUN | Implementation commit exists; archive commit and push are the remaining publication steps |
 
 V2.1 leaves the public runtime synchronous. Its Broker probe is local compatibility evidence, not an application-traffic test or a production reliability, delay-SLA, throughput, or capacity claim.

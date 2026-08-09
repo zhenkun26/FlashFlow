@@ -74,4 +74,4 @@
 - [x] 9.3 Update README, changelog, deferred roadmap, scenario matrix, and current verification status with precise V2.1/V3/V4 boundaries.
 - [x] 9.4 Run the complete Maven/Testcontainers suite, explicit synchronous compatibility selection, manifest validation, strict OpenSpec validation, deterministic command/expiration fault drills, and RocketMQ compatibility matrix.
 - [x] 9.5 Record every gate as `PASS`, `FAIL`, `BLOCKED`, or `NOT_RUN`; assert V3 readiness only if all required evidence belongs to the same revision and passes.
-- [ ] 9.6 Review all six delta specs for synchronization, archive the completed change only after all tasks pass, and request commit/push authorization separately.
+- [x] 9.6 Review all six delta specs for synchronization, archive the completed change only after all tasks pass, and request commit/push authorization separately.

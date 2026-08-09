@@ -2,7 +2,7 @@
 
 FlashFlow follows evidence-backed milestone releases. Performance figures below describe controlled local Docker experiments only; they are not production capacity or availability claims.
 
-## V2.1 — Unreleased
+## V2.1 — 2026-08-09
 
 ### Added
 
@@ -15,7 +15,12 @@ FlashFlow follows evidence-backed milestone releases. Performance figures below 
 
 - The normal application remains synchronous and contains no live RocketMQ client, producer, consumer, dispatcher, Transactional Outbox, CDC, or automatic fail-open path.
 - A command-ledger row is not evidence that a message was published. Synthetic fault tests are not broker reliability, delay-SLA, throughput, or production-readiness evidence.
-- Commit, push, OpenSpec archive, and V3 implementation remain separately authorized actions.
+- V3 implementation remains a separate OpenSpec change; publication status is recorded independently from the source changes.
+
+### OpenSpec
+
+- All six capability deltas were synchronized to the main specifications after the revision-bound 80-test, synchronous compatibility, manifest, RocketMQ, and strict OpenSpec gates passed.
+- Archived change: `2026-08-09-build-v2-1-v3-readiness-foundation`.
 
 ## V2 — 2026-08-09
 

@@ -67,6 +67,7 @@ fi
 "${docker_cmd[@]}" compose --profile messaging-spike exec -T rocketmq-broker \
   sh mqadmin getBrokerConfig -n rocketmq-namesrv:9876 -b rocketmq-broker:10911 \
   2>"${report_dir}/broker-config-error.log" \
-  | sed -E 's/[[:space:]]+$//' >"${report_dir}/broker-config.txt" || true
+  | sed -E -e 's/[[:space:]]+$//' -e '$ {/^[[:space:]]*$/d;}' \
+  >"${report_dir}/broker-config.txt" || true
 printf 'PASS\n' >"${report_dir}/status.txt"
 printf '%s\n' "${report_dir}"
