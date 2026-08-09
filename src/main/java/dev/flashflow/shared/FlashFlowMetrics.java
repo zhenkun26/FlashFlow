@@ -69,4 +69,34 @@ public final class FlashFlowMetrics {
         Counter.builder("flashflow.admission.reconciliation")
                 .tag("kind", kind).tag("outcome", outcome).register(registry).increment();
     }
+
+    public void command(String operation, String outcome) {
+        Counter.builder("flashflow.command")
+                .tag("operation", operation).tag("outcome", outcome).register(registry).increment();
+    }
+
+    public void publication(String outcome) {
+        Counter.builder("flashflow.messaging.publication")
+                .tag("outcome", outcome).register(registry).increment();
+    }
+
+    public void delivery(String outcome) {
+        Counter.builder("flashflow.messaging.delivery")
+                .tag("outcome", outcome).register(registry).increment();
+    }
+
+    public void consumer(String operation, String outcome) {
+        Counter.builder("flashflow.messaging.consumer")
+                .tag("operation", operation).tag("outcome", outcome).register(registry).increment();
+    }
+
+    public void expirationTrigger(String outcome) {
+        Counter.builder("flashflow.messaging.expiration.trigger")
+                .tag("outcome", outcome).register(registry).increment();
+    }
+
+    public void unresolvedWork(String kind, long count) {
+        registry.gauge("flashflow.messaging.unresolved", java.util.List.of(
+                io.micrometer.core.instrument.Tag.of("kind", kind)), count);
+    }
 }

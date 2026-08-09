@@ -60,8 +60,8 @@ public final class ExperimentManifestValidator {
         if (value.id() == null || !value.id().matches("[a-z0-9][a-z0-9-]*")) {
             errors.add(prefix + "id must be kebab-case");
         }
-        if (!Set.of("local", "lab").contains(value.profile())) {
-            errors.add(prefix + "profile must be local or lab");
+        if (!Set.of("local", "lab", "messaging-spike").contains(value.profile())) {
+            errors.add(prefix + "profile must be local, lab, or messaging-spike");
         }
         if (value.strategy() == null) {
             errors.add(prefix + "strategy is required");
@@ -114,6 +114,30 @@ public final class ExperimentManifestValidator {
         } else if (value.skuDistribution() != ExperimentManifest.SkuDistribution.SINGLE_HOT
                 && value.skuCount() < 2) {
             errors.add(prefix + value.skuDistribution() + " requires skuCount>=2");
+        }
+        if ("messaging-spike".equals(value.profile())) {
+            ExperimentManifest.Messaging messaging = value.messaging();
+            if (messaging == null) {
+                errors.add(prefix + "messaging-spike profile requires messaging inputs");
+            } else {
+                if (!"apache/rocketmq:5.3.4".equals(messaging.brokerImage())) {
+                    errors.add(prefix + "brokerImage must pin apache/rocketmq:5.3.4");
+                }
+                if (!"5.3.4-mqadmin".equals(messaging.clientVersion())) {
+                    errors.add(prefix + "clientVersion must pin 5.3.4-mqadmin");
+                }
+                if (messaging.producerRetries() < 0 || messaging.producerRetries() > 3) {
+                    errors.add(prefix + "producerRetries must be between 0 and 3");
+                }
+                if (messaging.topology() == null || messaging.topology().isBlank()
+                        || messaging.acknowledgementMode() == null || messaging.acknowledgementMode().isBlank()
+                        || messaging.delayMechanism() == null || messaging.delayMechanism().isBlank()
+                        || messaging.injectedFault() == null || messaging.injectedFault().isBlank()) {
+                    errors.add(prefix + "messaging inputs must be complete");
+                }
+            }
+        } else if (value.messaging() != null) {
+            errors.add(prefix + "messaging inputs require messaging-spike profile");
         }
     }
 

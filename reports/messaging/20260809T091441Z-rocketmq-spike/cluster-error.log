@@ -1,0 +1,11 @@
+org.apache.rocketmq.tools.command.SubCommandException: ClusterListSubCommand command failed
+	at org.apache.rocketmq.tools.command.cluster.ClusterListSubCommand.execute(ClusterListSubCommand.java:101)
+	at org.apache.rocketmq.tools.command.MQAdminStartup.main0(MQAdminStartup.java:177)
+	at org.apache.rocketmq.tools.command.MQAdminStartup.main(MQAdminStartup.java:127)
+Caused by: org.apache.rocketmq.remoting.exception.RemotingConnectException: connect to  failed
+	at org.apache.rocketmq.remoting.netty.NettyRemotingClient.invokeSync(NettyRemotingClient.java:588)
+	at org.apache.rocketmq.client.impl.MQClientAPIImpl.getBrokerClusterInfo(MQClientAPIImpl.java:1958)
+	at org.apache.rocketmq.tools.admin.DefaultMQAdminExtImpl.examineBrokerClusterInfo(DefaultMQAdminExtImpl.java:565)
+	at org.apache.rocketmq.tools.admin.DefaultMQAdminExt.examineBrokerClusterInfo(DefaultMQAdminExt.java:308)
+	at org.apache.rocketmq.tools.command.cluster.ClusterListSubCommand.execute(ClusterListSubCommand.java:89)
+	... 2 more

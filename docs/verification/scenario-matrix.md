@@ -1,6 +1,39 @@
 # Specification scenario matrix
 
-The mapped Java tests passed on 2026-08-09 as part of the 60-test Maven suite. V1.5 evidence remains in `2026-08-09-v1-5-local.md`; V2 admission and fault evidence is in `2026-08-09-v2-local.md`.
+The V1/V2 mapped Java tests passed on 2026-08-09 as part of the 60-test V2 Maven suite. V2.1 mappings below are source-to-test traceability until the V2.1 release gate records its final execution total. V1.5 evidence remains in `2026-08-09-v1-5-local.md`; V2 admission and fault evidence is in `2026-08-09-v2-local.md`.
+
+## messaging-command-foundation
+
+| Scenario | Mapped test |
+|---|---|
+| Envelope version and serialization compatibility | `OrderCommandContractTest.serializesVersionOneAndRejectsUnsupportedVersion` |
+| Stable private identity and conflicting replay | `OrderCommandContractTest.derivesStableIdentityAndRejectsConflictingReplay` and `CommandLedgerIntegrationTest` |
+| Concurrent ledger claim converges | `CommandLedgerIntegrationTest.concurrentCreateAndClaimConvergesAndTerminalStateCannotBeOverwritten` |
+| Sequential/concurrent duplicate delivery | `OrderCommandConsumerIntegrationTest` duplicate-delivery cases |
+| Interruption before commit | `OrderCommandConsumerIntegrationTest.interruptionBeforeCommitLeavesNoPartialEffect` |
+| Commit before acknowledgement loss | `OrderCommandConsumerIntegrationTest.interruptionAfterCommitBeforeAckReplaysDurableResult` |
+| Synchronous versus command race | `OrderCommandConsumerIntegrationTest.synchronousAndCommandRaceConverges` |
+| Publication result decision matrix | `DeterministicPublicationCoordinatorTest` |
+
+## delayed-expiration-readiness
+
+| Scenario | Mapped test |
+|---|---|
+| Early, duplicate, and paid-order triggers | `DelayedExpirationIntegrationTest` |
+| Missing trigger recovered by scanner | `DelayedExpirationIntegrationTest.missingTriggerIsRecoveredByScanner` |
+| Trigger versus scanner | `DelayedExpirationIntegrationTest.triggerAndScannerRaceClosesOnce` |
+| Payment versus trigger | `DelayedExpirationIntegrationTest.paymentAndTriggerOrderingPreservesTerminalWinner` |
+
+## rocketmq-compatibility-spike
+
+| Scenario | Mapped evidence |
+|---|---|
+| Pinned topology starts and responds to admin probe | `scripts/run-rocketmq-spike.sh` append-only report; status is recorded separately |
+| Duplicate, redelivery, poison, and unsupported envelope | `SyntheticMessagingSpikeTest` |
+| Lost producer response and acknowledgement | `SyntheticMessagingSpikeTest` |
+| Consumer interruption and broker restart classification | `SyntheticMessagingSpikeTest` |
+| Delay observation is bounded and not an SLA | `SyntheticMessagingSpikeTest.failuresAndDelayAreBoundedEvidence` |
+| Reconciled append-only readiness report | `MessagingReadinessReporterTest` |
 
 ## redis-admission-control
 

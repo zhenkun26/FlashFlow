@@ -23,7 +23,7 @@
       "required": ["id", "profile", "strategy", "vus", "durationSeconds", "initialStock", "skuDistribution", "skuCount", "poolSize", "connectionTimeoutMs", "optimisticMaxRetries", "transactionMaxRetries", "transactionSequence", "admissionMode", "heldResolutionSeconds", "redisImage", "scriptVersion", "generation", "injectedFailure"],
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
-        "profile": { "enum": ["local", "lab"] },
+        "profile": { "enum": ["local", "lab", "messaging-spike"] },
         "strategy": { "enum": ["CONDITIONAL_ATOMIC", "PESSIMISTIC", "OPTIMISTIC", "UNSAFE_READ_THEN_WRITE"] },
         "vus": { "type": "integer", "minimum": 1 },
         "durationSeconds": { "type": "integer", "minimum": 1 },
@@ -40,7 +40,21 @@
         "redisImage": { "type": "string", "minLength": 1 },
         "scriptVersion": { "type": "string", "minLength": 1 },
         "generation": { "type": "string", "minLength": 1 },
-        "injectedFailure": { "enum": ["NONE", "REDIS_OUTAGE", "AMBIGUOUS_REPLY", "RESTART_STATE_LOSS", "DUPLICATE_LIFECYCLE", "DRIFT_REBUILD"] }
+        "injectedFailure": { "enum": ["NONE", "REDIS_OUTAGE", "AMBIGUOUS_REPLY", "RESTART_STATE_LOSS", "DUPLICATE_LIFECYCLE", "DRIFT_REBUILD"] },
+        "messaging": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["brokerImage", "clientVersion", "topology", "acknowledgementMode", "producerRetries", "delayMechanism", "injectedFault"],
+          "properties": {
+            "brokerImage": { "const": "apache/rocketmq:5.3.4" },
+            "clientVersion": { "const": "5.3.4-mqadmin" },
+            "topology": { "type": "string", "minLength": 1 },
+            "acknowledgementMode": { "type": "string", "minLength": 1 },
+            "producerRetries": { "type": "integer", "minimum": 0, "maximum": 3 },
+            "delayMechanism": { "type": "string", "minLength": 1 },
+            "injectedFault": { "type": "string", "minLength": 1 }
+          }
+        }
       }
     },
     "comparison": {

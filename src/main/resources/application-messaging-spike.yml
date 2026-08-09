@@ -1,0 +1,5 @@
+flashflow:
+  messaging:
+    mode: SPIKE
+  expiration:
+    scheduling-enabled: false

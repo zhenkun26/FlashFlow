@@ -1,0 +1,13 @@
+java.lang.RuntimeException: SendMessageCommand command failed
+	at org.apache.rocketmq.tools.command.message.SendMessageCommand.execute(SendMessageCommand.java:137)
+	at org.apache.rocketmq.tools.command.MQAdminStartup.main0(MQAdminStartup.java:177)
+	at org.apache.rocketmq.tools.command.MQAdminStartup.main(MQAdminStartup.java:127)
+Caused by: org.apache.rocketmq.client.exception.MQClientException: No route info of this topic: FlashFlowCommandSpike
+See https://rocketmq.apache.org/docs/bestPractice/06FAQ for further details.
+	at org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl.sendDefaultImpl(DefaultMQProducerImpl.java:894)
+	at org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl.send(DefaultMQProducerImpl.java:1613)
+	at org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl.send(DefaultMQProducerImpl.java:1520)
+	at org.apache.rocketmq.client.producer.DefaultMQProducer.sendDirect(DefaultMQProducer.java:764)
+	at org.apache.rocketmq.client.producer.DefaultMQProducer.send(DefaultMQProducer.java:476)
+	at org.apache.rocketmq.tools.command.message.SendMessageCommand.execute(SendMessageCommand.java:133)
+	... 2 more

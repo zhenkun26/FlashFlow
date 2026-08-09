@@ -54,7 +54,8 @@ public record ExperimentManifest(
             String redisImage,
             String scriptVersion,
             String generation,
-            InjectedFailure injectedFailure) {
+            InjectedFailure injectedFailure,
+            Messaging messaging) {
 
         public Case(
                 String id, String profile, FlashFlowProperties.Strategy strategy, int vus,
@@ -65,8 +66,18 @@ public record ExperimentManifest(
                     skuCount, poolSize, connectionTimeoutMs, optimisticMaxRetries,
                     transactionMaxRetries, transactionSequence,
                     FlashFlowProperties.AdmissionMode.MYSQL_ONLY, 30,
-                    "none", "v2-1", "none", InjectedFailure.NONE);
+                    "none", "v2-1", "none", InjectedFailure.NONE, null);
         }
+    }
+
+    public record Messaging(
+            String brokerImage,
+            String clientVersion,
+            String topology,
+            String acknowledgementMode,
+            int producerRetries,
+            String delayMechanism,
+            String injectedFault) {
     }
 
     public record Comparison(String id, Factor factor, List<String> caseIds) {

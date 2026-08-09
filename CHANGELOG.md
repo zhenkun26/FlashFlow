@@ -2,6 +2,21 @@
 
 FlashFlow follows evidence-backed milestone releases. Performance figures below describe controlled local Docker experiments only; they are not production capacity or availability claims.
 
+## V2.1 — Unreleased
+
+### Added
+
+- Added a versioned, transport-neutral order-command envelope, privacy-preserving stable command identity, durable command ledger, and idempotent in-process consumer seam.
+- Added explicit publication ambiguity decisions and a disabled future `202 Accepted`/command-status contract without adding public V3 routes.
+- Unified delayed expiration triggers and the existing database scanner behind one locked, duplicate-safe closure boundary.
+- Added an isolated, pinned RocketMQ 5.3.4 compatibility profile, manifest fields, synthetic fault harness, reconciled readiness reports, and bounded command metrics.
+
+### Boundary
+
+- The normal application remains synchronous and contains no live RocketMQ client, producer, consumer, dispatcher, Transactional Outbox, CDC, or automatic fail-open path.
+- A command-ledger row is not evidence that a message was published. Synthetic fault tests are not broker reliability, delay-SLA, throughput, or production-readiness evidence.
+- Commit, push, OpenSpec archive, and V3 implementation remain separately authorized actions.
+
 ## V2 — 2026-08-09
 
 ### Added

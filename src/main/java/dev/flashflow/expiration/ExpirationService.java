@@ -20,6 +20,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,27 +61,58 @@ public class ExpirationService {
         LocalDateTime now = LocalDateTime.ofInstant(clock.instant(), ZoneOffset.UTC);
         List<OrderRow> orders = orderMapper.findExpiredForUpdate(now, properties.expiration().batchSize());
         int expired = 0;
+        List<String> expiredOrderIds = new ArrayList<>();
         for (OrderRow order : orders) {
-            inventoryMapper.findStockForUpdate(order.activitySkuId());
-            ReservationRow reservation = inventoryMapper.findReservationByOrderForUpdate(order.id());
-            if (reservation == null || !ReservationStatus.RESERVED.name().equals(reservation.status())) {
-                metrics.expirationOutcome("SKIPPED_STATE");
-                continue;
+            if (close(order, now)) {
+                expired++;
+                expiredOrderIds.add(order.id());
             }
-            requireOne(orderMapper.transitionStatus(order.id(), OrderStatus.PENDING_PAYMENT.name(),
-                    OrderStatus.CLOSED_UNPAID.name(), now), "order expiration transition");
-            requireOne(inventoryMapper.transitionReservation(order.id(), ReservationStatus.RELEASED.name(), now),
-                    "reservation release");
-            requireOne(inventoryMapper.releaseStock(order.activitySkuId(), now), "stock release");
-            requireOne(inventoryMapper.insertMovement(UUID.randomUUID().toString(), order.activitySkuId(), order.id(),
-                    "release:" + order.id(), MovementType.RELEASE.name(), 1, -1, 0, now), "release movement");
-            requireOne(orderMapper.deleteClaim(order.activitySkuId(), order.userId(), order.id()), "claim release");
-            registerAdmissionReleaseAfterCommit(order);
-            expired++;
-            metrics.expirationOutcome("EXPIRED");
         }
-        transactionHook.beforeCommit(orders.stream().map(OrderRow::id).toList());
+        transactionHook.beforeCommit(expiredOrderIds);
         return expired;
+    }
+
+    @Transactional
+    public dev.flashflow.messaging.ExpirationTriggerOutcome expireOne(
+            dev.flashflow.messaging.DelayedExpirationEnvelope envelope) {
+        LocalDateTime now = LocalDateTime.ofInstant(clock.instant(), ZoneOffset.UTC);
+        OrderRow order = orderMapper.findByIdForUpdate(envelope.orderId());
+        if (order == null) {
+            metrics.expirationOutcome("TRIGGER_NOT_FOUND");
+            return dev.flashflow.messaging.ExpirationTriggerOutcome.NOT_FOUND;
+        }
+        if (!OrderStatus.PENDING_PAYMENT.name().equals(order.status())) {
+            metrics.expirationOutcome("TRIGGER_SKIPPED_STATE");
+            return dev.flashflow.messaging.ExpirationTriggerOutcome.SKIPPED_STATE;
+        }
+        if (!order.expiresAt().equals(envelope.expectedExpiresAt()) || now.isBefore(order.expiresAt())) {
+            metrics.expirationOutcome("TRIGGER_TOO_EARLY");
+            return dev.flashflow.messaging.ExpirationTriggerOutcome.TOO_EARLY;
+        }
+        boolean closed = close(order, now);
+        transactionHook.beforeCommit(closed ? List.of(order.id()) : List.of());
+        return closed ? dev.flashflow.messaging.ExpirationTriggerOutcome.CLOSED
+                : dev.flashflow.messaging.ExpirationTriggerOutcome.SKIPPED_STATE;
+    }
+
+    private boolean close(OrderRow order, LocalDateTime now) {
+        inventoryMapper.findStockForUpdate(order.activitySkuId());
+        ReservationRow reservation = inventoryMapper.findReservationByOrderForUpdate(order.id());
+        if (reservation == null || !ReservationStatus.RESERVED.name().equals(reservation.status())) {
+            metrics.expirationOutcome("SKIPPED_STATE");
+            return false;
+        }
+        requireOne(orderMapper.transitionStatus(order.id(), OrderStatus.PENDING_PAYMENT.name(),
+                OrderStatus.CLOSED_UNPAID.name(), now), "order expiration transition");
+        requireOne(inventoryMapper.transitionReservation(order.id(), ReservationStatus.RELEASED.name(), now),
+                "reservation release");
+        requireOne(inventoryMapper.releaseStock(order.activitySkuId(), now), "stock release");
+        requireOne(inventoryMapper.insertMovement(UUID.randomUUID().toString(), order.activitySkuId(), order.id(),
+                "release:" + order.id(), MovementType.RELEASE.name(), 1, -1, 0, now), "release movement");
+        requireOne(orderMapper.deleteClaim(order.activitySkuId(), order.userId(), order.id()), "claim release");
+        registerAdmissionReleaseAfterCommit(order);
+        metrics.expirationOutcome("EXPIRED");
+        return true;
     }
 
     private void registerAdmissionReleaseAfterCommit(OrderRow order) {

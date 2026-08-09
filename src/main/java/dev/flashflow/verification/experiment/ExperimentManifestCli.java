@@ -51,5 +51,14 @@ public final class ExperimentManifestCli {
         System.out.println("SCRIPT_VERSION=" + value.scriptVersion());
         System.out.println("GENERATION=" + value.generation());
         System.out.println("INJECTED_FAILURE=" + value.injectedFailure());
+        if (value.messaging() != null) {
+            System.out.println("BROKER_IMAGE=" + value.messaging().brokerImage());
+            System.out.println("CLIENT_VERSION=" + value.messaging().clientVersion());
+            System.out.println("MESSAGING_TOPOLOGY=" + value.messaging().topology());
+            System.out.println("ACKNOWLEDGEMENT_MODE=" + value.messaging().acknowledgementMode());
+            System.out.println("PRODUCER_RETRIES=" + value.messaging().producerRetries());
+            System.out.println("DELAY_MECHANISM=" + value.messaging().delayMechanism());
+            System.out.println("MESSAGING_INJECTED_FAULT=" + value.messaging().injectedFault());
+        }
     }
 }

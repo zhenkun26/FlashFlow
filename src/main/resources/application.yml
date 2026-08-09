@@ -41,6 +41,8 @@ flashflow:
     held-resolution: ${FLASHFLOW_ADMISSION_HELD_RESOLUTION:PT30S}
     script-version: ${FLASHFLOW_ADMISSION_SCRIPT_VERSION:v2-1}
     identity-secret: ${FLASHFLOW_ADMISSION_IDENTITY_SECRET:}
+  messaging:
+    mode: ${FLASHFLOW_MESSAGING_MODE:DISABLED}
 
 management:
   health:

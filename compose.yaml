@@ -1,4 +1,34 @@
 services:
+  rocketmq-namesrv:
+    profiles: ["messaging-spike"]
+    image: apache/rocketmq:5.3.4
+    command: ["sh", "mqnamesrv"]
+    environment:
+      JAVA_OPT_EXT: "-Xms128m -Xmx128m -Xmn64m"
+    ports:
+      - "${FLASHFLOW_ROCKETMQ_NAMESRV_PORT:-9876}:9876"
+    tmpfs:
+      - /home/rocketmq/logs
+
+  rocketmq-broker:
+    profiles: ["messaging-spike"]
+    image: apache/rocketmq:5.3.4
+    depends_on:
+      - rocketmq-namesrv
+    command: ["sh", "mqbroker", "-n", "rocketmq-namesrv:9876", "-c", "/home/rocketmq/conf/broker.conf", "--enable-proxy"]
+    environment:
+      NAMESRV_ADDR: rocketmq-namesrv:9876
+      JAVA_OPT_EXT: "-Xms256m -Xmx256m -Xmn128m"
+    ports:
+      - "${FLASHFLOW_ROCKETMQ_BROKER_PORT:-10911}:10911"
+      - "${FLASHFLOW_ROCKETMQ_FAST_PORT:-10909}:10909"
+      - "${FLASHFLOW_ROCKETMQ_PROXY_GRPC_PORT:-8081}:8081"
+    volumes:
+      - ./docker/rocketmq/broker.conf:/home/rocketmq/conf/broker.conf:ro
+    tmpfs:
+      - /home/rocketmq/store
+      - /home/rocketmq/logs
+
   redis:
     image: redis:7.4.2-alpine
     command: ["redis-server", "--appendonly", "no", "--maxmemory-policy", "noeviction"]

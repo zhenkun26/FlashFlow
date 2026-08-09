@@ -1,0 +1,128 @@
+name: flashflow
+services:
+  mysql:
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+00:00
+      - --transaction-isolation=REPEATABLE-READ
+    environment:
+      MYSQL_DATABASE: flashflow
+      MYSQL_PASSWORD: <redacted-local-default>
+      MYSQL_ROOT_PASSWORD: <redacted-local-default>
+      MYSQL_USER: flashflow
+      TZ: UTC
+    healthcheck:
+      test:
+        - CMD
+        - mysqladmin
+        - ping
+        - -h
+        - 127.0.0.1
+        - -uflashflow
+        - -pflashflow
+      timeout: 3s
+      interval: 5s
+      retries: 20
+      start_period: 15s
+    image: mysql:8.4.6
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 3306
+        published: "3306"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/docker/mysql-data
+        target: /var/lib/mysql
+        bind: {}
+  redis:
+    command:
+      - redis-server
+      - --appendonly
+      - "no"
+      - --maxmemory-policy
+      - noeviction
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      timeout: 3s
+      interval: 5s
+      retries: 20
+      start_period: 5s
+    image: redis:7.4.2-alpine
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 6379
+        published: "6379"
+        protocol: tcp
+  rocketmq-broker:
+    profiles:
+      - messaging-spike
+    command:
+      - sh
+      - mqbroker
+      - -n
+      - rocketmq-namesrv:9876
+      - -c
+      - /home/rocketmq/conf/broker.conf
+      - --enable-proxy
+    depends_on:
+      rocketmq-namesrv:
+        condition: service_started
+        required: true
+    environment:
+      JAVA_OPT_EXT: -Xms256m -Xmx256m -Xmn128m
+      NAMESRV_ADDR: rocketmq-namesrv:9876
+    image: apache/rocketmq:5.3.4
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 10911
+        published: "10911"
+        protocol: tcp
+      - mode: ingress
+        target: 10909
+        published: "10909"
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        published: "8081"
+        protocol: tcp
+    tmpfs:
+      - /home/rocketmq/store
+      - /home/rocketmq/logs
+    volumes:
+      - type: bind
+        source: /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/docker/rocketmq/broker.conf
+        target: /home/rocketmq/conf/broker.conf
+        read_only: true
+        bind: {}
+  rocketmq-namesrv:
+    profiles:
+      - messaging-spike
+    command:
+      - sh
+      - mqnamesrv
+    environment:
+      JAVA_OPT_EXT: -Xms128m -Xmx128m -Xmn64m
+    image: apache/rocketmq:5.3.4
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 9876
+        published: "9876"
+        protocol: tcp
+    tmpfs:
+      - /home/rocketmq/logs
+networks:
+  default:
+    name: flashflow_default

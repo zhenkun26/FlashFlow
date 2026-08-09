@@ -29,3 +29,19 @@ Current V2 workspace snapshot (2026-08-09):
 | Commit / push / publication | PASS | V2 release authorized and published to `origin/main` after the release gates passed |
 
 These PASS statuses are execution evidence, not source-inspection claims. V1.5, V1.6, and V2 working runs disclosed a dirty worktree, and their local Docker/k6 results do not establish a production QPS, availability, persistence, failover, or capacity target. V2 retained two `BLOCKED` setup attempts before the canonical pair passed. The earlier [V1 report](2026-08-08-v1-local.md) remains available as historical evidence.
+
+## Current V2.1 apply-workflow snapshot (2026-08-09)
+
+| Gate | Status | Evidence |
+|---|---|---|
+| Complete Maven/Testcontainers suite | PASS | 80 tests, 0 failures, 0 errors, 0 skipped |
+| Explicit synchronous `MYSQL_ONLY` selection | PASS | 24 core compatibility tests passed |
+| Command and expiration deterministic drills | PASS | Contract, ledger, duplicate/interruption, synchronous race, publication ambiguity, delayed trigger, and scanner race cases passed |
+| Manifest / Compose | PASS | 11 manifest cases validated and the final messaging-spike Compose configuration resolved |
+| RocketMQ 5.3.4 compatibility | PASS | Final append-only report `reports/messaging/20260809T092454Z-rocketmq-spike` recorded registration, `SEND_OK`, matching consumption, and `SYNC_FLUSH` |
+| OpenSpec strict validation | PASS | 7/7 active change and main specifications passed |
+| Clean revision / V3 readiness | BLOCKED | Results belong to a dirty worktree based on `02d224f`; see [V2.1 local report](2026-08-09-v2-1-local.md) |
+| OpenSpec sync/archive | NOT_RUN | Separate workflow after review and a clean revision-bound rerun |
+| Commit / push / publication | NOT_RUN | Separate authorization required |
+
+V2.1 leaves the public runtime synchronous. Its Broker probe is local compatibility evidence, not an application-traffic test or a production reliability, delay-SLA, throughput, or capacity claim.
