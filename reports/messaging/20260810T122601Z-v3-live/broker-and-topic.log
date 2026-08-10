@@ -1,0 +1,46 @@
+rocketmq-broker-1  | Mon Aug 10 11:27:10 UTC 2026 rocketmq-proxy startup successfully
+rocketmq-broker-1  | Mon Aug 10 11:28:16 UTC 2026 rocketmq-proxy startup successfully
+rocketmq-broker-1  | Mon Aug 10 11:33:29 UTC 2026 rocketmq-proxy startup successfully
+rocketmq-broker-1  | Mon Aug 10 11:36:04 UTC 2026 rocketmq-proxy startup successfully
+rocketmq-broker-1  | Mon Aug 10 11:38:01 UTC 2026 rocketmq-proxy startup successfully
+rocketmq-broker-1  | Mon Aug 10 11:39:01 UTC 2026 rocketmq-proxy startup successfully
+rocketmq-broker-1  | Mon Aug 10 12:10:31 UTC 2026 rocketmq-proxy startup successfully
+rocketmq-broker-1  | Mon Aug 10 12:14:25 UTC 2026 rocketmq-proxy startup successfully
+rocketmq-broker-1  | Mon Aug 10 12:16:43 UTC 2026 rocketmq-proxy startup successfully
+rocketmq-broker-1  | Mon Aug 10 12:18:49 UTC 2026 rocketmq-proxy startup successfully
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-command-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-expiration-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-dead-letter-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-command-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-expiration-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-dead-letter-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-command-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-expiration-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-dead-letter-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-command-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-expiration-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-dead-letter-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-command-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-expiration-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-dead-letter-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-command-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-expiration-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]
+rocketmq-topics-1  | create topic to 127.0.0.1:10911 success.
+rocketmq-topics-1  | TopicConfig [topicName=flashflow-order-dead-letter-v1, readQueueNums=8, writeQueueNums=8, perm=RW-, topicFilterType=SINGLE_TAG, topicSysFlag=0, order=false, attributes={}]

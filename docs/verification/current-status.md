@@ -51,11 +51,11 @@ V2.1 leaves the public runtime synchronous. Its Broker probe is local compatibil
 | Gate | Status | Evidence |
 |---|---|---|
 | Complete Maven/Testcontainers suite | PASS | 100 tests, 0 failures, 0 errors, 0 skipped |
-| Real RocketMQ application and fault matrix | PASS | Final append-only report `reports/messaging/20260810T121449Z-v3-live`: 10 live tests passed |
+| Real RocketMQ application and fault matrix | PASS | Revision-bound report `reports/messaging/20260810T122601Z-v3-live`: 10 live tests passed |
 | Deterministic messaging and reconciliation matrix | PASS | Final report: 18 selected tests passed |
 | Controlled local synchronous/V3 comparison | PASS | Acceptance/completion were recorded separately with scope `LOCAL_SINGLE_REQUEST_NOT_CAPACITY`; see [V3 local report](2026-08-10-v3-local.md) |
 | Strict OpenSpec / Compose / source boundary / diff | PASS | Strict change validation, Compose resolution, script syntax, six focused boundary tests, and `git diff --check` passed |
-| Clean attributable V3 revision | NOT_RUN | Current retained evidence records base revision `810f06e` with `dirtyWorktree=true`; no V3 implementation commit has been created |
-| OpenSpec sync/archive and publication | NOT_RUN | Separate authorization and revision-bound gates are still required |
+| Clean attributable V3 revision | PASS | Report records implementation revision `1e66e1b1ebaaccae82d596d493859028434d11c8`, `dirtyWorktree=false`, and `status=PASS`; the same tracked revision passed the 100-test and static gates |
+| OpenSpec sync/archive and publication | NOT_RUN | Specification synchronization, archival, and push remain the next authorized release operations |
 
-V3 implementation behavior is locally verified, but V3 is not yet release-complete. The live report is evidence for a disposable laboratory topology only; it is not a production availability, persistence, delay-SLA, throughput, or capacity claim. Direct publication retains the documented V4 Outbox/CDC boundary.
+V3 implementation and its clean-revision gates are locally verified. OpenSpec synchronization, archival, and publication remain separate release steps. The live report is evidence for a disposable laboratory topology only; it is not a production availability, persistence, delay-SLA, throughput, or capacity claim. Direct publication retains the documented V4 Outbox/CDC boundary.

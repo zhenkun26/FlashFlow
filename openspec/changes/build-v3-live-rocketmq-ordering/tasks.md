@@ -76,4 +76,4 @@
 - [x] 9.4 Update architecture, transaction-boundary, runbook, scenario-matrix, deferred-roadmap, README, changelog, and verification-status documents with exact V3 behavior and the direct-publication/V4 Outbox boundary.
 - [x] 9.5 Add ADRs for explicit live mode, direct-publication acceptance, bounded retry/DLQ, Redis handling of dead-lettered ambiguity, and scanner-backed delayed delivery.
 - [x] 9.6 Run strict OpenSpec validation, Compose resolution, dependency/source boundary checks, and `git diff --check`.
-- [ ] 9.7 Rerun every required V3 gate against one clean attributable implementation revision and record each result as `PASS`, `FAIL`, `BLOCKED`, or `NOT_RUN` before claiming V3 complete.
+- [x] 9.7 Rerun every required V3 gate against one clean attributable implementation revision and record each result as `PASS`, `FAIL`, `BLOCKED`, or `NOT_RUN` before claiming V3 complete.

@@ -1,0 +1,429 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< dev.flashflow:flashflow >-----------------------
+[INFO] Building FlashFlow 0.1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] 1 problem was encountered while building the effective model for org.javassist:javassist:jar:3.21.0-GA during dependency collection step for project (use -X to see details)
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ flashflow ---
+[INFO] Copying 5 resources from src/main/resources to target/classes
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.0:compile (default-compile) @ flashflow ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ flashflow ---
+[INFO] skip non existing resourceDirectory /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.0:testCompile (default-testCompile) @ flashflow ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 46 source files with javac [debug parameters release 21] to target/test-classes
+[WARNING] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/ExpirationAdmissionFailureIntegrationTest.java:[26,6] org.springframework.boot.test.mock.mockito 中的 org.springframework.boot.test.mock.mockito.MockBean 已过时, 且标记为待删除
+[WARNING] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/ExpirationRollbackIntegrationTest.java:[21,6] org.springframework.boot.test.mock.mockito 中的 org.springframework.boot.test.mock.mockito.MockBean 已过时, 且标记为待删除
+[INFO] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/admission/RedisLuaAdmissionFailureTest.java: /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/admission/RedisLuaAdmissionFailureTest.java使用了未经检查或不安全的操作。
+[INFO] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/admission/RedisLuaAdmissionFailureTest.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+[INFO] 
+[INFO] --- surefire:3.5.3:test (default-test) @ flashflow ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running dev.flashflow.V3ControlledComparisonIntegrationTest
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+20:26:19.306 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [dev.flashflow.V3ControlledComparisonIntegrationTest]: V3ControlledComparisonIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:26:19.360 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration dev.flashflow.FlashFlowApplication for test class dev.flashflow.V3ControlledComparisonIntegrationTest
+20:26:19.405 [main] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+20:26:19.406 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+20:26:19.413 [main] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 1.21.3
+20:26:19.494 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+20:26:19.594 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+20:26:19.595 [main] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+20:26:19.606 [main] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+  Server Version: 29.4.1
+  API Version: 1.54
+  Operating System: Docker Desktop
+  Total Memory: 7936 MB
+  Labels: 
+    com.docker.desktop.address=unix:///Users/yuzheng/Library/Containers/com.docker.docker/Data/docker-cli.sock
+20:26:19.701 [main] INFO tc.testcontainers/ryuk:0.12.0 -- Creating container for image: testcontainers/ryuk:0.12.0
+20:26:19.724 [main] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-osxkeychain) does not have credentials for https://index.docker.io/v1/
+20:26:19.772 [main] INFO tc.testcontainers/ryuk:0.12.0 -- Container testcontainers/ryuk:0.12.0 is starting: 1bdfa1d5e29d20abe644e13d100d7a31b4c1212677552a17ce5d607abcb941c9
+20:26:19.884 [main] INFO tc.testcontainers/ryuk:0.12.0 -- Container testcontainers/ryuk:0.12.0 started in PT0.182499S
+20:26:19.887 [main] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+20:26:19.887 [main] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+20:26:19.887 [main] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+20:26:19.888 [main] INFO tc.mysql:8.4.6 -- Creating container for image: mysql:8.4.6
+20:26:19.923 [main] INFO tc.mysql:8.4.6 -- Container mysql:8.4.6 is starting: fa8f7c6ad86626ea25f172074552de42dc4bb0a0fbd4171292a22319c209aaf8
+20:26:20.004 [main] INFO tc.mysql:8.4.6 -- Waiting for database connection to become available at jdbc:mysql://localhost:64541/flashflow using query 'SELECT 1'
+20:26:24.533 [main] INFO tc.mysql:8.4.6 -- Container mysql:8.4.6 started in PT4.644461S
+20:26:24.533 [main] INFO tc.mysql:8.4.6 -- Container is started (JDBC URL: jdbc:mysql://localhost:64541/flashflow)
+20:26:24.533 [main] INFO tc.redis:7.4.2-alpine -- Creating container for image: redis:7.4.2-alpine
+20:26:24.555 [main] INFO tc.redis:7.4.2-alpine -- Container redis:7.4.2-alpine is starting: c7aa0251dc7fc5b61d58deacb237cf4c3e79cf72f4a951a55d19e825bacea2e2
+20:26:24.686 [main] INFO tc.redis:7.4.2-alpine -- Container redis:7.4.2-alpine started in PT0.152415S
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.5)
+
+2026-08-10T20:26:24.813+08:00 INFO  d.f.V3ControlledComparisonIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting V3ControlledComparisonIntegrationTest using Java 26.0.2 with PID 13730 (started by yuzheng in /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow)
+2026-08-10T20:26:24.813+08:00 INFO  d.f.V3ControlledComparisonIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - The following 1 profile is active: "test"
+2026-08-10T20:26:25.183+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-08-10T20:26:25.184+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-08-10T20:26:25.200+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Finished Spring Data repository scanning in 10 ms. Found 0 Redis repository interfaces.
+2026-08-10T20:26:25.420+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat initialized with port 0 (http)
+2026-08-10T20:26:25.428+08:00 INFO  o.a.catalina.core.StandardService request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting service [Tomcat]
+2026-08-10T20:26:25.428+08:00 INFO  o.a.catalina.core.StandardEngine request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting Servlet engine: [Apache Tomcat/10.1.44]
+2026-08-10T20:26:25.450+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring embedded WebApplicationContext
+2026-08-10T20:26:25.451+08:00 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Root WebApplicationContext: initialization completed in 626 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::allocateMemory has been called by io.netty.util.internal.PlatformDependent0$2 (file:/Users/yuzheng/.m2/repository/io/netty/netty-common/4.1.124.Final/netty-common-4.1.124.Final.jar)
+WARNING: Please consider reporting this to the maintainers of class io.netty.util.internal.PlatformDependent0$2
+WARNING: sun.misc.Unsafe::allocateMemory will be removed in a future release
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by io.netty.util.internal.NativeLibraryUtil in an unnamed module (file:/Users/yuzheng/.m2/repository/io/netty/netty-common/4.1.124.Final/netty-common-4.1.124.Final.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2026-08-10T20:26:26.339+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-1 - Starting...
+2026-08-10T20:26:26.449+08:00 INFO  com.zaxxer.hikari.pool.HikariPool request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@74f9004c
+2026-08-10T20:26:26.449+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-1 - Start completed.
+2026-08-10T20:26:26.466+08:00 INFO  org.flywaydb.core.FlywayExecutor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Database: jdbc:mysql://localhost:64541/flashflow (MySQL 8.4)
+2026-08-10T20:26:26.483+08:00 WARN  o.f.c.i.database.base.Database request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Flyway upgrade recommended: MySQL 8.4 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2026-08-10T20:26:26.495+08:00 INFO  o.f.c.i.s.JdbcTableSchemaHistory request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Schema history table `flashflow`.`flyway_schema_history` does not exist yet
+2026-08-10T20:26:26.497+08:00 INFO  o.f.core.internal.command.DbValidate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Successfully validated 3 migrations (execution time 00:00.010s)
+2026-08-10T20:26:26.513+08:00 INFO  o.f.c.i.s.JdbcTableSchemaHistory request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Creating Schema History table `flashflow`.`flyway_schema_history` ...
+2026-08-10T20:26:26.540+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Current version of schema `flashflow`: << Empty Schema >>
+2026-08-10T20:26:26.548+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Migrating schema `flashflow` to version "1 - create flashflow v1 schema"
+2026-08-10T20:26:26.649+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Migrating schema `flashflow` to version "2 - create order command ledger"
+2026-08-10T20:26:26.668+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Migrating schema `flashflow` to version "3 - extend order command transport evidence"
+2026-08-10T20:26:26.696+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Successfully applied 3 migrations to schema `flashflow`, now at version v3 (execution time 00:00.120s)
+2026-08-10T20:26:27.268+08:00 INFO  o.s.b.a.e.web.EndpointLinksResolver request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Exposing 2 endpoints beneath base path '/actuator'
+2026-08-10T20:26:27.334+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat started on port 64609 (http) with context path '/'
+2026-08-10T20:26:27.342+08:00 INFO  d.f.V3ControlledComparisonIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Started V3ControlledComparisonIntegrationTest in 2.643 seconds (process running for 8.305)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/Users/yuzheng/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.7/byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-08-10T20:26:29.909+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-10T20:26:29.909+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Servlet 'dispatcherServlet'
+2026-08-10T20:26:29.909+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Completed initialization in 0 ms
+2026-08-10T20:26:29.985+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=d2997a86-c5fb-4ef4-8dd7-d80b15898f0b idempotency_key=key-control-v3 order_id= user_id=user-control-v3 sku_id=sku-control-v3 payment_tx= - Asynchronous publication command_id=8e4ed7ff3c9abe6f8db7fa36a7e62b6e8c9ff6afb4c2b94a9af856f370d2e45c outcome=BROKER_ACKNOWLEDGED status=ACCEPTED cause=SEND_OK
+2026-08-10T20:26:30.049+08:00 INFO  d.f.V3ControlledComparisonIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - V3_CONTROLLED_COMPARISON sync_acceptance_ms=97.5 sync_completion_ms=97.5 v3_acceptance_ms=26.8 v3_completion_ms=83.6 business_created=2 technical_outcomes=SYNC_CREATED,V3_ACCEPTED_V3_COMPLETED message_observations=ACK_AND_DELIVERY scope=LOCAL_SINGLE_REQUEST_NOT_CAPACITY
+2026-08-10T20:26:30.055+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-10T20:26:32.060+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Graceful shutdown complete
+2026-08-10T20:26:32.060+08:00 ERROR org.apache.tomcat.util.net.Acceptor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Socket accept failed
+java.nio.channels.AsynchronousCloseException: null
+	at java.base/java.nio.channels.spi.AbstractInterruptibleChannel.end(AbstractInterruptibleChannel.java:218)
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.end(ServerSocketChannelImpl.java:372)
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:397)
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:537)
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:72)
+	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:127)
+	at java.base/java.lang.Thread.run(Thread.java:1516)
+2026-08-10T20:26:32.134+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-1 - Shutdown initiated...
+2026-08-10T20:26:32.136+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-1 - Shutdown completed.
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.89 s -- in dev.flashflow.V3ControlledComparisonIntegrationTest
+[INFO] Running dev.flashflow.LiveRocketMqRedeliveryIntegrationTest
+2026-08-10T20:26:32.145+08:00 INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Could not detect default configuration classes for test class [dev.flashflow.LiveRocketMqRedeliveryIntegrationTest]: LiveRocketMqRedeliveryIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-10T20:26:32.146+08:00 INFO  o.s.b.t.c.SpringBootTestContextBootstrapper request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Found @SpringBootConfiguration dev.flashflow.FlashFlowApplication for test class dev.flashflow.LiveRocketMqRedeliveryIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.5)
+
+2026-08-10T20:26:32.163+08:00 INFO  d.f.LiveRocketMqRedeliveryIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting LiveRocketMqRedeliveryIntegrationTest using Java 26.0.2 with PID 13730 (started by yuzheng in /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow)
+2026-08-10T20:26:32.164+08:00 INFO  d.f.LiveRocketMqRedeliveryIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - The following 1 profile is active: "test"
+2026-08-10T20:26:32.265+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-08-10T20:26:32.265+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-08-10T20:26:32.270+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Finished Spring Data repository scanning in 4 ms. Found 0 Redis repository interfaces.
+2026-08-10T20:26:32.292+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat initialized with port 0 (http)
+2026-08-10T20:26:32.293+08:00 INFO  o.a.catalina.core.StandardService request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting service [Tomcat]
+2026-08-10T20:26:32.293+08:00 INFO  o.a.catalina.core.StandardEngine request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting Servlet engine: [Apache Tomcat/10.1.44]
+2026-08-10T20:26:32.300+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring embedded WebApplicationContext
+2026-08-10T20:26:32.300+08:00 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Root WebApplicationContext: initialization completed in 135 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-08-10T20:26:32.332+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-2 - Starting...
+2026-08-10T20:26:32.341+08:00 INFO  com.zaxxer.hikari.pool.HikariPool request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-2 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2cad213d
+2026-08-10T20:26:32.341+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-2 - Start completed.
+2026-08-10T20:26:32.344+08:00 INFO  org.flywaydb.core.FlywayExecutor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Database: jdbc:mysql://localhost:64541/flashflow (MySQL 8.4)
+2026-08-10T20:26:32.348+08:00 WARN  o.f.c.i.database.base.Database request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Flyway upgrade recommended: MySQL 8.4 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2026-08-10T20:26:32.356+08:00 INFO  o.f.core.internal.command.DbValidate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Successfully validated 3 migrations (execution time 00:00.006s)
+2026-08-10T20:26:32.362+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Current version of schema `flashflow`: 3
+2026-08-10T20:26:32.362+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Schema `flashflow` is up to date. No migration necessary.
+2026-08-10T20:26:32.477+08:00 INFO  o.s.b.a.e.web.EndpointLinksResolver request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Exposing 2 endpoints beneath base path '/actuator'
+2026-08-10T20:26:32.483+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat started on port 64644 (http) with context path '/'
+2026-08-10T20:26:32.487+08:00 INFO  d.f.LiveRocketMqRedeliveryIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Started LiveRocketMqRedeliveryIntegrationTest in 0.339 seconds (process running for 13.451)
+2026-08-10T20:26:34.539+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-10T20:26:34.539+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Servlet 'dispatcherServlet'
+2026-08-10T20:26:34.540+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Completed initialization in 1 ms
+2026-08-10T20:26:34.572+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=8d53d8b8-d133-463a-aea3-e70bed56750c idempotency_key=key-redelivery order_id= user_id=user-redelivery sku_id=sku-redelivery payment_tx= - Asynchronous publication command_id=c96a0af58397f512ce41cca417eee9eee47778bff09a3b87e8e8edb9c7e14fe6 outcome=BROKER_ACKNOWLEDGED status=ACCEPTED cause=SEND_OK
+2026-08-10T20:26:54.025+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-10T20:26:56.031+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Graceful shutdown complete
+2026-08-10T20:26:56.031+08:00 ERROR org.apache.tomcat.util.net.Acceptor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Socket accept failed
+java.nio.channels.AsynchronousCloseException: null
+	at java.base/java.nio.channels.spi.AbstractInterruptibleChannel.end(AbstractInterruptibleChannel.java:218) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.end(ServerSocketChannelImpl.java:372) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:397) ~[na:na]
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:537) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:72) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:127) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at java.base/java.lang.Thread.run(Thread.java:1516) ~[na:na]
+2026-08-10T20:26:56.096+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-2 - Shutdown initiated...
+2026-08-10T20:26:56.098+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-2 - Shutdown completed.
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 23.96 s -- in dev.flashflow.LiveRocketMqRedeliveryIntegrationTest
+[INFO] Running dev.flashflow.LiveRocketMqScannerRecoveryIntegrationTest
+2026-08-10T20:26:56.104+08:00 INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Could not detect default configuration classes for test class [dev.flashflow.LiveRocketMqScannerRecoveryIntegrationTest]: LiveRocketMqScannerRecoveryIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-10T20:26:56.106+08:00 INFO  o.s.b.t.c.SpringBootTestContextBootstrapper request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Found @SpringBootConfiguration dev.flashflow.FlashFlowApplication for test class dev.flashflow.LiveRocketMqScannerRecoveryIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.5)
+
+2026-08-10T20:26:56.131+08:00 INFO  d.f.LiveRocketMqScannerRecoveryIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting LiveRocketMqScannerRecoveryIntegrationTest using Java 26.0.2 with PID 13730 (started by yuzheng in /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow)
+2026-08-10T20:26:56.131+08:00 INFO  d.f.LiveRocketMqScannerRecoveryIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - The following 1 profile is active: "test"
+2026-08-10T20:26:56.197+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-08-10T20:26:56.197+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-08-10T20:26:56.201+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Finished Spring Data repository scanning in 3 ms. Found 0 Redis repository interfaces.
+2026-08-10T20:26:56.215+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat initialized with port 0 (http)
+2026-08-10T20:26:56.216+08:00 INFO  o.a.catalina.core.StandardService request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting service [Tomcat]
+2026-08-10T20:26:56.216+08:00 INFO  o.a.catalina.core.StandardEngine request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting Servlet engine: [Apache Tomcat/10.1.44]
+2026-08-10T20:26:56.222+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring embedded WebApplicationContext
+2026-08-10T20:26:56.222+08:00 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Root WebApplicationContext: initialization completed in 90 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-08-10T20:26:56.247+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-3 - Starting...
+2026-08-10T20:26:56.256+08:00 INFO  com.zaxxer.hikari.pool.HikariPool request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-3 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5026a5ba
+2026-08-10T20:26:56.256+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-3 - Start completed.
+2026-08-10T20:26:56.259+08:00 INFO  org.flywaydb.core.FlywayExecutor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Database: jdbc:mysql://localhost:64541/flashflow (MySQL 8.4)
+2026-08-10T20:26:56.262+08:00 WARN  o.f.c.i.database.base.Database request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Flyway upgrade recommended: MySQL 8.4 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2026-08-10T20:26:56.270+08:00 INFO  o.f.core.internal.command.DbValidate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Successfully validated 3 migrations (execution time 00:00.005s)
+2026-08-10T20:26:56.277+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Current version of schema `flashflow`: 3
+2026-08-10T20:26:56.277+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Schema `flashflow` is up to date. No migration necessary.
+2026-08-10T20:26:56.378+08:00 INFO  o.s.b.a.e.web.EndpointLinksResolver request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Exposing 2 endpoints beneath base path '/actuator'
+2026-08-10T20:26:56.383+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat started on port 64743 (http) with context path '/'
+2026-08-10T20:26:56.385+08:00 INFO  d.f.LiveRocketMqScannerRecoveryIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Started LiveRocketMqScannerRecoveryIntegrationTest in 0.278 seconds (process running for 37.352)
+2026-08-10T20:26:58.425+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-10T20:26:58.425+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Servlet 'dispatcherServlet'
+2026-08-10T20:26:58.427+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Completed initialization in 1 ms
+2026-08-10T20:26:58.458+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=ab34ca7f-3a9d-4306-a86a-4e7307cedec8 idempotency_key=key-scanner order_id= user_id=user-scanner sku_id=sku-scanner payment_tx= - Asynchronous publication command_id=eee0647f195fc7bb6cf1d451c8d87694596e127a8cb53b317cb43388331adfa0 outcome=BROKER_ACKNOWLEDGED status=ACCEPTED cause=SEND_OK
+2026-08-10T20:26:59.638+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-10T20:27:01.645+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Graceful shutdown complete
+2026-08-10T20:27:01.645+08:00 ERROR org.apache.tomcat.util.net.Acceptor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Socket accept failed
+java.nio.channels.AsynchronousCloseException: null
+	at java.base/java.nio.channels.spi.AbstractInterruptibleChannel.end(AbstractInterruptibleChannel.java:218) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.end(ServerSocketChannelImpl.java:372) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:397) ~[na:na]
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:537) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:72) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:127) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at java.base/java.lang.Thread.run(Thread.java:1516) ~[na:na]
+2026-08-10T20:27:01.706+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-3 - Shutdown initiated...
+2026-08-10T20:27:01.708+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-3 - Shutdown completed.
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.610 s -- in dev.flashflow.LiveRocketMqScannerRecoveryIntegrationTest
+[INFO] Running dev.flashflow.LiveRocketMqExpirationAckLossIntegrationTest
+2026-08-10T20:27:01.716+08:00 INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Could not detect default configuration classes for test class [dev.flashflow.LiveRocketMqExpirationAckLossIntegrationTest]: LiveRocketMqExpirationAckLossIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-10T20:27:01.717+08:00 INFO  o.s.b.t.c.SpringBootTestContextBootstrapper request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Found @SpringBootConfiguration dev.flashflow.FlashFlowApplication for test class dev.flashflow.LiveRocketMqExpirationAckLossIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.5)
+
+2026-08-10T20:27:01.731+08:00 INFO  d.f.LiveRocketMqExpirationAckLossIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting LiveRocketMqExpirationAckLossIntegrationTest using Java 26.0.2 with PID 13730 (started by yuzheng in /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow)
+2026-08-10T20:27:01.731+08:00 INFO  d.f.LiveRocketMqExpirationAckLossIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - The following 1 profile is active: "test"
+2026-08-10T20:27:01.792+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-08-10T20:27:01.792+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-08-10T20:27:01.796+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Finished Spring Data repository scanning in 3 ms. Found 0 Redis repository interfaces.
+2026-08-10T20:27:01.809+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat initialized with port 0 (http)
+2026-08-10T20:27:01.809+08:00 INFO  o.a.catalina.core.StandardService request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting service [Tomcat]
+2026-08-10T20:27:01.809+08:00 INFO  o.a.catalina.core.StandardEngine request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting Servlet engine: [Apache Tomcat/10.1.44]
+2026-08-10T20:27:01.815+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring embedded WebApplicationContext
+2026-08-10T20:27:01.815+08:00 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Root WebApplicationContext: initialization completed in 83 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-08-10T20:27:01.839+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-4 - Starting...
+2026-08-10T20:27:01.848+08:00 INFO  com.zaxxer.hikari.pool.HikariPool request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-4 - Added connection com.mysql.cj.jdbc.ConnectionImpl@330a0dbb
+2026-08-10T20:27:01.848+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-4 - Start completed.
+2026-08-10T20:27:01.852+08:00 INFO  org.flywaydb.core.FlywayExecutor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Database: jdbc:mysql://localhost:64541/flashflow (MySQL 8.4)
+2026-08-10T20:27:01.856+08:00 WARN  o.f.c.i.database.base.Database request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Flyway upgrade recommended: MySQL 8.4 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2026-08-10T20:27:01.861+08:00 INFO  o.f.core.internal.command.DbValidate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Successfully validated 3 migrations (execution time 00:00.004s)
+2026-08-10T20:27:01.866+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Current version of schema `flashflow`: 3
+2026-08-10T20:27:01.867+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Schema `flashflow` is up to date. No migration necessary.
+2026-08-10T20:27:01.955+08:00 INFO  o.s.b.a.e.web.EndpointLinksResolver request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Exposing 2 endpoints beneath base path '/actuator'
+2026-08-10T20:27:01.959+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat started on port 64777 (http) with context path '/'
+2026-08-10T20:27:01.961+08:00 INFO  d.f.LiveRocketMqExpirationAckLossIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Started LiveRocketMqExpirationAckLossIntegrationTest in 0.242 seconds (process running for 42.928)
+2026-08-10T20:27:04.003+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-10T20:27:04.003+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Servlet 'dispatcherServlet'
+2026-08-10T20:27:04.004+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Completed initialization in 1 ms
+2026-08-10T20:27:04.038+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=fe1bd3f1-169b-41a1-8346-4d7bd8ced46f idempotency_key=key-exp-ack order_id= user_id=user-exp-ack sku_id=sku-exp-ack payment_tx= - Asynchronous publication command_id=9f8bf1c211762fb870c1797adfecf90b73c3e585b6a6245da5b166a09acc6815 outcome=BROKER_ACKNOWLEDGED status=ACCEPTED cause=SEND_OK
+2026-08-10T20:27:23.496+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-10T20:27:25.504+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Graceful shutdown complete
+2026-08-10T20:27:25.504+08:00 ERROR org.apache.tomcat.util.net.Acceptor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Socket accept failed
+java.nio.channels.AsynchronousCloseException: null
+	at java.base/java.nio.channels.spi.AbstractInterruptibleChannel.end(AbstractInterruptibleChannel.java:218) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.end(ServerSocketChannelImpl.java:372) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:397) ~[na:na]
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:537) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:72) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:127) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at java.base/java.lang.Thread.run(Thread.java:1516) ~[na:na]
+2026-08-10T20:27:28.567+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-4 - Shutdown initiated...
+2026-08-10T20:27:28.569+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-4 - Shutdown completed.
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 26.86 s -- in dev.flashflow.LiveRocketMqExpirationAckLossIntegrationTest
+[INFO] Running dev.flashflow.LiveRocketMqRetryExhaustionIntegrationTest
+2026-08-10T20:27:28.575+08:00 INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Could not detect default configuration classes for test class [dev.flashflow.LiveRocketMqRetryExhaustionIntegrationTest]: LiveRocketMqRetryExhaustionIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-10T20:27:28.575+08:00 INFO  o.s.b.t.c.SpringBootTestContextBootstrapper request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Found @SpringBootConfiguration dev.flashflow.FlashFlowApplication for test class dev.flashflow.LiveRocketMqRetryExhaustionIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.5)
+
+2026-08-10T20:27:28.586+08:00 INFO  d.f.LiveRocketMqRetryExhaustionIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting LiveRocketMqRetryExhaustionIntegrationTest using Java 26.0.2 with PID 13730 (started by yuzheng in /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow)
+2026-08-10T20:27:28.586+08:00 INFO  d.f.LiveRocketMqRetryExhaustionIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - The following 1 profile is active: "test"
+2026-08-10T20:27:28.666+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-08-10T20:27:28.666+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-08-10T20:27:28.670+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Finished Spring Data repository scanning in 3 ms. Found 0 Redis repository interfaces.
+2026-08-10T20:27:28.683+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat initialized with port 0 (http)
+2026-08-10T20:27:28.683+08:00 INFO  o.a.catalina.core.StandardService request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting service [Tomcat]
+2026-08-10T20:27:28.683+08:00 INFO  o.a.catalina.core.StandardEngine request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting Servlet engine: [Apache Tomcat/10.1.44]
+2026-08-10T20:27:28.688+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring embedded WebApplicationContext
+2026-08-10T20:27:28.688+08:00 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Root WebApplicationContext: initialization completed in 101 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-08-10T20:27:28.710+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-5 - Starting...
+2026-08-10T20:27:28.720+08:00 INFO  com.zaxxer.hikari.pool.HikariPool request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-5 - Added connection com.mysql.cj.jdbc.ConnectionImpl@4db6794c
+2026-08-10T20:27:28.720+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-5 - Start completed.
+2026-08-10T20:27:28.722+08:00 INFO  org.flywaydb.core.FlywayExecutor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Database: jdbc:mysql://localhost:64541/flashflow (MySQL 8.4)
+2026-08-10T20:27:28.726+08:00 WARN  o.f.c.i.database.base.Database request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Flyway upgrade recommended: MySQL 8.4 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2026-08-10T20:27:28.732+08:00 INFO  o.f.core.internal.command.DbValidate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Successfully validated 3 migrations (execution time 00:00.005s)
+2026-08-10T20:27:28.737+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Current version of schema `flashflow`: 3
+2026-08-10T20:27:28.737+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Schema `flashflow` is up to date. No migration necessary.
+2026-08-10T20:27:28.828+08:00 INFO  o.s.b.a.e.web.EndpointLinksResolver request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Exposing 2 endpoints beneath base path '/actuator'
+2026-08-10T20:27:28.833+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat started on port 64867 (http) with context path '/'
+2026-08-10T20:27:28.835+08:00 INFO  d.f.LiveRocketMqRetryExhaustionIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Started LiveRocketMqRetryExhaustionIntegrationTest in 0.258 seconds (process running for 69.802)
+2026-08-10T20:27:30.875+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-10T20:27:30.876+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Servlet 'dispatcherServlet'
+2026-08-10T20:27:30.877+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Completed initialization in 1 ms
+2026-08-10T20:27:30.914+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=eb3e1baf-2380-4221-94c3-afed3d67d4fd idempotency_key=key-exhaustion order_id= user_id=user-exhaustion sku_id=sku-exhaustion payment_tx= - Asynchronous publication command_id=376c29b67fdb29614b85c23214fb61aff7f3c58a83fd98b5832fbff2e0e36777 outcome=BROKER_ACKNOWLEDGED status=ACCEPTED cause=SEND_OK
+2026-08-10T20:27:40.403+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=438aa50e-9486-4cbd-b32d-55381d5d27ee idempotency_key=key-exhaustion order_id= user_id=user-exhaustion sku_id=sku-exhaustion payment_tx= - Asynchronous publication command_id=376c29b67fdb29614b85c23214fb61aff7f3c58a83fd98b5832fbff2e0e36777 outcome=BROKER_ACKNOWLEDGED status=ACCEPTED cause=SEND_OK
+2026-08-10T20:27:40.408+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-10T20:27:42.414+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Graceful shutdown complete
+2026-08-10T20:27:42.414+08:00 ERROR org.apache.tomcat.util.net.Acceptor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Socket accept failed
+java.nio.channels.AsynchronousCloseException: null
+	at java.base/java.nio.channels.spi.AbstractInterruptibleChannel.end(AbstractInterruptibleChannel.java:218) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.end(ServerSocketChannelImpl.java:372) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:397) ~[na:na]
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:537) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:72) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:127) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at java.base/java.lang.Thread.run(Thread.java:1516) ~[na:na]
+2026-08-10T20:27:43.800+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-5 - Shutdown initiated...
+2026-08-10T20:27:43.802+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-5 - Shutdown completed.
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.23 s -- in dev.flashflow.LiveRocketMqRetryExhaustionIntegrationTest
+[INFO] Running dev.flashflow.LiveRocketMqEndToEndIntegrationTest
+2026-08-10T20:27:43.812+08:00 INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Could not detect default configuration classes for test class [dev.flashflow.LiveRocketMqEndToEndIntegrationTest]: LiveRocketMqEndToEndIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-10T20:27:43.814+08:00 INFO  o.s.b.t.c.SpringBootTestContextBootstrapper request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Found @SpringBootConfiguration dev.flashflow.FlashFlowApplication for test class dev.flashflow.LiveRocketMqEndToEndIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.5)
+
+2026-08-10T20:27:43.832+08:00 INFO  d.f.LiveRocketMqEndToEndIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting LiveRocketMqEndToEndIntegrationTest using Java 26.0.2 with PID 13730 (started by yuzheng in /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow)
+2026-08-10T20:27:43.832+08:00 INFO  d.f.LiveRocketMqEndToEndIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - The following 1 profile is active: "test"
+2026-08-10T20:27:43.905+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-08-10T20:27:43.905+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-08-10T20:27:43.909+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Finished Spring Data repository scanning in 3 ms. Found 0 Redis repository interfaces.
+2026-08-10T20:27:43.921+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat initialized with port 0 (http)
+2026-08-10T20:27:43.921+08:00 INFO  o.a.catalina.core.StandardService request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting service [Tomcat]
+2026-08-10T20:27:43.921+08:00 INFO  o.a.catalina.core.StandardEngine request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting Servlet engine: [Apache Tomcat/10.1.44]
+2026-08-10T20:27:43.926+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring embedded WebApplicationContext
+2026-08-10T20:27:43.926+08:00 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Root WebApplicationContext: initialization completed in 93 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-08-10T20:27:43.945+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-6 - Starting...
+2026-08-10T20:27:43.951+08:00 INFO  com.zaxxer.hikari.pool.HikariPool request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-6 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6048cacf
+2026-08-10T20:27:43.951+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-6 - Start completed.
+2026-08-10T20:27:43.952+08:00 INFO  org.flywaydb.core.FlywayExecutor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Database: jdbc:mysql://localhost:64541/flashflow (MySQL 8.4)
+2026-08-10T20:27:43.956+08:00 WARN  o.f.c.i.database.base.Database request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Flyway upgrade recommended: MySQL 8.4 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2026-08-10T20:27:43.959+08:00 INFO  o.f.core.internal.command.DbValidate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Successfully validated 3 migrations (execution time 00:00.002s)
+2026-08-10T20:27:43.961+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Current version of schema `flashflow`: 3
+2026-08-10T20:27:43.962+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Schema `flashflow` is up to date. No migration necessary.
+2026-08-10T20:27:44.062+08:00 INFO  o.s.b.a.e.web.EndpointLinksResolver request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Exposing 2 endpoints beneath base path '/actuator'
+2026-08-10T20:27:44.066+08:00 INFO  o.s.b.w.e.tomcat.TomcatWebServer request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Tomcat started on port 64927 (http) with context path '/'
+2026-08-10T20:27:44.068+08:00 INFO  d.f.LiveRocketMqEndToEndIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Started LiveRocketMqEndToEndIntegrationTest in 0.251 seconds (process running for 85.036)
+2026-08-10T20:27:46.102+08:00 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-10T20:27:46.103+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Initializing Servlet 'dispatcherServlet'
+2026-08-10T20:27:46.103+08:00 INFO  o.s.web.servlet.DispatcherServlet request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Completed initialization in 0 ms
+2026-08-10T20:27:46.124+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=5a4d066f-625d-4756-8b70-d75ad5cde8d5 idempotency_key=key-live order_id= user_id=user-live sku_id=sku-live payment_tx= - Asynchronous publication command_id=e2b2c6feda34496e10ea7b5ef6bac451b4866cb9855d6437ce0a2391eb523024 outcome=BROKER_ACKNOWLEDGED status=ACCEPTED cause=SEND_OK
+2026-08-10T20:27:51.460+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=22e8646b-fc84-47e2-b1e8-70421b3f6ef2 idempotency_key=key-contract order_id= user_id=user-contract sku_id=sku-contract-a payment_tx= - Asynchronous publication command_id=1d32e54b7bda4a365a35f17783a2bfbf36e9b66768e6a459d06acbb43229669e outcome=BROKER_ACKNOWLEDGED status=ACCEPTED cause=SEND_OK
+2026-08-10T20:28:08.663+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=e493953f-4cc8-4463-9984-64f29c737f50 idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:08.761+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=784471e9-df12-45b8-9933-89429937e0d0 idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:08.881+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=0ce88d54-b2d4-4cc9-8d83-0e84f0890b70 idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:08.999+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=6c74382a-066a-46da-aaab-8b232ad069d0 idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:09.113+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=971cc833-889a-4b36-a7cc-ab39f1a0c7fb idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:09.227+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=2e9a7da0-6e99-4a68-8665-d46980905c90 idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:09.353+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=a4f8d475-3877-4a5d-8850-f982df3a8453 idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:09.483+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=64adb23d-d54a-4597-8049-6af890405fc2 idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:09.609+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=e3f48076-9300-43d3-895b-95595d590ba0 idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:09.727+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=6d66cec8-810f-46fe-b980-4189bd57566d idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:09.846+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=1b1125c2-9b3b-4379-b615-b1c0a675625f idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:09.965+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=b86d7131-0a75-4a7d-b958-e2940d35ced3 idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:10.082+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=ef41814b-60ac-4b9a-bb73-5135407732b7 idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:10.203+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=58f7708e-bee0-495c-9d31-89add018342c idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:10.323+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=664c533b-e27c-4084-a4d0-d9c52d9769ee idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=MQCLIENTEXCEPTION
+2026-08-10T20:28:10.461+08:00 INFO  d.f.m.AsyncOrderApplicationService request_id=c7a83ad2-ea28-48d4-90d9-41a3759985bd idempotency_key=key-restart order_id= user_id=user-restart sku_id=sku-restart payment_tx= - Asynchronous publication command_id=2129137347b6094d6fc3ec75cff8503279f4ba7e08e97b9af841e406d2908eeb outcome=BROKER_ACKNOWLEDGED status=ACCEPTED cause=SEND_OK
+2026-08-10T20:28:11.409+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-10T20:28:13.415+08:00 INFO  o.s.b.w.e.tomcat.GracefulShutdown request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Graceful shutdown complete
+2026-08-10T20:28:13.415+08:00 ERROR org.apache.tomcat.util.net.Acceptor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Socket accept failed
+java.nio.channels.AsynchronousCloseException: null
+	at java.base/java.nio.channels.spi.AbstractInterruptibleChannel.end(AbstractInterruptibleChannel.java:218) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.end(ServerSocketChannelImpl.java:372) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:397) ~[na:na]
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:537) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:72) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:127) ~[tomcat-embed-core-10.1.44.jar:10.1.44]
+	at java.base/java.lang.Thread.run(Thread.java:1516) ~[na:na]
+2026-08-10T20:28:16.460+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-6 - Shutdown initiated...
+2026-08-10T20:28:16.461+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-6 - Shutdown completed.
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 32.65 s -- in dev.flashflow.LiveRocketMqEndToEndIntegrationTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:59 min
+[INFO] Finished at: 2026-08-10T20:28:16+08:00
+[INFO] ------------------------------------------------------------------------
