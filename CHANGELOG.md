@@ -21,7 +21,7 @@ FlashFlow follows evidence-backed milestone releases. Performance figures below 
 
 - Synchronized all six V3 capability deltas into the main specifications after the clean-revision 100-test, live RocketMQ, deterministic messaging, Compose, source-boundary, and strict OpenSpec gates passed.
 - Archived change: `2026-08-10-build-v3-live-rocketmq-ordering` with 53/53 tasks complete.
-- External publication status is recorded separately after remote synchronization.
+- Published the tested implementation, revision-bound evidence, synchronized main specs, and archived change to `origin/main` through `69918c9`.
 
 ## V2.1 — 2026-08-09
 

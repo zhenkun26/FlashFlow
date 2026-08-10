@@ -57,6 +57,6 @@ V2.1 leaves the public runtime synchronous. Its Broker probe is local compatibil
 | Strict OpenSpec / Compose / source boundary / diff | PASS | Strict change validation, Compose resolution, script syntax, six focused boundary tests, and `git diff --check` passed |
 | Clean attributable V3 revision | PASS | Report records implementation revision `1e66e1b1ebaaccae82d596d493859028434d11c8`, `dirtyWorktree=false`, and `status=PASS`; the same tracked revision passed the 100-test and static gates |
 | OpenSpec sync/archive | PASS | Six deltas synchronized; archived as `2026-08-10-build-v3-live-rocketmq-ordering` with 53/53 tasks; post-archive strict validation passed 9/9 main specs |
-| Commit / push / publication | NOT_RUN | Implementation and evidence commits exist locally; remote synchronization has not yet been executed |
+| Commit / push / publication | PASS | V3 implementation, revision-bound evidence, and OpenSpec sync/archive were pushed to `origin/main` through `69918c9` |
 
-V3 implementation, clean-revision gates, specification synchronization, and archival are complete locally. Publication remains a separate release step. The live report is evidence for a disposable laboratory topology only; it is not a production availability, persistence, delay-SLA, throughput, or capacity claim. Direct publication retains the documented V4 Outbox/CDC boundary.
+V3 implementation, clean-revision gates, specification synchronization, archival, and publication are complete. The live report is evidence for a disposable laboratory topology only; it is not a production availability, persistence, delay-SLA, throughput, or capacity claim. Direct publication retains the documented V4 Outbox/CDC boundary.
