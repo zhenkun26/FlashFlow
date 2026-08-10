@@ -2,7 +2,7 @@
 
 FlashFlow follows evidence-backed milestone releases. Performance figures below describe controlled local Docker experiments only; they are not production capacity or availability claims.
 
-## V3 — implementation verification in progress, 2026-08-10
+## V3 — 2026-08-10
 
 ### Added
 
@@ -15,7 +15,13 @@ FlashFlow follows evidence-backed milestone releases. Performance figures below 
 
 - Direct publication can leave prepared or unresolved work across a process failure; V3 does not claim eventual publication without V4 Outbox/CDC.
 - Dead-lettering does not prove that no prior delivery committed and therefore does not automatically return Redis capacity.
-- Final release status remains separate from source implementation until the complete suite, live fault matrix, characterization, and clean-revision evidence pass.
+- The clean revision gates establish local implementation evidence only; production availability, persistence, delay SLA, throughput, and capacity remain outside the claim boundary.
+
+### OpenSpec
+
+- Synchronized all six V3 capability deltas into the main specifications after the clean-revision 100-test, live RocketMQ, deterministic messaging, Compose, source-boundary, and strict OpenSpec gates passed.
+- Archived change: `2026-08-10-build-v3-live-rocketmq-ordering` with 53/53 tasks complete.
+- External publication status is recorded separately after remote synchronization.
 
 ## V2.1 — 2026-08-09
 
