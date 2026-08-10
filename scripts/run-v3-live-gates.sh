@@ -10,12 +10,12 @@ if [[ -e "${report_dir}" ]]; then
   echo "Refusing to overwrite existing report: ${report_dir}" >&2
   exit 2
 fi
-mkdir -p "${report_dir}"
 
 revision="$(git rev-parse HEAD)"
 dirty="false"
 if [[ -n "$(git status --short)" ]]; then dirty="true"; fi
 started_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+mkdir -p "${report_dir}"
 
 finish() {
   local exit_code=$?
