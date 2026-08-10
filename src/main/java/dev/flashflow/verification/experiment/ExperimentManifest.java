@@ -77,6 +77,29 @@ public record ExperimentManifest(
             String acknowledgementMode,
             int producerRetries,
             String delayMechanism,
+            String injectedFault,
+            LiveMessaging live) {
+        public Messaging(String brokerImage, String clientVersion, String topology,
+                         String acknowledgementMode, int producerRetries,
+                         String delayMechanism, String injectedFault) {
+            this(brokerImage, clientVersion, topology, acknowledgementMode,
+                    producerRetries, delayMechanism, injectedFault, null);
+        }
+    }
+
+    public record LiveMessaging(
+            String mode,
+            String brokerVersion,
+            String namesrvAddr,
+            String orderTopic,
+            String orderConsumerGroup,
+            String expirationTopic,
+            String expirationConsumerGroup,
+            String deadLetterTopic,
+            int sendTimeoutMs,
+            int maxReconsumeTimes,
+            int delayLevel,
+            int drainSeconds,
             String injectedFault) {
     }
 

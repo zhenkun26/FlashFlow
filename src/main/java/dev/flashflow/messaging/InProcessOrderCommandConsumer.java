@@ -5,6 +5,7 @@ import dev.flashflow.ordering.OrderResult;
 import dev.flashflow.ordering.OrderResultCode;
 import dev.flashflow.ordering.PlaceOrderCommand;
 import dev.flashflow.shared.FlashFlowMetrics;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,12 +13,22 @@ public final class InProcessOrderCommandConsumer implements OrderCommandConsumer
     private final CommandLedgerService ledger;
     private final OrderCommandExecutor ordering;
     private final FlashFlowMetrics metrics;
+    private final ExpirationMessagePublisher expirations;
 
+    @Autowired
     public InProcessOrderCommandConsumer(
-            CommandLedgerService ledger, OrderCommandExecutor ordering, FlashFlowMetrics metrics) {
+            CommandLedgerService ledger, OrderCommandExecutor ordering, FlashFlowMetrics metrics,
+            ExpirationMessagePublisher expirations) {
         this.ledger = ledger;
         this.ordering = ordering;
         this.metrics = metrics;
+        this.expirations = expirations;
+    }
+
+    public InProcessOrderCommandConsumer(
+            CommandLedgerService ledger, OrderCommandExecutor ordering, FlashFlowMetrics metrics) {
+        this(ledger, ordering, metrics, envelope -> new PublicationResult(
+                PublicationOutcome.DEFINITELY_NOT_PUBLISHED, "TEST_DISABLED"));
     }
 
     @Override
@@ -47,6 +58,12 @@ public final class InProcessOrderCommandConsumer implements OrderCommandConsumer
                 default -> CommandStatus.REJECTED;
             };
             row = ledger.finish(envelope.commandId(), terminal, result.code().name(), result.orderId());
+            if (result.code() == OrderResultCode.CREATED && result.orderId() != null && result.expiresAt() != null) {
+                PublicationResult publication = expirations.publish(new DelayedExpirationEnvelope(
+                        DelayedExpirationEnvelope.CURRENT_SCHEMA_VERSION, result.orderId(),
+                        result.expiresAt(), envelope.traceId()));
+                metrics.expirationTrigger("AFTER_COMMIT_" + publication.outcome().name());
+            }
             metrics.command("CONSUME", ConsumerOutcome.ACKNOWLEDGED.name());
             return from(row);
         } catch (RuntimeException failure) {

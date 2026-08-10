@@ -1,5 +1,6 @@
 package dev.flashflow.shared.web;
 
+import dev.flashflow.messaging.CommandConflictException;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -15,6 +16,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    @ExceptionHandler(CommandConflictException.class)
+    public ResponseEntity<ApiError> commandConflict(CommandConflictException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError(
+                "COMMAND_CONFLICT", "Command identity conflicts with the original payload",
+                Instant.now(), Map.of()));
+    }
 
     @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class,
             MissingRequestHeaderException.class, HttpMessageNotReadableException.class,
@@ -36,4 +44,3 @@ public class ApiExceptionHandler {
                 "INTERNAL_ERROR", "The request could not be completed", Instant.now(), Map.of()));
     }
 }
-

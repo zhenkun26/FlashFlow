@@ -21,6 +21,7 @@ public class MySqlAdmissionSnapshotService {
         var stock = mapper.findStock(skuId);
         if (stock == null) throw new IllegalArgumentException("Unknown activity SKU: " + skuId);
         return new MySqlAdmissionFacts(clock.instant(), stock,
-                mapper.findEffectiveOrders(skuId), mapper.findAllOrderIdempotency());
+                mapper.findEffectiveOrders(skuId), mapper.findAllOrderIdempotency(),
+                mapper.findCommands(skuId));
     }
 }

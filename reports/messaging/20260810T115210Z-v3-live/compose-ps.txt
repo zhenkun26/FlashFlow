@@ -1,0 +1,7 @@
+NAME                              IMAGE                   COMMAND                  SERVICE               CREATED          STATUS                              PORTS
+flashflow-mysql-1                 mysql:8.4.6             "docker-entrypoint.s…"   mysql                 40 minutes ago   Up 40 minutes (healthy)             0.0.0.0:33306->3306/tcp, [::]:33306->3306/tcp
+flashflow-redis-1                 redis:7.4.2-alpine      "docker-entrypoint.s…"   redis                 40 minutes ago   Up 40 minutes (healthy)             0.0.0.0:36379->6379/tcp, [::]:36379->6379/tcp
+flashflow-rocketmq-broker-1       apache/rocketmq:5.3.4   "./docker-entrypoint…"   rocketmq-broker       25 minutes ago   Up 13 minutes                       0.0.0.0:8081->8081/tcp, [::]:8081->8081/tcp, 0.0.0.0:10909->10909/tcp, [::]:10909->10909/tcp, 0.0.0.0:10911->10911/tcp, [::]:10911->10911/tcp
+flashflow-rocketmq-namesrv-1      apache/rocketmq:5.3.4   "./docker-entrypoint…"   rocketmq-namesrv      39 minutes ago   Up 39 minutes                       0.0.0.0:9876->9876/tcp, [::]:9876->9876/tcp
+flashflow-rocketmq-store-init-1   apache/rocketmq:5.3.4   "sh -c 'mkdir -p /ho…"   rocketmq-store-init   25 minutes ago   Exited (0) 14 seconds ago           
+flashflow-rocketmq-topics-1       apache/rocketmq:5.3.4   "sh -c 'until sh mqa…"   rocketmq-topics       25 minutes ago   Exited (0) Less than a second ago   

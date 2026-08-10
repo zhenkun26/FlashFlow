@@ -47,3 +47,15 @@ A delivery is acknowledged only after its terminal result is durably recoverable
 ## ADR-012: Delayed delivery is an accelerator; the scanner remains the safety net
 
 Both a delayed trigger and the bounded database scanner call the same order-specific expiration boundary. That boundary locks and rechecks committed order state and `expiresAt` before closing. Missing, early, duplicate, or racing triggers cannot bypass those checks; the scanner remains enabled in V3 to recover a missing message.
+
+## ADR-013: Live messaging is explicit and rollback is configuration-only
+
+Only `FLASHFLOW_MESSAGING_MODE=LIVE` creates RocketMQ clients and exposes the asynchronous route. `DISABLED` creates no Broker connection and preserves `/api/v1/orders`. Startup rejects incomplete, shared-topic, shared-group, unpinned, or contradictory live configuration.
+
+## ADR-014: V3 uses bounded direct publication and preserves the Outbox comparison
+
+The producer writes or reuses durable command identity, acquires admission, then publishes directly. Only Broker `SEND_OK` permits `202`; definitive no-publication can release admission, while timeout or lost acknowledgement becomes `UNRESOLVED` and quarantines capacity. A prepared row is not a publish queue, so process-crash eventual delivery remains a V4 concern.
+
+## ADR-015: Retry exhaustion is visible but not business truth
+
+Transient delivery failures receive a bounded Broker retry budget. Poison, unsupported, or exhausted messages are copied to a dedicated dead-letter topic with command ID, schema, source, attempt, and bounded reason evidence. DLQ disposition alone cannot prove whether MySQL previously committed and therefore cannot authorize automatic capacity release.

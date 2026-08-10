@@ -43,6 +43,23 @@ flashflow:
     identity-secret: ${FLASHFLOW_ADMISSION_IDENTITY_SECRET:}
   messaging:
     mode: ${FLASHFLOW_MESSAGING_MODE:DISABLED}
+    namesrv-addr: ${FLASHFLOW_ROCKETMQ_NAMESRV_ADDR:127.0.0.1:9876}
+    client-version: "5.3.3"
+    broker-version: "5.3.4"
+    producer-group: ${FLASHFLOW_ROCKETMQ_PRODUCER_GROUP:flashflow-v3-producer}
+    order-topic: ${FLASHFLOW_ROCKETMQ_ORDER_TOPIC:flashflow-order-command-v1}
+    order-consumer-group: ${FLASHFLOW_ROCKETMQ_ORDER_GROUP:flashflow-order-consumer-v1}
+    expiration-topic: ${FLASHFLOW_ROCKETMQ_EXPIRATION_TOPIC:flashflow-expiration-v1}
+    expiration-consumer-group: ${FLASHFLOW_ROCKETMQ_EXPIRATION_GROUP:flashflow-expiration-consumer-v1}
+    dead-letter-topic: ${FLASHFLOW_ROCKETMQ_DEAD_LETTER_TOPIC:flashflow-order-dead-letter-v1}
+    send-timeout: ${FLASHFLOW_ROCKETMQ_SEND_TIMEOUT:3s}
+    producer-retries: ${FLASHFLOW_ROCKETMQ_PRODUCER_RETRIES:1}
+    max-reconsume-times: ${FLASHFLOW_ROCKETMQ_MAX_RECONSUME_TIMES:3}
+    delay-level: ${FLASHFLOW_ROCKETMQ_DELAY_LEVEL:14}
+    drain-timeout: ${FLASHFLOW_ROCKETMQ_DRAIN_TIMEOUT:30s}
+    consume-from: ${FLASHFLOW_ROCKETMQ_CONSUME_FROM:FIRST}
+    acknowledgement: SYNC_FLUSH
+    injected-fault: ${FLASHFLOW_MESSAGING_INJECTED_FAULT:NONE}
 
 management:
   health:

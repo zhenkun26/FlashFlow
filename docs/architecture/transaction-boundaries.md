@@ -49,3 +49,8 @@ A successful callback after `CLOSED_UNPAID` records payment as `REFUND_REQUIRED`
 The runner scans a bounded ordered batch with `FOR UPDATE SKIP LOCKED`. For each eligible order, the same transaction commits `PENDING_PAYMENT -> CLOSED_UNPAID`, `RESERVED -> RELEASED`, reserved-to-available stock movement, ledger row, and purchase-claim removal.
 
 The scheduler is an adapter. The transaction remains in `ExpirationService`, so direct invocation and scheduled invocation have identical semantics.
+# V3 messaging boundaries
+
+The asynchronous request prepares command identity and performs Redis admission before direct Broker publication. These are deliberately not one atomic transaction. `202` requires Broker acknowledgement; an ambiguous acknowledgement retains or quarantines admission under the stable command identity.
+
+The order consumer acknowledges only after the existing MySQL ordering transaction and command terminal result are recoverable. Delayed expiration is published only after the order transaction returns committed success. Failure to publish a trigger cannot roll back the order; the scanner remains the recovery boundary.

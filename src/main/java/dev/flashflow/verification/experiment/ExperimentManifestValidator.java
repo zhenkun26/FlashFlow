@@ -60,8 +60,8 @@ public final class ExperimentManifestValidator {
         if (value.id() == null || !value.id().matches("[a-z0-9][a-z0-9-]*")) {
             errors.add(prefix + "id must be kebab-case");
         }
-        if (!Set.of("local", "lab", "messaging-spike").contains(value.profile())) {
-            errors.add(prefix + "profile must be local, lab, or messaging-spike");
+        if (!Set.of("local", "lab", "messaging-spike", "messaging-live").contains(value.profile())) {
+            errors.add(prefix + "profile must be local, lab, messaging-spike, or messaging-live");
         }
         if (value.strategy() == null) {
             errors.add(prefix + "strategy is required");
@@ -115,16 +115,17 @@ public final class ExperimentManifestValidator {
                 && value.skuCount() < 2) {
             errors.add(prefix + value.skuDistribution() + " requires skuCount>=2");
         }
-        if ("messaging-spike".equals(value.profile())) {
+        if ("messaging-spike".equals(value.profile()) || "messaging-live".equals(value.profile())) {
             ExperimentManifest.Messaging messaging = value.messaging();
             if (messaging == null) {
-                errors.add(prefix + "messaging-spike profile requires messaging inputs");
+                errors.add(prefix + value.profile() + " profile requires messaging inputs");
             } else {
                 if (!"apache/rocketmq:5.3.4".equals(messaging.brokerImage())) {
                     errors.add(prefix + "brokerImage must pin apache/rocketmq:5.3.4");
                 }
-                if (!"5.3.4-mqadmin".equals(messaging.clientVersion())) {
-                    errors.add(prefix + "clientVersion must pin 5.3.4-mqadmin");
+                String expectedClient = "messaging-live".equals(value.profile()) ? "5.3.3" : "5.3.4-mqadmin";
+                if (!expectedClient.equals(messaging.clientVersion())) {
+                    errors.add(prefix + "clientVersion must pin " + expectedClient);
                 }
                 if (messaging.producerRetries() < 0 || messaging.producerRetries() > 3) {
                     errors.add(prefix + "producerRetries must be between 0 and 3");
@@ -135,10 +136,35 @@ public final class ExperimentManifestValidator {
                         || messaging.injectedFault() == null || messaging.injectedFault().isBlank()) {
                     errors.add(prefix + "messaging inputs must be complete");
                 }
+                if ("messaging-live".equals(value.profile())) validateLive(prefix, messaging.live(), errors);
             }
         } else if (value.messaging() != null) {
-            errors.add(prefix + "messaging inputs require messaging-spike profile");
+            errors.add(prefix + "messaging inputs require a messaging profile");
         }
+    }
+
+    private static void validateLive(
+            String prefix, ExperimentManifest.LiveMessaging live, List<String> errors) {
+        if (live == null) {
+            errors.add(prefix + "messaging-live requires live inputs");
+            return;
+        }
+        if (!"LIVE".equals(live.mode()) || !"5.3.4".equals(live.brokerVersion())) {
+            errors.add(prefix + "live mode and brokerVersion must be pinned");
+        }
+        if (live.namesrvAddr() == null || live.namesrvAddr().isBlank()
+                || live.orderTopic() == null || live.orderTopic().isBlank()
+                || live.orderConsumerGroup() == null || live.orderConsumerGroup().isBlank()
+                || live.expirationTopic() == null || live.expirationTopic().isBlank()
+                || live.expirationConsumerGroup() == null || live.expirationConsumerGroup().isBlank()
+                || live.deadLetterTopic() == null || live.deadLetterTopic().isBlank()
+                || live.injectedFault() == null || live.injectedFault().isBlank()) {
+            errors.add(prefix + "live topic, group, endpoint, and fault inputs must be complete");
+        }
+        range(prefix, "sendTimeoutMs", live.sendTimeoutMs(), 1, 60000, errors);
+        range(prefix, "maxReconsumeTimes", live.maxReconsumeTimes(), 0, 100, errors);
+        range(prefix, "delayLevel", live.delayLevel(), 1, 18, errors);
+        range(prefix, "drainSeconds", live.drainSeconds(), 1, 3600, errors);
     }
 
     private static void validateComparison(

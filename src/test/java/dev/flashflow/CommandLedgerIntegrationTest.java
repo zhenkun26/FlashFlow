@@ -33,7 +33,7 @@ class CommandLedgerIntegrationTest extends MySqlIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM order_command_ledger", Integer.class)).isEqualTo(1);
         assertThat(ledger.claim(envelope.commandId())).isTrue();
         ledger.finish(envelope.commandId(), CommandStatus.REJECTED, "SOLD_OUT", null);
-        assertThat(mapper.markNonTerminal(envelope.commandId(), "UNRESOLVED",
+        assertThat(mapper.markNonTerminal(envelope.commandId(), "UNRESOLVED", "LATE_ACK", 0,
                 LocalDateTime.now(ZoneOffset.UTC))).isZero();
         assertThat(ledger.summary(envelope.commandId()).status()).isEqualTo(CommandStatus.REJECTED);
     }

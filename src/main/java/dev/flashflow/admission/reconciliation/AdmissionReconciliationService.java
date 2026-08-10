@@ -6,6 +6,7 @@ import dev.flashflow.admission.AdmissionGenerationSnapshot;
 import dev.flashflow.admission.AdmissionIdentity;
 import dev.flashflow.admission.AdmissionRecordView;
 import dev.flashflow.admission.AdmissionState;
+import dev.flashflow.admission.persistence.CommandAdmissionRow;
 import dev.flashflow.ordering.persistence.IdempotencyRow;
 import dev.flashflow.shared.FlashFlowMetrics;
 import java.io.IOException;
@@ -97,6 +98,8 @@ public class AdmissionReconciliationService {
             idempotencyByAdmission.put(identities.admissionId(
                     row.operationName(), row.callerId(), row.idempotencyKey()), row);
         }
+        Map<String, CommandAdmissionRow> commandByAdmission = new HashMap<>();
+        facts.commands().forEach(command -> commandByAdmission.put(command.commandId(), command));
 
         Map<String, Long> discrepancies = new LinkedHashMap<>();
         Map<String, Long> actions = new LinkedHashMap<>();
@@ -129,6 +132,7 @@ public class AdmissionReconciliationService {
         for (AdmissionRecordView record : oldRecords) {
             if (effectiveUsers.containsKey(record.userDigest())) continue;
             IdempotencyRow durable = idempotencyByAdmission.get(record.admissionId());
+            CommandAdmissionRow command = commandByAdmission.get(record.admissionId());
             if (record.state() == AdmissionState.CONFIRMED) {
                 increment(discrepancies, "ORPHANED_CONFIRMED");
                 increment(actions, "DROP_STALE");
@@ -139,7 +143,7 @@ public class AdmissionReconciliationService {
                 increment(actions, "RELEASE_PROVEN");
             } else {
                 unresolved++;
-                increment(discrepancies, "AMBIGUOUS_HELD");
+                increment(discrepancies, commandClassification(command));
                 seeds.add(new AdmissionRecordView(record.admissionId(), record.userDigest(),
                         AdmissionState.QUARANTINED, record.resolutionDeadline()));
                 consumes.put(record.admissionId(), true);
@@ -272,5 +276,17 @@ public class AdmissionReconciliationService {
 
     private static void increment(Map<String, Long> values, String key) {
         values.merge(key, 1L, Long::sum);
+    }
+
+    private static String commandClassification(CommandAdmissionRow command) {
+        if (command == null) return "AMBIGUOUS_HELD";
+        if (command.deadLetteredAt() != null) return "DEAD_LETTERED_WITHOUT_MYSQL_RESULT";
+        return switch (command.status()) {
+            case "PREPARED" -> "AGED_PREPARED_COMMAND";
+            case "UNRESOLVED" -> "AMBIGUOUS_COMMAND";
+            case "RETRYABLE" -> "RETRYABLE_COMMAND";
+            case "ACCEPTED", "PROCESSING" -> "IN_FLIGHT_COMMAND";
+            default -> "AMBIGUOUS_HELD";
+        };
     }
 }

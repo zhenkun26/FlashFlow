@@ -1,6 +1,25 @@
 # Specification scenario matrix
 
-The V1/V2 mapped Java tests passed on 2026-08-09 as part of the 60-test V2 Maven suite. V2.1 mappings below are source-to-test traceability until the V2.1 release gate records its final execution total. V1.5 evidence remains in `2026-08-09-v1-5-local.md`; V2 admission and fault evidence is in `2026-08-09-v2-local.md`.
+The V1/V2 mapped Java tests passed on 2026-08-09 as part of the 60-test V2 Maven suite. V2.1 evidence remains in `2026-08-09-v2-1-local.md`. V3 live mappings below were exercised on 2026-08-10 unless explicitly marked as a deterministic-only boundary; the current roll-up is in `2026-08-10-v3-local.md`.
+
+## v3-live-rocketmq-ordering
+
+| Scenario | Mapped test/evidence |
+|---|---|
+| `202` only after real Broker acknowledgement and caller-scoped status | `LiveRocketMqEndToEndIntegrationTest.httpBoundaryThroughLiveBrokerCommitsOnceAndDelayedTriggerClosesOnce` |
+| Broker unavailable does not claim acceptance; same identity recovers | `LiveRocketMqEndToEndIntegrationTest.brokerOutageDoesNotClaimAcceptanceAndSameIdentityRecoversAfterRestart` |
+| Existing synchronous HTTP semantics remain available in live mode | `LiveRocketMqEndToEndIntegrationTest.synchronousV1KeepsCreatedAndReplaySemanticsWhileLiveMessagingIsEnabled` |
+| Poison envelope reaches the dedicated real DLQ with bounded metadata | `LiveRocketMqEndToEndIntegrationTest.poisonEnvelopeIsPublishedToTheRealDeadLetterTopicWithBoundedMetadata` |
+| Live delayed trigger closes once and reconciles Redis/MySQL | `LiveRocketMqEndToEndIntegrationTest.httpBoundaryThroughLiveBrokerCommitsOnceAndDelayedTriggerClosesOnce` |
+| Missing/late delayed delivery is recovered by the scanner | `LiveRocketMqScannerRecoveryIntegrationTest.scannerClosesWhenTheBrokerDelayExceedsTheDeclaredRecoveryBound` |
+| Lost acknowledgement and interruption recovery | `OrderCommandConsumerIntegrationTest` and `InProcessOrderCommandConsumerTest` (deterministic boundary injection) |
+| Real consumer acknowledgement loss and redelivery | `LiveRocketMqRedeliveryIntegrationTest.lostAcknowledgementRedeliversAndRecoversOneCommittedResult` |
+| Retry exhaustion, manual same-identity replay, and admission retention | `LiveRocketMqRetryExhaustionIntegrationTest.retryExhaustionDeadLettersWithoutBusinessEffectOrAdmissionRelease` |
+| Expiration acknowledgement loss and duplicate closure prevention | `LiveRocketMqExpirationAckLossIntegrationTest.lostExpirationAcknowledgementRedeliversWithoutDuplicateClosure` |
+| Retry exhaustion and unsupported envelope disposition | `RocketMqListenerContractTest` (deterministic) plus the real poison-envelope and retry-exhaustion tests above |
+| Prepared, ambiguous, retryable, and dead-lettered reconciliation | `AdmissionReconciliationIntegrationTest.classifiesPreparedAmbiguousAndDeadLetteredCommandsWithoutAssumingBusinessTruth` |
+| Identity-level evidence refuses unreconciled or in-flight PASS | `ExperimentEvidenceReporterTest.requiresIdentityLevelMessagingReconciliationForLiveRuns` |
+| Synchronous completion versus V3 acceptance/completion | `V3ControlledComparisonIntegrationTest.separatesSynchronousCompletionFromV3AcceptanceAndCompletion` |
 
 ## messaging-command-foundation
 

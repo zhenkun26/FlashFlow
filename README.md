@@ -1,8 +1,8 @@
 # FlashFlow
 
-FlashFlow is a database-first limited-stock ordering laboratory. V1 establishes synchronous MySQL/InnoDB correctness; V2 adds Redis Lua admission; V2.1 adds transport-neutral command, consumer, publication-ambiguity, and delayed-expiration seams needed before a future V3 RocketMQ runtime. MySQL remains the sole durable business source of truth.
+FlashFlow is a database-first limited-stock ordering laboratory. V1 establishes synchronous MySQL/InnoDB correctness; V2 adds Redis Lua admission; V2.1 adds transport-neutral messaging seams; V3 activates an explicitly selected RocketMQ producer, at-least-once consumer, asynchronous HTTP contract, DLQ, and advisory delayed expiration. MySQL remains the sole durable business source of truth.
 
-## Current V2.1 scope
+## Current V3 scope
 
 - Java 21, Spring Boot, MyBatis, MySQL/InnoDB, Redis Lua, Flyway, JUnit, Testcontainers, Micrometer, and k6.
 - One activity SKU and quantity one per order.
@@ -10,9 +10,11 @@ FlashFlow is a database-first limited-stock ordering laboratory. V1 establishes 
 - Four inventory strategies: conditional atomic update (normal default), pessimistic lock, optimistic lock, and an unsafe read-then-write laboratory control.
 - Redis admission IDs are privacy-preserving digests; atomic scripts enforce generation, capacity, replay, per-user activity, confirmation, release, and quarantine.
 - Fenced reconciliation rebuilds Redis only from committed MySQL facts and emits append-only evidence.
-- A versioned command contract, non-Outbox lifecycle ledger, idempotent in-process consumer, and shared delayed-expiration boundary are implemented and tested while public ordering remains synchronous.
-- RocketMQ 5.3.4 exists only in an isolated compatibility-spike Compose profile; there is no live broker client in the normal application graph.
-- No public V3 asynchronous route, Outbox, CDC, real payment provider, automated refund execution, microservices, automatic fail-open, or production-scale claim.
+- `LIVE` messaging mode loads a pinned RocketMQ 5.3.3 classic Java client against the pinned 5.3.4 Broker; `DISABLED` remains broker-free.
+- `/api/v2/orders` returns `202 Accepted` only after `SEND_OK`; `/api/v2/order-commands/{commandId}` exposes caller-scoped durable status.
+- Consumers are at-least-once and acknowledge only recoverable outcomes. Bounded retries and poison messages lead to an inspectable dedicated dead-letter topic.
+- Delayed expiration messages accelerate the existing locked MySQL closure; the scanner remains the recovery authority.
+- V3 direct publication is deliberately not an Outbox guarantee. No CDC, dispatcher lease, crash-safe eventual publication, production availability, delay SLA, or production-capacity claim is made.
 
 ## Invariants
 
@@ -49,7 +51,7 @@ Payment application                 |
 
 The safe new-order transaction reserves stock before inserting stock-referencing child rows, then persists the order, purchase claim, reservation, stock movement, and result atomically. Payment and expiration operate on existing orders and lock the order first; whichever transaction commits first determines the legal terminal outcome.
 
-See [V2.1 messaging-readiness architecture](docs/architecture/v2-1-messaging-readiness.md), [V2.1 runbook](docs/runbooks/v2-1-messaging-readiness.md), [V2 admission architecture](docs/architecture/v2-redis-admission.md), [transaction boundaries](docs/architecture/transaction-boundaries.md), and [decisions](docs/DECISIONS.md).
+See [V3 live messaging architecture](docs/architecture/v3-live-rocketmq-ordering.md), [V3 runbook](docs/runbooks/v3-live-rocketmq-ordering.md), [V2 admission architecture](docs/architecture/v2-redis-admission.md), [transaction boundaries](docs/architecture/transaction-boundaries.md), and [decisions](docs/DECISIONS.md).
 
 Release-by-release changes and their evidence boundaries are recorded in the [changelog](CHANGELOG.md).
 
@@ -66,6 +68,8 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
 If port 3306 is already occupied, set `FLASHFLOW_MYSQL_PORT=3307` for Compose and point `FLASHFLOW_DB_URL` at port 3307 when starting the application.
 
 The commands above explicitly retain `MYSQL_ONLY` behavior. To enable V2, start `mysql redis`, set `FLASHFLOW_ADMISSION_MODE=REDIS_LUA` and a 32+ character `FLASHFLOW_ADMISSION_IDENTITY_SECRET`, then initialize the SKU generation as described in the V2 runbook. Redis failure is fail-closed; it never falls back to an unadmitted MySQL attempt.
+
+To enable the V3 laboratory topology, run `docker compose --profile messaging-live up -d` and select `FLASHFLOW_MESSAGING_MODE=LIVE`. Configure the advertised Broker address and host ports as described in the V3 runbook. The live route is intentionally unavailable when messaging is disabled.
 
 Load disposable demonstration data:
 

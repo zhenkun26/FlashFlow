@@ -21,6 +21,7 @@ public record ExperimentRunEvidence(
         Map<String, String> resolvedInputs,
         Map<String, Double> operationalMetrics,
         Map<String, String> admissionEvidence,
+        Map<String, String> messagingEvidence,
         InvariantEvidence invariants,
         VerificationStatus status,
         List<String> warnings,

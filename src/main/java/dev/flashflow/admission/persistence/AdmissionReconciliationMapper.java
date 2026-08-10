@@ -27,4 +27,11 @@ public interface AdmissionReconciliationMapper {
             FROM idempotency_record WHERE operation_name = 'CREATE_ORDER'
             """)
     List<IdempotencyRow> findAllOrderIdempotency();
+
+    @Select("""
+            SELECT command_id, status, transport_cause, updated_at, dead_lettered_at
+            FROM order_command_ledger
+            WHERE activity_sku_id = #{skuId}
+            """)
+    List<CommandAdmissionRow> findCommands(String skuId);
 }

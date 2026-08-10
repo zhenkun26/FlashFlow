@@ -24,6 +24,9 @@ public interface CommandMapper {
     @Select("SELECT * FROM order_command_ledger WHERE command_id = #{commandId}")
     CommandRow findById(String commandId);
 
+    @Select("SELECT * FROM order_command_ledger WHERE command_id = #{commandId} AND caller_id = #{callerId}")
+    CommandRow findByIdAndCaller(@Param("commandId") String commandId, @Param("callerId") String callerId);
+
     @Update("""
             UPDATE order_command_ledger SET status = 'PROCESSING', attempt_count = attempt_count + 1,
                 updated_at = #{now}
@@ -42,9 +45,20 @@ public interface CommandMapper {
                @Param("now") LocalDateTime now);
 
     @Update("""
-            UPDATE order_command_ledger SET status = #{status}, updated_at = #{now}
-            WHERE command_id = #{commandId} AND status IN ('PREPARED', 'ACCEPTED', 'PROCESSING', 'RETRYABLE')
+            UPDATE order_command_ledger SET status = #{status}, transport_cause = #{cause},
+                publication_attempt_count = publication_attempt_count + #{publicationAttempt}, updated_at = #{now}
+            WHERE command_id = #{commandId}
+              AND status IN ('PREPARED', 'ACCEPTED', 'PROCESSING', 'RETRYABLE', 'UNRESOLVED')
             """)
     int markNonTerminal(@Param("commandId") String commandId, @Param("status") String status,
+                        @Param("cause") String cause, @Param("publicationAttempt") int publicationAttempt,
                         @Param("now") LocalDateTime now);
+
+    @Update("""
+            UPDATE order_command_ledger SET status = 'RETRYABLE', transport_cause = #{cause},
+                dead_lettered_at = #{now}, updated_at = #{now}
+            WHERE command_id = #{commandId} AND status NOT IN ('COMPLETED', 'REJECTED')
+            """)
+    int markDeadLetter(@Param("commandId") String commandId, @Param("cause") String cause,
+                       @Param("now") LocalDateTime now);
 }

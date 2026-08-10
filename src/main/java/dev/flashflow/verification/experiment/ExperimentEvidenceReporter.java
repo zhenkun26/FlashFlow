@@ -31,9 +31,11 @@ public final class ExperimentEvidenceReporter {
         boolean workloadCompleted = Boolean.parseBoolean(metadata.getProperty("workloadCompleted", "false"));
         Map<String, String> resolvedInputs = keyValues(runDirectory.resolve("resolved.env"));
         boolean redisAdmission = "REDIS_LUA".equals(resolvedInputs.get("ADMISSION_MODE"));
+        boolean liveMessaging = "LIVE".equals(resolvedInputs.get("MESSAGING_MODE"));
         boolean collectionComplete = Files.isRegularFile(runDirectory.resolve("k6-summary.json"))
                 && Files.isRegularFile(runDirectory.resolve("invariants.tsv"))
                 && Files.isRegularFile(runDirectory.resolve("metrics.prom"))
+                && (!liveMessaging || Files.isRegularFile(runDirectory.resolve("messaging-evidence.properties")))
                 && (!redisAdmission || (Files.isRegularFile(runDirectory.resolve("admission-evidence.properties"))
                         && Files.isRegularFile(runDirectory.resolve("redis-evidence.txt"))
                         && Files.isDirectory(runDirectory.resolve("reconciliation-final"))));
@@ -41,6 +43,7 @@ public final class ExperimentEvidenceReporter {
         K6Evidence k6 = readK6(runDirectory.resolve("k6-summary.json"));
         Map<String, Double> operationalMetrics = readOperationalMetrics(runDirectory.resolve("metrics.prom"));
         Map<String, String> admissionEvidence = keyValues(runDirectory.resolve("admission-evidence.properties"));
+        Map<String, String> messagingEvidence = keyValues(runDirectory.resolve("messaging-evidence.properties"));
         ExperimentRunEvidence.InvariantEvidence invariants = readInvariants(runDirectory.resolve("invariants.tsv"));
         List<String> warnings = new ArrayList<>();
         boolean dirty = Boolean.parseBoolean(metadata.getProperty("dirtyWorktree", "true"));
@@ -67,6 +70,35 @@ public final class ExperimentEvidenceReporter {
         if (!admissionReconciled) {
             warnings.add("Request, admission, MySQL-attempt, and lifecycle counts do not reconcile.");
         }
+        boolean messagingReconciled = true;
+        if (liveMessaging) {
+            long identities = property(messagingEvidence, "identity.http");
+            long prepared = property(messagingEvidence, "identity.prepared");
+            long accepted = property(messagingEvidence, "identity.accepted");
+            long terminal = property(messagingEvidence, "identity.completed")
+                    + property(messagingEvidence, "identity.rejected")
+                    + property(messagingEvidence, "identity.retryable")
+                    + property(messagingEvidence, "identity.unresolved");
+            long inFlight = property(messagingEvidence, "identity.inFlight")
+                    + property(messagingEvidence, "delivery.inFlight")
+                    + property(messagingEvidence, "expiration.inFlight");
+            long incompleteGates = property(messagingEvidence, "required.fail")
+                    + property(messagingEvidence, "required.blocked")
+                    + property(messagingEvidence, "required.notRun")
+                    + property(messagingEvidence, "required.simulated")
+                    + property(messagingEvidence, "required.stale");
+            messagingReconciled = identities == k6.totalRequests()
+                    && identities == prepared
+                    && accepted <= prepared
+                    && terminal == prepared
+                    && property(messagingEvidence, "identity.completed")
+                            == property(messagingEvidence, "mysql.orders")
+                    && inFlight == 0
+                    && incompleteGates == 0;
+            if (!messagingReconciled) {
+                warnings.add("Live HTTP, command, delivery, terminal, MySQL, or required-gate evidence does not reconcile.");
+            }
+        }
         if (invariants == null) warnings.add("Committed-state invariant evidence is unavailable.");
         else if (!invariants.valid()) warnings.add("Committed-state invariants failed.");
         Path diagnosticsError = runDirectory.resolve("mysql-diagnostics-error.log");
@@ -75,7 +107,8 @@ public final class ExperimentEvidenceReporter {
         }
 
         VerificationStatus status = deriveStatus(gate, workloadCompleted, collectionComplete,
-                reconciled && admissionReconciled, invariants != null && invariants.valid());
+                reconciled && admissionReconciled && messagingReconciled,
+                invariants != null && invariants.valid());
         return new ExperimentRunEvidence(
                 metadata.getProperty("runId"), metadata.getProperty("caseId"),
                 Instant.parse(metadata.getProperty("startedAt")),
@@ -83,7 +116,7 @@ public final class ExperimentEvidenceReporter {
                 metadata.getProperty("gitRevision", "UNKNOWN"), dirty, gate,
                 metadata.getProperty("correctnessGateReference", "none"), workloadCompleted,
                 collectionComplete, k6.totalRequests(), k6.outcomes(), k6.latencyMillis(),
-                resolvedInputs, operationalMetrics, admissionEvidence,
+                resolvedInputs, operationalMetrics, admissionEvidence, messagingEvidence,
                 invariants, status, List.copyOf(warnings), environment(metadata));
     }
 
@@ -185,6 +218,8 @@ public final class ExperimentEvidenceReporter {
             if (!(line.startsWith("flashflow_order_attempt")
                     || line.startsWith("flashflow_inventory_conflict")
                     || line.startsWith("flashflow_admission_")
+                    || line.startsWith("flashflow_command_")
+                    || line.startsWith("flashflow_messaging_")
                     || line.startsWith("hikaricp_connections"))) continue;
             int separator = line.lastIndexOf(' ');
             if (separator <= 0) continue;
@@ -235,6 +270,16 @@ public final class ExperimentEvidenceReporter {
                 .mapToLong(entry -> Long.parseLong(entry.getValue())).sum();
     }
 
+    private static long property(Map<String, String> values, String key) {
+        String value = values.get(key);
+        if (value == null || value.isBlank()) return -1;
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ignored) {
+            return -1;
+        }
+    }
+
     private static String markdown(ExperimentRunEvidence evidence) {
         StringBuilder text = new StringBuilder("# FlashFlow experiment ").append(evidence.runId()).append("\n\n");
         text.append("Status: **").append(evidence.status()).append("**\n\n");
@@ -258,6 +303,11 @@ public final class ExperimentEvidenceReporter {
         if (!evidence.admissionEvidence().isEmpty()) {
             text.append("\n## Redis admission and reconciliation evidence\n\n| Evidence | Value |\n|---|---|\n");
             evidence.admissionEvidence().forEach((key, value) -> text.append('|').append(key)
+                    .append('|').append(value).append("|\n"));
+        }
+        if (!evidence.messagingEvidence().isEmpty()) {
+            text.append("\n## Live messaging identity reconciliation\n\n| Evidence | Value |\n|---|---:|\n");
+            evidence.messagingEvidence().forEach((key, value) -> text.append('|').append(key)
                     .append('|').append(value).append("|\n"));
         }
         text.append("\n## Committed state\n\n");

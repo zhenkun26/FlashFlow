@@ -75,6 +75,62 @@ class ExperimentEvidenceReporterTest {
     }
 
     @Test
+    void requiresIdentityLevelMessagingReconciliationForLiveRuns() throws Exception {
+        Path run = Files.createDirectory(temporaryDirectory.resolve("live"));
+        Files.writeString(run.resolve("metadata.properties"), """
+                runId=live
+                caseId=rocketmq-live-v3
+                startedAt=2026-08-10T00:00:00Z
+                endedAt=2026-08-10T00:00:05Z
+                gitRevision=abc
+                dirtyWorktree=false
+                correctnessGate=PASS
+                workloadCompleted=true
+                """);
+        Files.writeString(run.resolve("k6-summary.json"), """
+                {"totalRequests":1,"outcomes":{"ACCEPTED":1},"latencyMillis":{"p95":20.0}}
+                """);
+        Files.writeString(run.resolve("invariants.tsv"), invariantHeader() + "\n"
+                + "1\t0\t1\t0\t1\t1\t1\t1\t0\t0\t0\t0\t0\t0\n");
+        Files.writeString(run.resolve("resolved.env"), "MESSAGING_MODE=LIVE\n");
+        Files.writeString(run.resolve("metrics.prom"), """
+                flashflow_admission_decision_total{decision="BYPASSED"} 1
+                flashflow_admission_mysql_total{outcome="STARTED"} 1
+                flashflow_admission_lifecycle_total{operation="CONFIRM",outcome="BYPASSED"} 1
+                flashflow_command_publication_total{outcome="ACKNOWLEDGED"} 1
+                """);
+        Files.writeString(run.resolve("messaging-evidence.properties"), """
+                identity.http=1
+                identity.prepared=1
+                identity.accepted=1
+                identity.completed=1
+                identity.rejected=0
+                identity.retryable=0
+                identity.unresolved=0
+                identity.inFlight=0
+                delivery.inFlight=0
+                expiration.inFlight=0
+                mysql.orders=1
+                required.fail=0
+                required.blocked=0
+                required.notRun=0
+                required.simulated=0
+                required.stale=0
+                """);
+
+        ExperimentRunEvidence evidence = ExperimentEvidenceReporter.read(run);
+        assertThat(evidence.status()).isEqualTo(VerificationStatus.PASS);
+        assertThat(evidence.messagingEvidence()).containsEntry("identity.completed", "1");
+
+        Files.writeString(run.resolve("messaging-evidence.properties"),
+                Files.readString(run.resolve("messaging-evidence.properties"))
+                        .replace("delivery.inFlight=0", "delivery.inFlight=1"));
+        ExperimentRunEvidence inFlight = ExperimentEvidenceReporter.read(run);
+        assertThat(inFlight.status()).isEqualTo(VerificationStatus.FAIL);
+        assertThat(inFlight.warnings()).anyMatch(warning -> warning.contains("does not reconcile"));
+    }
+
+    @Test
     void reportsDirtyAttributionAndControlledComparisonDifferences() throws Exception {
         ExperimentRunEvidence left = evidence("left", false, Map.of("java", "21", "database", "MySQL-8.4"));
         ExperimentRunEvidence right = evidence("right", true, Map.of("java", "26", "database", "MySQL-8.4"));
@@ -106,7 +162,7 @@ class ExperimentEvidenceReporterTest {
                 "abc", dirty, VerificationStatus.PASS, "gate.log", true, true, 10,
                 Map.of("CREATED", 5L, "SOLD_OUT", 5L), Map.of("p95", 20.0),
                 Map.of("VUS", "10"), Map.of("flashflow_order_attempt_total", 10.0),
-                Map.of(), invariants, VerificationStatus.PASS, List.of(), environment);
+                Map.of(), Map.of(), invariants, VerificationStatus.PASS, List.of(), environment);
     }
 
     private static String invariantHeader() {

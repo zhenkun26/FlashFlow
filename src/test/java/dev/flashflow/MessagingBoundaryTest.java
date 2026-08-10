@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 class MessagingBoundaryTest {
     @Test
-    void v21HasNoLiveRocketMqDependencyOrAsyncController() throws Exception {
+    void v3PinsRocketMqAndKeepsLiveComponentsConditional() throws Exception {
         String pom = Files.readString(Path.of("pom.xml"));
         String controllers;
         try (var paths = Files.walk(Path.of("src/main/java/dev/flashflow"))) {
@@ -18,7 +18,10 @@ class MessagingBoundaryTest {
                         catch (Exception exception) { throw new IllegalStateException(exception); }
                     }).reduce("", String::concat);
         }
-        assertThat(pom).doesNotContain("org.apache.rocketmq");
-        assertThat(controllers).doesNotContain("/api/v2/orders");
+        assertThat(pom).contains("org.apache.rocketmq", "<rocketmq.client.version>5.3.3");
+        assertThat(controllers).contains("/api/v2", "ConditionalOnProperty", "havingValue = \"LIVE\"");
+        assertThat(Files.readString(Path.of(
+                "src/main/java/dev/flashflow/messaging/RocketMqOrderCommandPublisher.java")))
+                .contains("ConditionalOnProperty", "havingValue = \"LIVE\"");
     }
 }

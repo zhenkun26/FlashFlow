@@ -120,6 +120,43 @@ class AdmissionReconciliationIntegrationTest extends RedisIntegrationTest {
         assertThat(mysqlStock("s1")).isEqualTo(mysqlBefore);
     }
 
+    @Test
+    void classifiesPreparedAmbiguousAndDeadLetteredCommandsWithoutAssumingBusinessTruth() {
+        fixture().activeSku("a-command", "s-command", 3);
+        ready("s-command", 3);
+        insertCommandAdmission("s-command", "u-prepared", "k-prepared", "PREPARED", null, false);
+        insertCommandAdmission("s-command", "u-ambiguous", "k-ambiguous", "UNRESOLVED", "TIMEOUT", false);
+        insertCommandAdmission("s-command", "u-dlq", "k-dlq", "RETRYABLE", "RETRY_EXHAUSTED", true);
+
+        AdmissionReconciliationReport report = reconciliation.reconcile("s-command", reports);
+
+        assertThat(report.status()).isEqualTo(ReconciliationStatus.BLOCKED);
+        assertThat(report.unresolved()).isEqualTo(3);
+        assertThat(report.discrepancies()).containsEntry("AGED_PREPARED_COMMAND", 1L)
+                .containsEntry("AMBIGUOUS_COMMAND", 1L)
+                .containsEntry("DEAD_LETTERED_WITHOUT_MYSQL_RESULT", 1L);
+        assertThat(report.actions()).containsEntry("SEED_QUARANTINED", 3L)
+                .containsEntry("WITHHOLD_CAPACITY", 3L);
+        assertThat(admission.snapshot("s-command").state()).isEqualTo(AdmissionGenerationState.INITIALIZING);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM orders WHERE activity_sku_id = 's-command'",
+                Integer.class)).isZero();
+    }
+
+    private void insertCommandAdmission(
+            String skuId, String userId, String key, String status, String cause, boolean deadLettered) {
+        AdmissionCommand command = command(skuId, key, userId);
+        admission.acquire(command);
+        jdbc.update("""
+                INSERT INTO order_command_ledger
+                  (command_id, operation_name, caller_id, idempotency_key, activity_sku_id,
+                   payload_fingerprint, schema_version, status, transport_cause,
+                   created_at, updated_at, dead_lettered_at)
+                VALUES (?, 'CREATE_ORDER', ?, ?, ?, REPEAT('a', 64), 1, ?, ?,
+                        DATE_SUB(NOW(6), INTERVAL 1 MINUTE), NOW(6),
+                        CASE WHEN ? THEN NOW(6) ELSE NULL END)
+                """, command.admissionId(), userId, key, skuId, status, cause, deadLettered);
+    }
+
     private AdmissionCommand command(String skuId, String idempotencyKey, String userId) {
         return new AdmissionCommand(skuId,
                 identities.admissionId("CREATE_ORDER", userId, idempotencyKey),

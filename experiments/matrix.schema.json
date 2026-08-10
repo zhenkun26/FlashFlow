@@ -23,7 +23,7 @@
       "required": ["id", "profile", "strategy", "vus", "durationSeconds", "initialStock", "skuDistribution", "skuCount", "poolSize", "connectionTimeoutMs", "optimisticMaxRetries", "transactionMaxRetries", "transactionSequence", "admissionMode", "heldResolutionSeconds", "redisImage", "scriptVersion", "generation", "injectedFailure"],
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
-        "profile": { "enum": ["local", "lab", "messaging-spike"] },
+        "profile": { "enum": ["local", "lab", "messaging-spike", "messaging-live"] },
         "strategy": { "enum": ["CONDITIONAL_ATOMIC", "PESSIMISTIC", "OPTIMISTIC", "UNSAFE_READ_THEN_WRITE"] },
         "vus": { "type": "integer", "minimum": 1 },
         "durationSeconds": { "type": "integer", "minimum": 1 },
@@ -52,7 +52,27 @@
             "acknowledgementMode": { "type": "string", "minLength": 1 },
             "producerRetries": { "type": "integer", "minimum": 0, "maximum": 3 },
             "delayMechanism": { "type": "string", "minLength": 1 },
-            "injectedFault": { "type": "string", "minLength": 1 }
+            "injectedFault": { "type": "string", "minLength": 1 },
+            "live": {
+              "type": ["object", "null"],
+              "additionalProperties": false,
+              "required": ["mode", "brokerVersion", "namesrvAddr", "orderTopic", "orderConsumerGroup", "expirationTopic", "expirationConsumerGroup", "deadLetterTopic", "sendTimeoutMs", "maxReconsumeTimes", "delayLevel", "drainSeconds", "injectedFault"],
+              "properties": {
+                "mode": { "const": "LIVE" },
+                "brokerVersion": { "const": "5.3.4" },
+                "namesrvAddr": { "type": "string", "minLength": 1 },
+                "orderTopic": { "type": "string", "minLength": 1 },
+                "orderConsumerGroup": { "type": "string", "minLength": 1 },
+                "expirationTopic": { "type": "string", "minLength": 1 },
+                "expirationConsumerGroup": { "type": "string", "minLength": 1 },
+                "deadLetterTopic": { "type": "string", "minLength": 1 },
+                "sendTimeoutMs": { "type": "integer", "minimum": 1, "maximum": 60000 },
+                "maxReconsumeTimes": { "type": "integer", "minimum": 0, "maximum": 100 },
+                "delayLevel": { "type": "integer", "minimum": 1, "maximum": 18 },
+                "drainSeconds": { "type": "integer", "minimum": 1, "maximum": 3600 },
+                "injectedFault": { "type": "string", "minLength": 1 }
+              }
+            }
           }
         }
       }

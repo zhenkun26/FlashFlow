@@ -19,11 +19,17 @@ public final class DeterministicPublicationCoordinator {
 
     public PublicationResolution resolve(
             AdmissionCommand command, String generation, PublicationResult publication) {
-        PublicationResolution resolution = switch (publication.outcome()) {
-            case BROKER_ACKNOWLEDGED -> PublicationResolution.RETAINED;
-            case DEFINITELY_NOT_PUBLISHED -> release(command, generation);
-            case AMBIGUOUS -> quarantine(command, generation);
-        };
+        PublicationResolution resolution;
+        try {
+            resolution = switch (publication.outcome()) {
+                case BROKER_ACKNOWLEDGED -> PublicationResolution.RETAINED;
+                case DEFINITELY_NOT_PUBLISHED -> release(command, generation);
+                case AMBIGUOUS -> quarantine(command, generation);
+            };
+        } catch (RuntimeException unavailable) {
+            metrics.admissionLifecycle("PUBLICATION_CLASSIFICATION", "UNRESOLVED");
+            resolution = PublicationResolution.UNRESOLVED;
+        }
         metrics.command("PUBLICATION", publication.outcome().name());
         return resolution;
     }

@@ -1,6 +1,7 @@
 package dev.flashflow.admission.reconciliation;
 
 import dev.flashflow.admission.persistence.AdmissionStockRow;
+import dev.flashflow.admission.persistence.CommandAdmissionRow;
 import dev.flashflow.admission.persistence.EffectiveAdmissionRow;
 import dev.flashflow.ordering.persistence.IdempotencyRow;
 import java.time.Instant;
@@ -10,5 +11,6 @@ public record MySqlAdmissionFacts(
         Instant snapshotBoundary,
         AdmissionStockRow stock,
         List<EffectiveAdmissionRow> effectiveOrders,
-        List<IdempotencyRow> idempotencyRows) {
+        List<IdempotencyRow> idempotencyRows,
+        List<CommandAdmissionRow> commands) {
 }

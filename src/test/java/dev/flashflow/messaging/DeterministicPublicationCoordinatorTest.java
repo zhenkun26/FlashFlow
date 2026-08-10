@@ -37,6 +37,28 @@ class DeterministicPublicationCoordinatorTest {
         assertThat(admission.quarantines).isEqualTo(1);
     }
 
+    @Test
+    void redisLossDuringPublicationClassificationRemainsUnresolved() {
+        AdmissionPort unavailable = new FakeAdmission() {
+            @Override
+            public AdmissionLifecycleResult release(
+                    AdmissionCommand command, String generation, boolean confirmedClosure) {
+                throw new IllegalStateException("redis unavailable");
+            }
+
+            @Override
+            public AdmissionLifecycleResult quarantine(AdmissionCommand command, String generation) {
+                throw new IllegalStateException("redis unavailable");
+            }
+        };
+        DeterministicPublicationCoordinator coordinator = coordinator(unavailable);
+
+        assertThat(coordinator.resolve(command(), "g1", result(PublicationOutcome.DEFINITELY_NOT_PUBLISHED)))
+                .isEqualTo(PublicationResolution.UNRESOLVED);
+        assertThat(coordinator.resolve(command(), "g1", result(PublicationOutcome.AMBIGUOUS)))
+                .isEqualTo(PublicationResolution.UNRESOLVED);
+    }
+
     private static DeterministicPublicationCoordinator coordinator(AdmissionPort admission) {
         return new DeterministicPublicationCoordinator(admission,
                 new FlashFlowMetrics(new SimpleMeterRegistry()));
@@ -50,7 +72,7 @@ class DeterministicPublicationCoordinatorTest {
         return new AdmissionCommand("sku", "admission", "user-digest", Instant.now());
     }
 
-    private static final class FakeAdmission implements AdmissionPort {
+    private static class FakeAdmission implements AdmissionPort {
         private int releaseEffects;
         private int quarantines;
         private boolean released;

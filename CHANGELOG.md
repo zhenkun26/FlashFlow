@@ -2,6 +2,21 @@
 
 FlashFlow follows evidence-backed milestone releases. Performance figures below describe controlled local Docker experiments only; they are not production capacity or availability claims.
 
+## V3 — implementation verification in progress, 2026-08-10
+
+### Added
+
+- Added explicit `LIVE` RocketMQ configuration, startup guards, pinned Java client, deterministic topic provisioning, direct producer, at-least-once order consumer, bounded retry, dedicated dead-letter publication, and bounded transport evidence.
+- Added `/api/v2/orders` with Broker-acknowledged `202 Accepted` semantics and caller-scoped command-status lookup.
+- Added after-commit delayed-expiration publication and a live consumer that reuses the existing locked closure boundary while retaining scanner recovery.
+- Added deterministic listener tests, MySQL/Redis integration regressions, and a real HTTP → Redis → RocketMQ → MySQL → status → delayed-close test.
+
+### Boundary
+
+- Direct publication can leave prepared or unresolved work across a process failure; V3 does not claim eventual publication without V4 Outbox/CDC.
+- Dead-lettering does not prove that no prior delivery committed and therefore does not automatically return Redis capacity.
+- Final release status remains separate from source implementation until the complete suite, live fault matrix, characterization, and clean-revision evidence pass.
+
 ## V2.1 — 2026-08-09
 
 ### Added

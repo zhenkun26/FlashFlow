@@ -45,11 +45,24 @@ public final class CommandLedgerService {
     }
 
     public CommandRow mark(String commandId, CommandStatus status) {
+        return mark(commandId, status, status.name(), false);
+    }
+
+    public CommandRow markPublication(String commandId, CommandStatus status, String cause) {
+        return mark(commandId, status, cause, true);
+    }
+
+    private CommandRow mark(String commandId, CommandStatus status, String cause, boolean publicationAttempt) {
         if (status != CommandStatus.ACCEPTED && status != CommandStatus.RETRYABLE
                 && status != CommandStatus.UNRESOLVED) {
             throw new IllegalArgumentException("Unsupported non-terminal command state: " + status);
         }
-        mapper.markNonTerminal(commandId, status.name(), now());
+        mapper.markNonTerminal(commandId, status.name(), bounded(cause), publicationAttempt ? 1 : 0, now());
+        return require(commandId);
+    }
+
+    public CommandRow markDeadLetter(String commandId, String cause) {
+        mapper.markDeadLetter(commandId, bounded(cause), now());
         return require(commandId);
     }
 
@@ -61,11 +74,26 @@ public final class CommandLedgerService {
 
     public CommandSummary summary(String commandId) {
         CommandRow row = require(commandId);
+        return summary(row);
+    }
+
+    public CommandSummary summaryForCaller(String commandId, String callerId) {
+        CommandRow row = mapper.findByIdAndCaller(commandId, callerId);
+        return row == null ? null : summary(row);
+    }
+
+    private static CommandSummary summary(CommandRow row) {
         return new CommandSummary(row.commandId(), row.schemaVersion(), CommandStatus.valueOf(row.status()),
                 row.resultCode(), row.orderId(), row.attemptCount(), row.updatedAt());
     }
 
     private LocalDateTime now() {
         return LocalDateTime.ofInstant(clock.instant(), ZoneOffset.UTC);
+    }
+
+    private static String bounded(String cause) {
+        if (cause == null || cause.isBlank()) return "UNKNOWN";
+        String normalized = cause.toUpperCase().replaceAll("[^A-Z0-9_]+", "_");
+        return normalized.substring(0, Math.min(64, normalized.length()));
     }
 }
