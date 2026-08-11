@@ -24,6 +24,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -70,8 +71,8 @@ class V3ControlledComparisonIntegrationTest extends RedisIntegrationTest {
         assertThat(sync.getBody().code()).isEqualTo(OrderResultCode.CREATED);
 
         long asyncStarted = System.nanoTime();
-        var accepted = http.exchange("/api/v2/orders", HttpMethod.POST,
-                request("key-control-v3", "user-control-v3", "sku-control-v3"), AsyncOrderResponse.class);
+        var accepted = postUntilAccepted(Duration.ofSeconds(20),
+                request("key-control-v3", "user-control-v3", "sku-control-v3"));
         long asyncAccepted = System.nanoTime();
         assertThat(accepted.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
         String commandId = accepted.getBody().commandId();
@@ -107,6 +108,19 @@ class V3ControlledComparisonIntegrationTest extends RedisIntegrationTest {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Idempotency-Key", key);
         return new HttpEntity<>(java.util.Map.of("userId", user, "activitySkuId", sku), headers);
+    }
+
+    private ResponseEntity<AsyncOrderResponse> postUntilAccepted(
+            Duration timeout, HttpEntity<java.util.Map<String, String>> request) throws Exception {
+        Instant deadline = Instant.now().plus(timeout);
+        ResponseEntity<AsyncOrderResponse> response;
+        do {
+            response = http.exchange("/api/v2/orders", HttpMethod.POST, request, AsyncOrderResponse.class);
+            if (response.getStatusCode() == HttpStatus.ACCEPTED) return response;
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+            Thread.sleep(250);
+        } while (Instant.now().isBefore(deadline));
+        throw new AssertionError("direct publication did not recover within " + timeout);
     }
 
     private double metric(String name, String tag, String value) {
