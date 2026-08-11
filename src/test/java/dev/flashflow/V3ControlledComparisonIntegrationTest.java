@@ -43,6 +43,7 @@ class V3ControlledComparisonIntegrationTest extends RedisIntegrationTest {
     static void liveMessaging(DynamicPropertyRegistry registry) {
         registry.add("flashflow.messaging.mode", () -> "DIRECT");
         registry.add("flashflow.messaging.namesrv-addr", () -> "127.0.0.1:9876");
+        registry.add("flashflow.messaging.producer-group", () -> "flashflow-comparison-producer-" + GROUP_SUFFIX);
         registry.add("flashflow.messaging.order-consumer-group", () -> "flashflow-comparison-orders-" + GROUP_SUFFIX);
         registry.add("flashflow.messaging.expiration-consumer-group", () -> "flashflow-comparison-exp-" + GROUP_SUFFIX);
         registry.add("flashflow.messaging.consume-from", () -> "LAST");
@@ -120,7 +121,10 @@ class V3ControlledComparisonIntegrationTest extends RedisIntegrationTest {
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
             Thread.sleep(250);
         } while (Instant.now().isBefore(deadline));
-        throw new AssertionError("direct publication did not recover within " + timeout);
+        AsyncOrderResponse body = response.getBody();
+        throw new AssertionError("direct publication did not recover within " + timeout
+                + " status=" + (body == null ? "NO_BODY" : body.status())
+                + " cause=" + (body == null ? "NO_BODY" : body.cause()));
     }
 
     private double metric(String name, String tag, String value) {
