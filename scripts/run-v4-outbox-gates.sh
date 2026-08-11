@@ -17,11 +17,15 @@ dirty="false"
 if [[ -n "$(git status --short)" ]]; then dirty="true"; fi
 started_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 started_epoch="$(date +%s)"
-maven_args=()
-if [[ -n "${FLASHFLOW_MAVEN_ARGLINE:-}" ]]; then
-  maven_args+=("-DargLine=${FLASHFLOW_MAVEN_ARGLINE}")
-fi
 mkdir -p "${report_dir}"
+
+run_maven() {
+  if [[ -n "${FLASHFLOW_MAVEN_ARGLINE:-}" ]]; then
+    mvn "-DargLine=${FLASHFLOW_MAVEN_ARGLINE}" "$@"
+  else
+    mvn "$@"
+  fi
+}
 
 finish() {
   local exit_code=$?
@@ -78,14 +82,20 @@ trap finish EXIT
 "${docker_cmd[@]}" compose --profile "${profile}" logs --no-color \
   rocketmq-broker rocketmq-topics >"${report_dir}/container.log"
 
-mvn "${maven_args[@]}" -Dtest=OutboxAcceptanceIntegrationTest,OutboxPersistenceIntegrationTest,AdmissionReconciliationIntegrationTest test \
+run_maven -Dtest=OutboxAcceptanceIntegrationTest,OutboxPersistenceIntegrationTest,AdmissionReconciliationIntegrationTest test \
   2>&1 | tee "${report_dir}/mysql-outbox-gate.log"
-mvn "${maven_args[@]}" -Dflashflow.v4.report-dir="${report_dir}" \
+run_maven -Dflashflow.v4.report-dir="${report_dir}" \
   -Dtest=V4OutboxRocketMqEndToEndIntegrationTest,V4OutboxProducerAckLossIntegrationTest,V4OutboxConcurrentRedeliveryIntegrationTest,V4OutboxBacklogDrainIntegrationTest test \
   2>&1 | tee "${report_dir}/rocketmq-recovery-gate.log"
-mvn "${maven_args[@]}" -Dtest=MessagingBoundaryTest,MessagingConfigurationGuardTest,AsyncOrderApplicationServiceTest,OutboxAsyncOrderApplicationServiceTest,OutboxDispatcherTest,DeterministicPublicationCoordinatorTest,RocketMqListenerContractTest,FlashFlowMetricsTest,ExperimentEvidenceReporterTest,ExperimentManifestValidatorTest test \
+run_maven -Dtest=MessagingBoundaryTest,MessagingConfigurationGuardTest,AsyncOrderApplicationServiceTest,OutboxAsyncOrderApplicationServiceTest,OutboxDispatcherTest,DeterministicPublicationCoordinatorTest,RocketMqListenerContractTest,FlashFlowMetricsTest,ExperimentEvidenceReporterTest,ExperimentManifestValidatorTest test \
   2>&1 | tee "${report_dir}/deterministic-gate.log"
-mvn "${maven_args[@]}" test 2>&1 | tee "${report_dir}/complete-maven-gate.log"
+run_maven test 2>&1 | tee "${report_dir}/complete-maven-gate.log"
+for maven_log in mysql-outbox-gate.log rocketmq-recovery-gate.log deterministic-gate.log complete-maven-gate.log; do
+  if ! grep -q '\[INFO\] BUILD SUCCESS' "${report_dir}/${maven_log}"; then
+    echo "Maven gate did not record BUILD SUCCESS: ${maven_log}" >&2
+    exit 3
+  fi
+done
 openspec validate build-v4-transactional-outbox-publication --strict \
   2>&1 | tee "${report_dir}/openspec-validation.log"
 git diff --check 2>&1 | tee "${report_dir}/diff-check.log"
