@@ -81,7 +81,7 @@
 - [x] 9.4 Run the complete Maven/Testcontainers suite, explicit synchronous compatibility suite, mode/configuration tests, deterministic Outbox fault matrix, admission reconciliation matrix, and real RocketMQ recovery matrix.
 - [x] 9.5 Validate Compose resolution, Flyway migration, script syntax, source/dependency boundaries, privacy scans, OpenSpec strict validation, and `git diff --check`.
 - [x] 9.6 Record machine, container limits, dataset, revision, dirty-worktree state, duration, concurrency, fault schedule, counts, latency dimensions, backlog, retries, duplicates, final balances, and invariant results in a revision-bound V4 local report.
-- [ ] 9.7 Rerun every required gate against one clean attributable implementation revision and keep the release `FAIL`, `BLOCKED`, or `NOT_RUN` when any identity or gate cannot reconcile.
+- [x] 9.7 Rerun every required gate against one clean attributable implementation revision and keep the release `FAIL`, `BLOCKED`, or `NOT_RUN` when any identity or gate cannot reconcile.
 
 ## 10. Document and Prepare Release
 
@@ -89,5 +89,5 @@
 - [x] 10.2 Add V4 architecture and runbook documentation covering transaction boundaries, state machine, configuration migration, failure recovery, backlog operations, privacy, retention, and configuration-only rollback.
 - [x] 10.3 Update README, changelog, deferred roadmap, scenario matrix, verification status, and V3 documentation with the exact `DIRECT`/`OUTBOX`/`DISABLED` semantics and V4 evidence boundary.
 - [x] 10.4 State explicitly that V4 does not provide exactly-once publication, CDC, automated replay, production HA, capacity, persistence, or latency-SLA evidence.
-- [ ] 10.5 Review completed tasks and delta specs against implementation and retained evidence, synchronize the five deltas to main specs only after authorization, and archive the change only after every required gate passes.
+- [x] 10.5 Review completed tasks and delta specs against implementation and retained evidence, synchronize the five deltas to main specs only after authorization, and archive the change only after every required gate passes.
 - [x] 10.6 Keep commit, push, publication, spec synchronization, and archival as separately authorized release actions after a clean revision-bound review.

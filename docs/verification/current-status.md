@@ -69,12 +69,12 @@ V3 implementation, clean-revision gates, specification synchronization, archival
 | Java and test compilation | PASS | Java 21 release target compiled 93 production source files and 54 test source files on OpenJDK 26.0.2 |
 | Flyway/MySQL 8.4.6 atomicity and constraints | PASS | 14 selected acceptance, persistence, and reconciliation tests passed against Testcontainers MySQL and Redis |
 | Real RocketMQ V4 recovery matrix | PASS | 5 live tests cover normal publication, Broker outage, producer ACK loss, consumer ACK loss/redelivery, concurrent dispatchers, and bounded backlog drain |
-| Deterministic messaging and evidence matrix | PASS | 30 selected boundary, configuration, dispatcher, consumer, metrics, manifest, and evidence tests passed |
+| Deterministic messaging and evidence matrix | PASS | 31 selected boundary, configuration, dispatcher, consumer, metrics, manifest, and evidence tests passed |
 | Bounded backlog evidence | PASS | 12 durable commands drained with all command, Outbox, order, claim, reservation, movement, and admission invariants passing; local latency, attempts, retries, duplicates, and final balances are retained |
-| Complete suite and static gates | PASS | 123 tests passed with no failures, strict OpenSpec validation passed, and `git diff --check` passed |
-| Revision-bound local report | PASS | `reports/messaging/20260811T013206Z-v4-outbox` records revision `292b47d`, dirty state, environment, 368-second duration, fault schedule, counts, latency dimensions, and invariant results |
-| Clean attributable V4 revision | BLOCKED | The successful report correctly records `dirtyWorktree=true`, `gateStatus=PASS`, and `releaseStatus=BLOCKED`; a commit and clean-revision rerun require authorization |
-| OpenSpec sync/archive | NOT_RUN | Requires completed tasks, gates, review, and separate authorization |
-| Commit / push / publication | NOT_RUN | Requires separate authorization after clean revision-bound review |
+| Complete suite and static gates | PASS | 124 tests passed with no failures, strict OpenSpec validation passed, and `git diff --check` passed |
+| Revision-bound local report | PASS | `reports/messaging/20260811T031003Z-v4-outbox` records revision `ac6e70c`, `dirtyWorktree=false`, environment, 368-second duration, fault schedule, counts, latency dimensions, and invariant results |
+| Clean attributable V4 revision | PASS | The same clean implementation revision passed MySQL/Outbox 14/14, RocketMQ recovery 5/5, deterministic 31/31, complete Maven 124/124, strict OpenSpec, and diff gates |
+| OpenSpec sync/archive | PASS | Five delta specs were reconciled exactly into main specs; the completed 64/64-task change was archived as `2026-08-11-build-v4-transactional-outbox-publication` and strict main-spec validation passed |
+| Commit / push / publication | NOT_RUN | Implementation commits exist locally; final evidence/spec/archive commit and authorized upload remain pending |
 
-The V4 technical gates pass, but release remains blocked until the same implementation is committed and rerun as one clean attributable revision. The retained local report is evidence for a disposable topology only; it does not establish exactly-once publication, CDC behavior, production availability, persistence, failover, throughput, capacity, or latency SLA.
+The V4 implementation, clean revision-bound gates, specification synchronization, and archival pass. The authorized upload remains in progress. The retained local report is evidence for a disposable topology only; it does not establish exactly-once publication, CDC behavior, production availability, persistence, failover, throughput, capacity, or latency SLA.
