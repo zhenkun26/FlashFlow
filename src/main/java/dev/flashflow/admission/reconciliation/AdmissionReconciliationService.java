@@ -281,6 +281,24 @@ public class AdmissionReconciliationService {
     private static String commandClassification(CommandAdmissionRow command) {
         if (command == null) return "AMBIGUOUS_HELD";
         if (command.deadLetteredAt() != null) return "DEAD_LETTERED_WITHOUT_MYSQL_RESULT";
+        if (command.outboxStatus() != null && !"ACCEPTED".equals(command.status())
+                && !"PROCESSING".equals(command.status())) {
+            return "CONTRADICTORY_COMMAND_OUTBOX";
+        }
+        if ("OUTBOX_COMMITTED".equals(command.transportCause()) && command.outboxStatus() == null) {
+            return "MISSING_OUTBOX_FOR_ACCEPTED_COMMAND";
+        }
+        if (command.outboxStatus() != null) {
+            return switch (command.outboxStatus()) {
+                case "READY" -> "OUTBOX_READY_IN_FLIGHT";
+                case "CLAIMED" -> "OUTBOX_CLAIMED_IN_FLIGHT";
+                case "RETRYABLE" -> "OUTBOX_RETRYABLE_IN_FLIGHT";
+                case "ACKNOWLEDGED" -> "OUTBOX_ACKNOWLEDGED_AWAITING_RESULT";
+                case "INVALID" -> "OUTBOX_INVALID_OPERATOR_REQUIRED";
+                case "EXHAUSTED" -> "OUTBOX_EXHAUSTED_OPERATOR_REQUIRED";
+                default -> "UNKNOWN_OUTBOX_DISPOSITION";
+            };
+        }
         return switch (command.status()) {
             case "PREPARED" -> "AGED_PREPARED_COMMAND";
             case "UNRESOLVED" -> "AMBIGUOUS_COMMAND";

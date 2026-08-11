@@ -22,8 +22,20 @@ class MigrationConstraintTest extends MySqlIntegrationTest {
                 WHERE constraint_schema = DATABASE() AND table_name = 'activity_sku_stock'
                   AND constraint_type = 'CHECK'
                 """, Integer.class);
+        Integer outboxEligibilityIndex = jdbc.queryForObject("""
+                SELECT COUNT(*) FROM information_schema.statistics
+                WHERE table_schema = DATABASE() AND table_name = 'order_command_outbox'
+                  AND index_name = 'idx_outbox_dispatch_eligibility'
+                """, Integer.class);
+        Integer outboxForeignKey = jdbc.queryForObject("""
+                SELECT COUNT(*) FROM information_schema.referential_constraints
+                WHERE constraint_schema = DATABASE() AND table_name = 'order_command_outbox'
+                  AND referenced_table_name = 'order_command_ledger'
+                """, Integer.class);
         assertThat(expirationIndex).isPositive();
         assertThat(stockChecks).isGreaterThanOrEqualTo(2);
+        assertThat(outboxEligibilityIndex).isPositive();
+        assertThat(outboxForeignKey).isEqualTo(1);
     }
 
     @Test

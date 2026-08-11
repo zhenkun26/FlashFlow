@@ -22,6 +22,8 @@ public final class DeterministicPublicationCoordinator {
         PublicationResolution resolution;
         try {
             resolution = switch (publication.outcome()) {
+                case DURABLY_QUEUED -> throw new IllegalArgumentException(
+                        "Durable Outbox acceptance is not a direct publication outcome");
                 case BROKER_ACKNOWLEDGED -> PublicationResolution.RETAINED;
                 case DEFINITELY_NOT_PUBLISHED -> release(command, generation);
                 case AMBIGUOUS -> quarantine(command, generation);

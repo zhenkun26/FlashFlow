@@ -58,7 +58,7 @@
               "additionalProperties": false,
               "required": ["mode", "brokerVersion", "namesrvAddr", "orderTopic", "orderConsumerGroup", "expirationTopic", "expirationConsumerGroup", "deadLetterTopic", "sendTimeoutMs", "maxReconsumeTimes", "delayLevel", "drainSeconds", "injectedFault"],
               "properties": {
-                "mode": { "const": "LIVE" },
+                "mode": { "enum": ["DIRECT", "OUTBOX"] },
                 "brokerVersion": { "const": "5.3.4" },
                 "namesrvAddr": { "type": "string", "minLength": 1 },
                 "orderTopic": { "type": "string", "minLength": 1 },
@@ -83,7 +83,7 @@
       "required": ["id", "factor", "caseIds"],
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
-        "factor": { "enum": ["ADMISSION_MODE", "INJECTED_FAILURE", "STRATEGY", "VUS", "POOL_SIZE", "TRANSACTION_RETRY_BUDGET", "TRANSACTION_SEQUENCE", "STOCK_LEVEL", "SKU_CONTENTION_SHAPE"] },
+        "factor": { "enum": ["ADMISSION_MODE", "INJECTED_FAILURE", "STRATEGY", "VUS", "POOL_SIZE", "TRANSACTION_RETRY_BUDGET", "TRANSACTION_SEQUENCE", "MESSAGING_MODE", "STOCK_LEVEL", "SKU_CONTENTION_SHAPE"] },
         "caseIds": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } }
       }
     }

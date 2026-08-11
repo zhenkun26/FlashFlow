@@ -50,7 +50,7 @@ Both a delayed trigger and the bounded database scanner call the same order-spec
 
 ## ADR-013: Live messaging is explicit and rollback is configuration-only
 
-Only `FLASHFLOW_MESSAGING_MODE=LIVE` creates RocketMQ clients and exposes the asynchronous route. `DISABLED` creates no Broker connection and preserves `/api/v1/orders`. Startup rejects incomplete, shared-topic, shared-group, unpinned, or contradictory live configuration.
+This V3 decision originally used `FLASHFLOW_MESSAGING_MODE=LIVE`; V4 supersedes that value with `DIRECT`. `DIRECT` creates RocketMQ clients and exposes the inline-publication asynchronous route. `DISABLED` creates no Broker connection and preserves `/api/v1/orders`. Startup rejects the legacy `LIVE` value and incomplete, shared-topic, shared-group, unpinned, or contradictory active configuration.
 
 ## ADR-014: V3 uses bounded direct publication and preserves the Outbox comparison
 
@@ -59,3 +59,19 @@ The producer writes or reuses durable command identity, acquires admission, then
 ## ADR-015: Retry exhaustion is visible but not business truth
 
 Transient delivery failures receive a bounded Broker retry budget. Poison, unsupported, or exhausted messages are copied to a dedicated dead-letter topic with command ID, schema, source, attempt, and bounded reason evidence. DLQ disposition alone cannot prove whether MySQL previously committed and therefore cannot authorize automatic capacity release.
+
+## ADR-016: V4 accepts an atomic command and Outbox commit
+
+In `OUTBOX` mode, `202 Accepted` means one stable command and one immutable publish-ready envelope committed in the same MySQL transaction. It no longer requires inline Broker acknowledgement and never claims order completion. The command ledger and Outbox stay separate because business-result convergence and publication ownership have different state machines and retention.
+
+## ADR-017: Polling leases provide recoverable at-least-once publication
+
+V4 uses bounded MySQL polling with `FOR UPDATE SKIP LOCKED`, a unique per-claim lease token, expiration, and takeover. Broker I/O occurs outside the claim transaction. A lost acknowledgement or crash after send may republish, so the stable identity and idempotent consumer—not the dispatcher lease—prevent duplicate business effects.
+
+## ADR-018: Runtime modes make acceptance semantics explicit
+
+`DISABLED` is broker-free, `DIRECT` preserves the V3 inline `SEND_OK` control, and `OUTBOX` selects durable local acceptance plus recovery dispatch. The former `LIVE` value is rejected rather than silently aliased so configuration and retained evidence cannot confuse the two acceptance contracts.
+
+## ADR-019: Outbox exhaustion is conservative transport evidence
+
+`INVALID` and `EXHAUSTED` stop automatic dispatch and retain bounded evidence. Neither proves that no earlier delivery committed and neither releases Redis admission automatically. CDC/Debezium and automatic replay require later independent changes.

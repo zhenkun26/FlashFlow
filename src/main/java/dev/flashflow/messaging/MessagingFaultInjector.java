@@ -4,11 +4,11 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(prefix = "flashflow.messaging", name = "mode", havingValue = "LIVE")
+@ConditionalOnExpression("'${flashflow.messaging.mode:DISABLED}' == 'DIRECT' or '${flashflow.messaging.mode:DISABLED}' == 'OUTBOX'")
 public final class MessagingFaultInjector {
     private final Fault fault;
     private final AtomicBoolean fired = new AtomicBoolean();
@@ -52,6 +52,18 @@ public final class MessagingFaultInjector {
         }
     }
 
+    public void afterBrokerAcknowledgementBeforeOutboxRecord(String commandId) {
+        if (fault == Fault.AFTER_BROKER_ACK_BEFORE_OUTBOX_ACK_ONCE
+                && commandId.equals(faultedIdentity.get())) {
+            recovered.set(true);
+        }
+        if (fault == Fault.AFTER_BROKER_ACK_BEFORE_OUTBOX_ACK_ONCE
+                && fired.compareAndSet(false, true)) {
+            faultedIdentity.set(commandId);
+            throw new InjectedMessagingFault("after Broker acknowledgement before Outbox acknowledgement");
+        }
+    }
+
     public boolean recoveredAfterFault() {
         return recovered.get();
     }
@@ -59,6 +71,7 @@ public final class MessagingFaultInjector {
     public enum Fault {
         NONE,
         BEFORE_CONSUME_ALWAYS,
+        AFTER_BROKER_ACK_BEFORE_OUTBOX_ACK_ONCE,
         AFTER_DURABLE_RESULT_BEFORE_ACK_ONCE,
         AFTER_EXPIRATION_RESULT_BEFORE_ACK_ONCE
     }

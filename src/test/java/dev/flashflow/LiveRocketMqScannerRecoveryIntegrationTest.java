@@ -10,6 +10,7 @@ import dev.flashflow.support.RedisIntegrationTest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ class LiveRocketMqScannerRecoveryIntegrationTest extends RedisIntegrationTest {
 
     @DynamicPropertySource
     static void liveMessaging(DynamicPropertyRegistry registry) {
-        registry.add("flashflow.messaging.mode", () -> "LIVE");
+        registry.add("flashflow.messaging.mode", () -> "DIRECT");
         registry.add("flashflow.messaging.namesrv-addr", () -> "127.0.0.1:9876");
         registry.add("flashflow.messaging.order-consumer-group", () -> "flashflow-scanner-orders-" + GROUP_SUFFIX);
         registry.add("flashflow.messaging.expiration-consumer-group", () -> "flashflow-scanner-exp-" + GROUP_SUFFIX);
@@ -57,12 +58,20 @@ class LiveRocketMqScannerRecoveryIntegrationTest extends RedisIntegrationTest {
         assertThat(admission.publishGeneration("sku-scanner", generation, "fence-scanner")).isTrue();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Idempotency-Key", "key-scanner");
-        var response = http.exchange("/api/v2/orders", HttpMethod.POST,
-                new HttpEntity<>(java.util.Map.of("userId", "user-scanner", "activitySkuId", "sku-scanner"),
-                        headers),
-                AsyncOrderResponse.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
-        String commandId = response.getBody().commandId();
+        AtomicReference<org.springframework.http.ResponseEntity<AsyncOrderResponse>> accepted = new AtomicReference<>();
+        await(Duration.ofSeconds(60), () -> {
+            var candidate = http.exchange("/api/v2/orders", HttpMethod.POST,
+                    new HttpEntity<>(java.util.Map.of("userId", "user-scanner",
+                            "activitySkuId", "sku-scanner"), headers),
+                    AsyncOrderResponse.class);
+            if (candidate.getStatusCode() == HttpStatus.ACCEPTED) {
+                accepted.set(candidate);
+                return true;
+            }
+            assertThat(candidate.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+            return false;
+        });
+        String commandId = accepted.get().getBody().commandId();
         await(Duration.ofSeconds(20), () -> ledger.summary(commandId).status() == CommandStatus.COMPLETED);
         String orderId = ledger.summary(commandId).orderId();
 

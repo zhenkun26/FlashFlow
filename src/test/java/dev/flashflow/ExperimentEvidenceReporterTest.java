@@ -92,7 +92,7 @@ class ExperimentEvidenceReporterTest {
                 """);
         Files.writeString(run.resolve("invariants.tsv"), invariantHeader() + "\n"
                 + "1\t0\t1\t0\t1\t1\t1\t1\t0\t0\t0\t0\t0\t0\n");
-        Files.writeString(run.resolve("resolved.env"), "MESSAGING_MODE=LIVE\n");
+        Files.writeString(run.resolve("resolved.env"), "MESSAGING_MODE=DIRECT\n");
         Files.writeString(run.resolve("metrics.prom"), """
                 flashflow_admission_decision_total{decision="BYPASSED"} 1
                 flashflow_admission_mysql_total{outcome="STARTED"} 1
@@ -131,6 +131,67 @@ class ExperimentEvidenceReporterTest {
     }
 
     @Test
+    void rejectsUnexplainedOrContradictoryV4OutboxAcceptance() throws Exception {
+        Path run = Files.createDirectory(temporaryDirectory.resolve("outbox"));
+        Files.writeString(run.resolve("metadata.properties"), """
+                runId=outbox
+                caseId=rocketmq-outbox-v4
+                startedAt=2026-08-11T00:00:00Z
+                endedAt=2026-08-11T00:00:05Z
+                gitRevision=abc
+                dirtyWorktree=false
+                correctnessGate=PASS
+                workloadCompleted=true
+                """);
+        Files.writeString(run.resolve("k6-summary.json"),
+                "{\"totalRequests\":1,\"outcomes\":{\"ACCEPTED\":1},\"latencyMillis\":{\"p95\":10.0}}");
+        Files.writeString(run.resolve("invariants.tsv"), invariantHeader() + "\n"
+                + "1\t0\t1\t0\t1\t1\t1\t1\t0\t0\t0\t0\t0\t0\n");
+        Files.writeString(run.resolve("resolved.env"), "MESSAGING_MODE=OUTBOX\n");
+        Files.writeString(run.resolve("metrics.prom"), """
+                flashflow_admission_decision_total{decision="BYPASSED"} 1
+                flashflow_admission_mysql_total{outcome="STARTED"} 1
+                flashflow_admission_lifecycle_total{operation="CONFIRM",outcome="BYPASSED"} 1
+                """);
+        Files.writeString(run.resolve("messaging-evidence.properties"), """
+                identity.http=1
+                identity.prepared=1
+                identity.accepted=1
+                identity.completed=1
+                identity.rejected=0
+                identity.retryable=0
+                identity.unresolved=0
+                identity.inFlight=0
+                delivery.inFlight=0
+                expiration.inFlight=0
+                mysql.orders=1
+                required.fail=0
+                required.blocked=0
+                required.notRun=0
+                required.simulated=0
+                required.stale=0
+                outbox.rows=1
+                outbox.ready=0
+                outbox.claimed=0
+                outbox.retryable=0
+                outbox.acknowledged=1
+                outbox.invalid=0
+                outbox.exhausted=0
+                outbox.unresolved=0
+                outbox.contradictory=0
+                """);
+
+        assertThat(ExperimentEvidenceReporter.read(run).status()).isEqualTo(VerificationStatus.PASS);
+
+        Files.writeString(run.resolve("messaging-evidence.properties"),
+                Files.readString(run.resolve("messaging-evidence.properties"))
+                        .replace("outbox.unresolved=0", "outbox.unresolved=1"));
+        ExperimentRunEvidence unresolved = ExperimentEvidenceReporter.read(run);
+        assertThat(unresolved.status()).isEqualTo(VerificationStatus.FAIL);
+        assertThat(unresolved.warnings()).anyMatch(warning -> warning.contains("does not reconcile"));
+    }
+
+    @Test
     void reportsDirtyAttributionAndControlledComparisonDifferences() throws Exception {
         ExperimentRunEvidence left = evidence("left", false, Map.of("java", "21", "database", "MySQL-8.4"));
         ExperimentRunEvidence right = evidence("right", true, Map.of("java", "26", "database", "MySQL-8.4"));
@@ -140,6 +201,12 @@ class ExperimentEvidenceReporterTest {
         assertThat(ExperimentEvidenceReporter.comparison(comparison, left, right))
                 .contains("Declared factor: `VUS`")
                 .contains("java: 21 -> 26");
+
+        ExperimentManifest.Comparison messaging = new ExperimentManifest.Comparison(
+                "compare-messaging", ExperimentManifest.Factor.MESSAGING_MODE, List.of("left", "right"));
+        assertThat(ExperimentEvidenceReporter.comparison(messaging, left, right))
+                .contains("Acceptance p95", "Broker acknowledgement p95", "Completion p95",
+                        "Recovery", "Backlog drain", "Duplicate publications");
 
         Path dirtyRun = Files.createDirectory(temporaryDirectory.resolve("dirty"));
         Files.writeString(dirtyRun.resolve("metadata.properties"), """

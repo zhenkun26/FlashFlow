@@ -29,11 +29,13 @@ public record MessagingProperties(
         @Min(1) @Max(18) int delayLevel,
         @NotNull Duration drainTimeout,
         @NotNull ConsumeStart consumeFrom,
-        @Valid @NotNull Acknowledgement acknowledgement) {
+        @Valid @NotNull Acknowledgement acknowledgement,
+        @Valid @NotNull Outbox outbox) {
     public enum Mode {
         DISABLED,
         SPIKE,
-        LIVE
+        DIRECT,
+        OUTBOX
     }
 
     public enum Acknowledgement {
@@ -43,5 +45,18 @@ public record MessagingProperties(
     public enum ConsumeStart {
         FIRST,
         LAST
+    }
+
+    public record Outbox(
+            @Min(1) @Max(1000) int batchSize,
+            @NotNull Duration pollInterval,
+            @NotNull Duration leaseDuration,
+            @Min(1) @Max(100) int maxAttempts,
+            @NotNull Duration initialBackoff,
+            @NotNull Duration maxBackoff,
+            @NotBlank @Size(max = 64) String leaseOwner,
+            boolean dispatchEnabled,
+            boolean cleanupEnabled,
+            @NotNull Duration retention) {
     }
 }

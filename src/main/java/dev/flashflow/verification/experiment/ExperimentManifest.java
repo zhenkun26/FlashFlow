@@ -22,6 +22,7 @@ public record ExperimentManifest(
         POOL_SIZE,
         TRANSACTION_RETRY_BUDGET,
         TRANSACTION_SEQUENCE,
+        MESSAGING_MODE,
         STOCK_LEVEL,
         SKU_CONTENTION_SHAPE
     }

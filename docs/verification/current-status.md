@@ -4,7 +4,7 @@ Status vocabulary:
 
 - `PASS`: command executed and assertions passed.
 - `FAIL`: command executed and failed.
-- `BLOCKED`: required runtime or infrastructure was unavailable.
+- `BLOCKED`: a required runtime, clean revision, authorization, or other release prerequisite was unavailable or unreconciled.
 - `NOT_RUN`: available but not executed yet.
 
 Current V2 workspace snapshot (2026-08-09):
@@ -60,3 +60,21 @@ V2.1 leaves the public runtime synchronous. Its Broker probe is local compatibil
 | Commit / push / publication | PASS | V3 implementation, revision-bound evidence, and OpenSpec sync/archive were pushed to `origin/main` through `69918c9` |
 
 V3 implementation, clean-revision gates, specification synchronization, archival, and publication are complete. The live report is evidence for a disposable laboratory topology only; it is not a production availability, persistence, delay-SLA, throughput, or capacity claim. Direct publication retains the documented V4 Outbox/CDC boundary.
+
+## Current V4 apply-workflow snapshot (2026-08-11)
+
+| Gate | Status | Evidence |
+|---|---|---|
+| OpenSpec planning and strict validation | PASS | Proposal, five deltas, design, and tasks exist; `openspec validate build-v4-transactional-outbox-publication --strict` passed in the retained gate run |
+| Java and test compilation | PASS | Java 21 release target compiled 93 production source files and 54 test source files on OpenJDK 26.0.2 |
+| Flyway/MySQL 8.4.6 atomicity and constraints | PASS | 14 selected acceptance, persistence, and reconciliation tests passed against Testcontainers MySQL and Redis |
+| Real RocketMQ V4 recovery matrix | PASS | 5 live tests cover normal publication, Broker outage, producer ACK loss, consumer ACK loss/redelivery, concurrent dispatchers, and bounded backlog drain |
+| Deterministic messaging and evidence matrix | PASS | 30 selected boundary, configuration, dispatcher, consumer, metrics, manifest, and evidence tests passed |
+| Bounded backlog evidence | PASS | 12 durable commands drained with all command, Outbox, order, claim, reservation, movement, and admission invariants passing; local latency, attempts, retries, duplicates, and final balances are retained |
+| Complete suite and static gates | PASS | 123 tests passed with no failures, strict OpenSpec validation passed, and `git diff --check` passed |
+| Revision-bound local report | PASS | `reports/messaging/20260811T013206Z-v4-outbox` records revision `292b47d`, dirty state, environment, 368-second duration, fault schedule, counts, latency dimensions, and invariant results |
+| Clean attributable V4 revision | BLOCKED | The successful report correctly records `dirtyWorktree=true`, `gateStatus=PASS`, and `releaseStatus=BLOCKED`; a commit and clean-revision rerun require authorization |
+| OpenSpec sync/archive | NOT_RUN | Requires completed tasks, gates, review, and separate authorization |
+| Commit / push / publication | NOT_RUN | Requires separate authorization after clean revision-bound review |
+
+The V4 technical gates pass, but release remains blocked until the same implementation is committed and rerun as one clean attributable revision. The retained local report is evidence for a disposable topology only; it does not establish exactly-once publication, CDC behavior, production availability, persistence, failover, throughput, capacity, or latency SLA.

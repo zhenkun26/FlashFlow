@@ -65,10 +65,16 @@ class RocketMqListenerContractTest {
     }
 
     private static MessagingProperties properties() {
-        return new MessagingProperties(MessagingProperties.Mode.LIVE, "127.0.0.1:9876", "5.3.3", "5.3.4",
+        return new MessagingProperties(MessagingProperties.Mode.DIRECT, "127.0.0.1:9876", "5.3.3", "5.3.4",
                 "producer", "orders", "orders-group", "expiration", "expiration-group", "dead-letter",
                 Duration.ofSeconds(3), 1, 3, 14, Duration.ofSeconds(30),
                 MessagingProperties.ConsumeStart.FIRST,
-                MessagingProperties.Acknowledgement.SYNC_FLUSH);
+                MessagingProperties.Acknowledgement.SYNC_FLUSH, outbox());
+    }
+
+    private static MessagingProperties.Outbox outbox() {
+        return new MessagingProperties.Outbox(50, Duration.ofMillis(250), Duration.ofSeconds(10),
+                8, Duration.ofMillis(500), Duration.ofSeconds(30), "test", true, false,
+                Duration.ofDays(7));
     }
 }

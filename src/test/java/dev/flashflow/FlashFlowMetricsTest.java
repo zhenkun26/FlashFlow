@@ -47,4 +47,21 @@ class FlashFlowMetricsTest {
         assertThat(OrderApplicationService.isConnectionAcquisitionFailure(new IllegalStateException("other")))
                 .isFalse();
     }
+
+    @Test
+    void recordsBoundedOutboxEventsAndBacklogGauges() {
+        SimpleMeterRegistry registry = new SimpleMeterRegistry();
+        FlashFlowMetrics metrics = new FlashFlowMetrics(registry);
+
+        metrics.outbox("CLAIM", "TAKEOVER");
+        metrics.outbox("DISPOSITION", "EXHAUSTED");
+        metrics.outboxSnapshot(7, 1250, 2);
+
+        assertThat(registry.get("flashflow.messaging.outbox")
+                .tags("operation", "CLAIM", "outcome", "TAKEOVER").counter().count()).isEqualTo(1);
+        assertThat(registry.get("flashflow.messaging.outbox.backlog").gauge().value()).isEqualTo(7);
+        assertThat(registry.get("flashflow.messaging.outbox.oldest.age.millis").gauge().value())
+                .isEqualTo(1250);
+        assertThat(registry.get("flashflow.messaging.outbox.unresolved").gauge().value()).isEqualTo(2);
+    }
 }

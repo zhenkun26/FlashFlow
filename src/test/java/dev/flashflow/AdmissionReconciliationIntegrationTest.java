@@ -142,6 +142,59 @@ class AdmissionReconciliationIntegrationTest extends RedisIntegrationTest {
                 Integer.class)).isZero();
     }
 
+    @Test
+    void classifiesEveryOutboxDispositionWithoutReleasingAdmission() {
+        fixture().activeSku("a-outbox", "s-outbox", 8);
+        ready("s-outbox", 8);
+        insertOutboxAdmission("s-outbox", "u-ready", "k-ready", "ACCEPTED", "READY");
+        insertOutboxAdmission("s-outbox", "u-claimed", "k-claimed", "ACCEPTED", "CLAIMED");
+        insertOutboxAdmission("s-outbox", "u-retry", "k-retry", "ACCEPTED", "RETRYABLE");
+        insertOutboxAdmission("s-outbox", "u-ack", "k-ack", "ACCEPTED", "ACKNOWLEDGED");
+        insertOutboxAdmission("s-outbox", "u-invalid", "k-invalid", "ACCEPTED", "INVALID");
+        insertOutboxAdmission("s-outbox", "u-exhausted", "k-exhausted", "ACCEPTED", "EXHAUSTED");
+        insertCommandAdmission("s-outbox", "u-missing", "k-missing", "ACCEPTED", "OUTBOX_COMMITTED", false);
+        insertOutboxAdmission("s-outbox", "u-contradict", "k-contradict", "PREPARED", "READY");
+
+        AdmissionReconciliationReport report = reconciliation.reconcile("s-outbox", reports);
+
+        assertThat(report.status()).isEqualTo(ReconciliationStatus.BLOCKED);
+        assertThat(report.unresolved()).isEqualTo(8);
+        assertThat(report.discrepancies())
+                .containsEntry("OUTBOX_READY_IN_FLIGHT", 1L)
+                .containsEntry("OUTBOX_CLAIMED_IN_FLIGHT", 1L)
+                .containsEntry("OUTBOX_RETRYABLE_IN_FLIGHT", 1L)
+                .containsEntry("OUTBOX_ACKNOWLEDGED_AWAITING_RESULT", 1L)
+                .containsEntry("OUTBOX_INVALID_OPERATOR_REQUIRED", 1L)
+                .containsEntry("OUTBOX_EXHAUSTED_OPERATOR_REQUIRED", 1L)
+                .containsEntry("MISSING_OUTBOX_FOR_ACCEPTED_COMMAND", 1L)
+                .containsEntry("CONTRADICTORY_COMMAND_OUTBOX", 1L);
+        assertThat(report.actions()).containsEntry("WITHHOLD_CAPACITY", 8L);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM orders WHERE activity_sku_id = 's-outbox'",
+                Integer.class)).isZero();
+    }
+
+    private void insertOutboxAdmission(
+            String skuId, String userId, String key, String commandStatus, String outboxStatus) {
+        insertCommandAdmission(skuId, userId, key, commandStatus, "OUTBOX_COMMITTED", false);
+        String commandId = identities.admissionId("CREATE_ORDER", userId, key);
+        jdbc.update("""
+                INSERT INTO order_command_outbox
+                  (outbox_id, command_id, schema_version, envelope_payload, envelope_fingerprint,
+                   topic_name, tag_name, status, attempt_count, next_attempt_at,
+                   lease_token, lease_owner, lease_until, result_code, acknowledged_at,
+                   created_at, updated_at)
+                VALUES (?, ?, 1, '{}', REPEAT('b', 64), 'orders', 'ORDER_V1', ?, 1, NOW(6),
+                        CASE WHEN ? = 'CLAIMED' THEN ? ELSE NULL END,
+                        CASE WHEN ? = 'CLAIMED' THEN 'test' ELSE NULL END,
+                        CASE WHEN ? = 'CLAIMED' THEN DATE_ADD(NOW(6), INTERVAL 30 SECOND) ELSE NULL END,
+                        CASE WHEN ? IN ('INVALID', 'EXHAUSTED') THEN ? ELSE NULL END,
+                        CASE WHEN ? = 'ACKNOWLEDGED' THEN NOW(6) ELSE NULL END,
+                        NOW(6), NOW(6))
+                """, UUID.randomUUID().toString(), commandId, outboxStatus, outboxStatus,
+                UUID.randomUUID().toString(), outboxStatus, outboxStatus,
+                outboxStatus, outboxStatus, outboxStatus);
+    }
+
     private void insertCommandAdmission(
             String skuId, String userId, String key, String status, String cause, boolean deadLettered) {
         AdmissionCommand command = command(skuId, key, userId);

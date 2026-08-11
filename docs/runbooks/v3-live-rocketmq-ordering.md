@@ -5,7 +5,7 @@
 1. Start `mysql`, `redis`, and the `messaging-live` Compose profile.
 2. Confirm the one-shot `rocketmq-topics` service exits `0` after creating the order, expiration, and dead-letter topics.
 3. Initialize and publish the Redis generation for every active SKU.
-4. Set `FLASHFLOW_MESSAGING_MODE=LIVE`, a 32+ character admission secret, and the environment-specific NameServer address.
+4. Set `FLASHFLOW_MESSAGING_MODE=DIRECT`, a 32+ character admission secret, and the environment-specific NameServer address. The former `LIVE` value is rejected by V4 configuration.
 5. Start the application and verify `/actuator/health` before sending `/api/v2/orders` traffic.
 
 The classic client uses the Broker address advertised through NameServer. Local Docker must advertise a host-reachable address and map the same Broker listen port; a successful mqadmin probe alone does not establish application connectivity.

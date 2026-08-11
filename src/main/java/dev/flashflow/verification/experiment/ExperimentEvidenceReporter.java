@@ -31,11 +31,13 @@ public final class ExperimentEvidenceReporter {
         boolean workloadCompleted = Boolean.parseBoolean(metadata.getProperty("workloadCompleted", "false"));
         Map<String, String> resolvedInputs = keyValues(runDirectory.resolve("resolved.env"));
         boolean redisAdmission = "REDIS_LUA".equals(resolvedInputs.get("ADMISSION_MODE"));
-        boolean liveMessaging = "LIVE".equals(resolvedInputs.get("MESSAGING_MODE"));
+        boolean activeMessaging = "DIRECT".equals(resolvedInputs.get("MESSAGING_MODE"))
+                || "OUTBOX".equals(resolvedInputs.get("MESSAGING_MODE"));
+        boolean outboxMessaging = "OUTBOX".equals(resolvedInputs.get("MESSAGING_MODE"));
         boolean collectionComplete = Files.isRegularFile(runDirectory.resolve("k6-summary.json"))
                 && Files.isRegularFile(runDirectory.resolve("invariants.tsv"))
                 && Files.isRegularFile(runDirectory.resolve("metrics.prom"))
-                && (!liveMessaging || Files.isRegularFile(runDirectory.resolve("messaging-evidence.properties")))
+                && (!activeMessaging || Files.isRegularFile(runDirectory.resolve("messaging-evidence.properties")))
                 && (!redisAdmission || (Files.isRegularFile(runDirectory.resolve("admission-evidence.properties"))
                         && Files.isRegularFile(runDirectory.resolve("redis-evidence.txt"))
                         && Files.isDirectory(runDirectory.resolve("reconciliation-final"))));
@@ -71,7 +73,7 @@ public final class ExperimentEvidenceReporter {
             warnings.add("Request, admission, MySQL-attempt, and lifecycle counts do not reconcile.");
         }
         boolean messagingReconciled = true;
-        if (liveMessaging) {
+        if (activeMessaging) {
             long identities = property(messagingEvidence, "identity.http");
             long prepared = property(messagingEvidence, "identity.prepared");
             long accepted = property(messagingEvidence, "identity.accepted");
@@ -95,6 +97,20 @@ public final class ExperimentEvidenceReporter {
                             == property(messagingEvidence, "mysql.orders")
                     && inFlight == 0
                     && incompleteGates == 0;
+            if (outboxMessaging) {
+                long outboxRows = property(messagingEvidence, "outbox.rows");
+                long outboxDispositioned = property(messagingEvidence, "outbox.ready")
+                        + property(messagingEvidence, "outbox.claimed")
+                        + property(messagingEvidence, "outbox.retryable")
+                        + property(messagingEvidence, "outbox.acknowledged")
+                        + property(messagingEvidence, "outbox.invalid")
+                        + property(messagingEvidence, "outbox.exhausted");
+                messagingReconciled = messagingReconciled
+                        && outboxRows == accepted
+                        && outboxDispositioned == outboxRows
+                        && property(messagingEvidence, "outbox.unresolved") == 0
+                        && property(messagingEvidence, "outbox.contradictory") == 0;
+            }
             if (!messagingReconciled) {
                 warnings.add("Live HTTP, command, delivery, terminal, MySQL, or required-gate evidence does not reconcile.");
             }
@@ -158,6 +174,23 @@ public final class ExperimentEvidenceReporter {
             }
         }
         String uncontrolled = differences.isEmpty() ? "none" : String.join("; ", differences);
+        String messagingDimensions = comparison.factor() == ExperimentManifest.Factor.MESSAGING_MODE
+                ? "- Acceptance p95: " + latency(left, "acceptanceP95", "p95") + " ms vs "
+                    + latency(right, "acceptanceP95", "p95") + " ms\n"
+                    + "- Broker acknowledgement p95: " + latency(left, "brokerAckP95", "brokerAckP95")
+                    + " ms vs " + latency(right, "brokerAckP95", "brokerAckP95") + " ms\n"
+                    + "- Completion p95: " + latency(left, "completionP95", "p95") + " ms vs "
+                    + latency(right, "completionP95", "p95") + " ms\n"
+                    + "- Recovery: " + latency(left, "recoveryMillis", "recoveryMillis") + " ms vs "
+                    + latency(right, "recoveryMillis", "recoveryMillis") + " ms\n"
+                    + "- Backlog drain: " + latency(left, "backlogDrainMillis", "backlogDrainMillis")
+                    + " ms vs " + latency(right, "backlogDrainMillis", "backlogDrainMillis") + " ms\n"
+                    + "- Duplicate publications: "
+                    + Math.round(left.operationalMetrics().getOrDefault("outbox.duplicatePublications", 0.0))
+                    + " vs "
+                    + Math.round(right.operationalMetrics().getOrDefault("outbox.duplicatePublications", 0.0))
+                    + "\n"
+                : "";
         return "## " + comparison.id() + "\n\n"
                 + "- Declared factor: `" + comparison.factor() + "`\n"
                 + "- Runs: `" + left.runId() + "` vs `" + right.runId() + "`\n"
@@ -166,7 +199,13 @@ public final class ExperimentEvidenceReporter {
                 + right.outcomes().getOrDefault("CREATED", 0L) + "\n"
                 + "- p95: " + left.latencyMillis().getOrDefault("p95", 0.0) + " ms vs "
                 + right.latencyMillis().getOrDefault("p95", 0.0) + " ms\n"
+                + messagingDimensions
                 + "- Uncontrolled environment differences: " + uncontrolled + "\n";
+    }
+
+    private static double latency(ExperimentRunEvidence evidence, String preferred, String fallback) {
+        return evidence.latencyMillis().getOrDefault(preferred,
+                evidence.latencyMillis().getOrDefault(fallback, 0.0));
     }
 
     private static K6Evidence readK6(Path path) throws IOException {

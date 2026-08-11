@@ -2,6 +2,70 @@
 
 The V1/V2 mapped Java tests passed on 2026-08-09 as part of the 60-test V2 Maven suite. V2.1 evidence remains in `2026-08-09-v2-1-local.md`. V3 live mappings below were exercised on 2026-08-10 unless explicitly marked as a deterministic-only boundary; the current roll-up is in `2026-08-10-v3-local.md`.
 
+## v4-transactional-outbox-publication
+
+The mappings below are implementation targets for the active V4 change. They remain `NOT_RUN` until the named gates execute against an attributable V4 revision.
+
+| Scenario | Mapped test/evidence |
+|---|---|
+| Command and Outbox commit atomically | `OutboxAcceptanceIntegrationTest.commandAndOutboxCommitAsOneAcceptedPair` |
+| Acceptance transaction rolls back | `OutboxAcceptanceIntegrationTest.persistenceFaultsExposeNoPartialAcceptedPair` |
+| Response is lost after commit | `OutboxAcceptanceIntegrationTest.sameIdentityRecoversCommittedAcceptanceAfterLostResponse` |
+| Competing dispatchers claim work | `OutboxClaimIntegrationTest.concurrentDispatchersHoldOneActiveLease` |
+| Dispatcher stops after claim | `OutboxClaimIntegrationTest.expiredLeaseIsTakenOver` and real `V4OutboxRocketMqRecoveryIntegrationTest` |
+| No work is eligible | `OutboxDispatcherTest.emptyPollAndTerminalRowsDoNothing` |
+| Broker acknowledges publication | `OutboxDispatcherTest.sendOkRecordsAcknowledgementForCurrentLease` and real V4 gate |
+| Broker is temporarily unavailable | `V4OutboxRocketMqRecoveryIntegrationTest.brokerOutageLeavesBacklogAndRecoveryPublishesWithoutCallerRetry` |
+| Producer acknowledgement is lost | `V4OutboxRocketMqRecoveryIntegrationTest.lostProducerAcknowledgementRepublishesOneBusinessEffect` |
+| Dispatcher stops after Broker acknowledgement | `V4OutboxRocketMqRecoveryIntegrationTest.stopAfterSendOkRecoversThroughDuplicateIdentity` |
+| Retry budget is exhausted | `OutboxDispatcherTest.retryBudgetProducesInspectableExhaustion` and real failure gate |
+| Stored envelope is invalid | `OutboxDispatcherTest.invalidImmutableEnvelopeIsNotPublished` |
+| Operator inspects a backlog | `OutboxMetricsTest` and the append-only V4 local report |
+| Accepted work cannot be reconciled | `ExperimentEvidenceReporterTest.rejectsUnexplainedV4Acceptance` |
+
+## v4-asynchronous-order-contract
+
+| Scenario | Mapped test/evidence |
+|---|---|
+| Durable command awaits dispatch | `OutboxAsyncOrderControllerTest.durablePairReturns202BeforeBrokerAcknowledgement` |
+| Durable acceptance cannot commit | `OutboxAcceptanceIntegrationTest.persistenceFaultsExposeNoPartialAcceptedPair` |
+| Accepted command is queried before delivery | `OutboxAsyncOrderControllerTest.statusKeepsTransportDetailsPrivate` |
+| Accepted command later completes | `V4OutboxRocketMqEndToEndIntegrationTest.acceptanceDispatchAndConsumptionConverge` |
+| Direct mode handles a request | existing `AsyncOrderApplicationServiceTest` plus `MessagingModeIntegrationTest.directKeepsV3Contract` |
+| Outbox mode handles a request | `OutboxAsyncOrderControllerTest.durablePairReturns202BeforeBrokerAcknowledgement` |
+
+## v4-rocketmq-order-runtime
+
+| Scenario | Mapped test/evidence |
+|---|---|
+| Outbox mode starts with complete configuration | `MessagingConfigurationGuardTest.completeOutboxConfigurationPasses` |
+| Outbox configuration is incomplete | `MessagingConfigurationGuardTest.outboxModeRejectsUnsafeDispatcherBounds` |
+| Direct comparison mode is selected | `MessagingModeIntegrationTest.directKeepsV3ContractAndCreatesNoOutboxWork` |
+| Messaging is disabled | `MessagingModeIntegrationTest.disabledCreatesNoMessagingOrDispatcherComponents` |
+| Direct and Outbox carry equivalent commands | `V4ControlledComparisonIntegrationTest.directAndOutboxReuseEnvelopeAndConsumerSemantics` |
+| Outbox publication is duplicated | `V4OutboxRocketMqRecoveryIntegrationTest.lostProducerAcknowledgementRepublishesOneBusinessEffect` |
+
+## v4-redis-outbox-reconciliation
+
+| Scenario | Mapped test/evidence |
+|---|---|
+| Accepted Outbox item awaits publication | `AdmissionReconciliationIntegrationTest.retainsReadyClaimedAndRetryableOutboxAdmissions` |
+| Outbox item was acknowledged | `AdmissionReconciliationIntegrationTest.retainsAcknowledgedNonterminalOutboxAdmission` |
+| Outbox publication is exhausted | `AdmissionReconciliationIntegrationTest.exhaustedOrInvalidOutboxRequiresOperatorEvidence` |
+| No durable or in-progress effect is proven | `AdmissionReconciliationIntegrationTest.releasesOnlyProvenNoEffectOutboxAdmission` |
+| Outbox evidence is unavailable or contradictory | `AdmissionReconciliationIntegrationTest.blocksMissingOrContradictoryOutboxEvidence` |
+
+## v4-concurrency-experiments
+
+| Scenario | Mapped test/evidence |
+|---|---|
+| V4 workload and drain complete | `V4ControlledComparisonIntegrationTest` and revision-bound V4 local report |
+| Durable accepted work is unexplained | `ExperimentEvidenceReporterTest.rejectsUnexplainedV4Acceptance` |
+| Claim expires during a fault drill | `OutboxClaimIntegrationTest.expiredLeaseIsTakenOver` plus retained identity evidence |
+| Direct and Outbox runs are compared | `V4ControlledComparisonIntegrationTest.directAndOutboxReportSeparateLatencyDimensions` |
+| Broker outage spans acceptance | `V4ControlledComparisonIntegrationTest.outageSeparatesDirectNonAcceptanceFromOutboxRecovery` |
+| Local comparison completes | revision-bound V4 local report with machine, container, dataset, revision, fault, and local-scope fields |
+
 ## v3-live-rocketmq-ordering
 
 | Scenario | Mapped test/evidence |

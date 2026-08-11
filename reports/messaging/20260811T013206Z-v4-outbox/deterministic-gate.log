@@ -1,0 +1,74 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< dev.flashflow:flashflow >-----------------------
+[INFO] Building FlashFlow 0.1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] 1 problem was encountered while building the effective model for org.javassist:javassist:jar:3.21.0-GA during dependency collection step for project (use -X to see details)
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ flashflow ---
+[INFO] Copying 5 resources from src/main/resources to target/classes
+[INFO] Copying 11 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.0:compile (default-compile) @ flashflow ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ flashflow ---
+[INFO] skip non existing resourceDirectory /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.0:testCompile (default-testCompile) @ flashflow ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 54 source files with javac [debug parameters release 21] to target/test-classes
+[WARNING] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/ExpirationAdmissionFailureIntegrationTest.java:[26,6] org.springframework.boot.test.mock.mockito 中的 org.springframework.boot.test.mock.mockito.MockBean 已过时, 且标记为待删除
+[WARNING] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/ExpirationRollbackIntegrationTest.java:[21,6] org.springframework.boot.test.mock.mockito 中的 org.springframework.boot.test.mock.mockito.MockBean 已过时, 且标记为待删除
+[INFO] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/admission/RedisLuaAdmissionFailureTest.java: /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/admission/RedisLuaAdmissionFailureTest.java使用了未经检查或不安全的操作。
+[INFO] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/admission/RedisLuaAdmissionFailureTest.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+[INFO] 
+[INFO] --- surefire:3.5.3:test (default-test) @ flashflow ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running dev.flashflow.MessagingBoundaryTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.068 s -- in dev.flashflow.MessagingBoundaryTest
+[INFO] Running dev.flashflow.ExperimentManifestValidatorTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.099 s -- in dev.flashflow.ExperimentManifestValidatorTest
+[INFO] Running dev.flashflow.shared.config.MessagingConfigurationGuardTest
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in dev.flashflow.shared.config.MessagingConfigurationGuardTest
+[INFO] Running dev.flashflow.ExperimentEvidenceReporterTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.049 s -- in dev.flashflow.ExperimentEvidenceReporterTest
+[INFO] Running dev.flashflow.ordering.FlashFlowMetricsTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in dev.flashflow.ordering.FlashFlowMetricsTest
+[INFO] Running dev.flashflow.messaging.AsyncOrderApplicationServiceTest
+09:34:48.785 [main] INFO dev.flashflow.messaging.AsyncOrderApplicationService -- Asynchronous publication command_id=01f6edbdbcb069068af0743c4a6c1cdf608ddb350e20c922f2699fa0232ba5f4 outcome=DEFINITELY_NOT_PUBLISHED status=RETRYABLE cause=CONNECT_FAILED
+09:34:48.789 [main] INFO dev.flashflow.messaging.AsyncOrderApplicationService -- Asynchronous publication command_id=1cc3cdc8f3519b00083f110b3605cd4a5b770b7e5245fbd4722e3d69cc876121 outcome=AMBIGUOUS status=UNRESOLVED cause=REMOTING_TIMEOUT
+09:34:48.789 [main] INFO dev.flashflow.messaging.AsyncOrderApplicationService -- Asynchronous publication command_id=1cc3cdc8f3519b00083f110b3605cd4a5b770b7e5245fbd4722e3d69cc876121 outcome=AMBIGUOUS status=UNRESOLVED cause=REMOTING_TIMEOUT
+09:34:48.791 [main] INFO dev.flashflow.messaging.AsyncOrderApplicationService -- Asynchronous publication command_id=eb5faa2199474e8f5bc1a28fb0121e6030966fc10dd104d1a1406803200ea69a outcome=BROKER_ACKNOWLEDGED status=ACCEPTED cause=SEND_OK
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.020 s -- in dev.flashflow.messaging.AsyncOrderApplicationServiceTest
+[INFO] Running dev.flashflow.messaging.RocketMqListenerContractTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in dev.flashflow.messaging.RocketMqListenerContractTest
+[INFO] Running dev.flashflow.messaging.OutboxAsyncOrderApplicationServiceTest
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+09:34:49.068 [main] INFO dev.flashflow.messaging.outbox.OutboxAsyncOrderApplicationService -- Durable Outbox acceptance command_id=a7e3407f561a93b1e814e8043a124494518c72dc766988244ddc280fe0b281c4 status=ACCEPTED
+09:34:49.078 [main] WARN dev.flashflow.messaging.outbox.OutboxAsyncOrderApplicationService -- Durable Outbox acceptance unresolved command_id=a7e3407f561a93b1e814e8043a124494518c72dc766988244ddc280fe0b281c4 cause=IllegalStateException
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.278 s -- in dev.flashflow.messaging.OutboxAsyncOrderApplicationServiceTest
+[INFO] Running dev.flashflow.messaging.DeterministicPublicationCoordinatorTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in dev.flashflow.messaging.DeterministicPublicationCoordinatorTest
+[INFO] Running dev.flashflow.messaging.OutboxDispatcherTest
+09:34:49.123 [main] INFO dev.flashflow.messaging.outbox.OutboxDispatcher -- Outbox publication deferred outbox_id=outbox command_id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa outcome=RETRYABLE cause=REMOTING_TIMEOUT
+09:34:49.125 [main] WARN dev.flashflow.messaging.outbox.OutboxDispatcher -- Outbox publication exhausted outbox_id=outbox command_id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa cause=CONNECT_FAILED
+09:34:49.126 [main] INFO dev.flashflow.messaging.outbox.OutboxDispatcher -- Outbox publication outbox_id=outbox command_id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa outcome=ACKNOWLEDGED
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.044 s -- in dev.flashflow.messaging.OutboxDispatcherTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 30, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.689 s
+[INFO] Finished at: 2026-08-11T09:34:49+08:00
+[INFO] ------------------------------------------------------------------------

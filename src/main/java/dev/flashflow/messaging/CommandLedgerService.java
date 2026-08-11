@@ -72,6 +72,10 @@ public final class CommandLedgerService {
         return row;
     }
 
+    public CommandRow find(String commandId) {
+        return mapper.findById(commandId);
+    }
+
     public CommandSummary summary(String commandId) {
         CommandRow row = require(commandId);
         return summary(row);

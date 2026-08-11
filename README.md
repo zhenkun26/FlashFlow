@@ -1,8 +1,8 @@
 # FlashFlow
 
-FlashFlow is a database-first limited-stock ordering laboratory. V1 establishes synchronous MySQL/InnoDB correctness; V2 adds Redis Lua admission; V2.1 adds transport-neutral messaging seams; V3 activates an explicitly selected RocketMQ producer, at-least-once consumer, asynchronous HTTP contract, DLQ, and advisory delayed expiration. MySQL remains the sole durable business source of truth.
+FlashFlow is a database-first limited-stock ordering laboratory. V1 establishes synchronous MySQL/InnoDB correctness; V2 adds Redis Lua admission; V2.1 adds transport-neutral messaging seams; V3 activates direct RocketMQ ordering; the active V4 change adds a polling Transactional Outbox with recoverable at-least-once publication. MySQL remains the sole durable business source of truth.
 
-## Current V3 scope
+## Current V3 baseline and V4 apply scope
 
 - Java 21, Spring Boot, MyBatis, MySQL/InnoDB, Redis Lua, Flyway, JUnit, Testcontainers, Micrometer, and k6.
 - One activity SKU and quantity one per order.
@@ -10,11 +10,12 @@ FlashFlow is a database-first limited-stock ordering laboratory. V1 establishes 
 - Four inventory strategies: conditional atomic update (normal default), pessimistic lock, optimistic lock, and an unsafe read-then-write laboratory control.
 - Redis admission IDs are privacy-preserving digests; atomic scripts enforce generation, capacity, replay, per-user activity, confirmation, release, and quarantine.
 - Fenced reconciliation rebuilds Redis only from committed MySQL facts and emits append-only evidence.
-- `LIVE` messaging mode loads a pinned RocketMQ 5.3.3 classic Java client against the pinned 5.3.4 Broker; `DISABLED` remains broker-free.
+- `DIRECT` preserves V3 inline Broker-acknowledged acceptance, `OUTBOX` selects V4 durable MySQL acceptance and polling dispatch, and `DISABLED` remains broker-free. The former `LIVE` value is rejected.
 - `/api/v2/orders` returns `202 Accepted` only after `SEND_OK`; `/api/v2/order-commands/{commandId}` exposes caller-scoped durable status.
 - Consumers are at-least-once and acknowledge only recoverable outcomes. Bounded retries and poison messages lead to an inspectable dedicated dead-letter topic.
 - Delayed expiration messages accelerate the existing locked MySQL closure; the scanner remains the recovery authority.
-- V3 direct publication is deliberately not an Outbox guarantee. No CDC, dispatcher lease, crash-safe eventual publication, production availability, delay SLA, or production-capacity claim is made.
+- V4 persists a stable immutable envelope beside the command in one MySQL transaction, then uses bounded expiring leases to recover publication after restart or Broker outage.
+- V4 remains an unverified apply workflow until its full MySQL/Redis/real-RocketMQ gates pass. No exactly-once transport, CDC, automated replay, production availability, persistence, delay SLA, or production-capacity claim is made.
 
 ## Invariants
 
@@ -69,7 +70,7 @@ If port 3306 is already occupied, set `FLASHFLOW_MYSQL_PORT=3307` for Compose an
 
 The commands above explicitly retain `MYSQL_ONLY` behavior. To enable V2, start `mysql redis`, set `FLASHFLOW_ADMISSION_MODE=REDIS_LUA` and a 32+ character `FLASHFLOW_ADMISSION_IDENTITY_SECRET`, then initialize the SKU generation as described in the V2 runbook. Redis failure is fail-closed; it never falls back to an unadmitted MySQL attempt.
 
-To enable the V3 laboratory topology, run `docker compose --profile messaging-live up -d` and select `FLASHFLOW_MESSAGING_MODE=LIVE`. Configure the advertised Broker address and host ports as described in the V3 runbook. The live route is intentionally unavailable when messaging is disabled.
+To enable the messaging laboratory topology, run `docker compose --profile messaging-live up -d` and select `FLASHFLOW_MESSAGING_MODE=DIRECT` for the V3 control or `FLASHFLOW_MESSAGING_MODE=OUTBOX` for V4. Configure the advertised Broker address, Outbox bounds, and host ports as described in the V3/V4 runbooks. The asynchronous route is unavailable when messaging is disabled.
 
 Load disposable demonstration data:
 

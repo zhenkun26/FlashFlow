@@ -2,11 +2,29 @@
 
 FlashFlow follows evidence-backed milestone releases. Performance figures below describe controlled local Docker experiments only; they are not production capacity or availability claims.
 
+## V4 — Unreleased apply workflow
+
+### Added
+
+- Added an additive one-command/one-envelope MySQL Outbox schema, atomic durable acceptance service, immutable replay validation, bounded polling dispatcher, expiring token-fenced leases, retries, exhaustion, and conservative retention eligibility.
+- Added explicit `DIRECT`, `OUTBOX`, and `DISABLED` modes; the legacy `LIVE` value is rejected. `DIRECT` retains V3 inline Broker acknowledgement, while `OUTBOX` returns `202` after command-plus-Outbox commit.
+- Added Outbox-aware Redis reconciliation, low-cardinality backlog/lease/disposition metrics, identity-level evidence rejection, deterministic tests, MySQL/Redis fixtures, and real RocketMQ recovery fixtures.
+
+### Boundary
+
+- Publication is at least once. Lease expiry or acknowledgement loss may duplicate a message; the stable command identity and idempotent consumer prevent duplicate business effects.
+- `INVALID` and `EXHAUSTED` do not prove absence of a prior delivery and do not release admission automatically.
+- CDC/Debezium, automatic replay, exactly-once publication, production HA, persistence, capacity, and latency SLA remain excluded.
+
+### Status
+
+- Implementation is in progress under `build-v4-transactional-outbox-publication`. Docker-dependent MySQL, Redis, real RocketMQ, controlled comparison, clean-revision, sync/archive, commit, push, and publication gates have not passed and are not implied by this source state.
+
 ## V3 — 2026-08-10
 
 ### Added
 
-- Added explicit `LIVE` RocketMQ configuration, startup guards, pinned Java client, deterministic topic provisioning, direct producer, at-least-once order consumer, bounded retry, dedicated dead-letter publication, and bounded transport evidence.
+- Added explicit RocketMQ configuration (renamed to the `DIRECT` control by V4), startup guards, pinned Java client, deterministic topic provisioning, direct producer, at-least-once order consumer, bounded retry, dedicated dead-letter publication, and bounded transport evidence.
 - Added `/api/v2/orders` with Broker-acknowledged `202 Accepted` semantics and caller-scoped command-status lookup.
 - Added after-commit delayed-expiration publication and a live consumer that reuses the existing locked closure boundary while retaining scanner recovery.
 - Added deterministic listener tests, MySQL/Redis integration regressions, and a real HTTP → Redis → RocketMQ → MySQL → status → delayed-close test.

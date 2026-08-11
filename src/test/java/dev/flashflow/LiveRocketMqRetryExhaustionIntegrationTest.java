@@ -33,7 +33,7 @@ class LiveRocketMqRetryExhaustionIntegrationTest extends RedisIntegrationTest {
 
     @DynamicPropertySource
     static void liveMessaging(DynamicPropertyRegistry registry) {
-        registry.add("flashflow.messaging.mode", () -> "LIVE");
+        registry.add("flashflow.messaging.mode", () -> "DIRECT");
         registry.add("flashflow.messaging.namesrv-addr", () -> "127.0.0.1:9876");
         registry.add("flashflow.messaging.order-consumer-group", () -> "flashflow-exhaustion-orders-" + GROUP_SUFFIX);
         registry.add("flashflow.messaging.expiration-consumer-group", () -> "flashflow-exhaustion-exp-" + GROUP_SUFFIX);

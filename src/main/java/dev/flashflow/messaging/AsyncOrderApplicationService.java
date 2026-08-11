@@ -17,8 +17,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnProperty(prefix = "flashflow.messaging", name = "mode", havingValue = "LIVE")
-public final class AsyncOrderApplicationService {
+@ConditionalOnProperty(prefix = "flashflow.messaging", name = "mode", havingValue = "DIRECT")
+public final class AsyncOrderApplicationService implements AsyncOrderSubmissionService {
     private static final Logger log = LoggerFactory.getLogger(AsyncOrderApplicationService.class);
     private final OrderCommandFactory commands;
     private final CommandLedgerService ledger;
@@ -51,6 +51,7 @@ public final class AsyncOrderApplicationService {
         this.clock = clock;
     }
 
+    @Override
     public AsyncOrderSubmission submit(PlaceOrderCommand command, String traceId) {
         OrderCommandEnvelope envelope = commands.create(command, traceId);
         CommandRow row = ledger.prepare(envelope);
@@ -80,6 +81,8 @@ public final class AsyncOrderApplicationService {
         CommandStatus status = resolution == PublicationResolution.UNRESOLVED
                 ? CommandStatus.UNRESOLVED
                 : switch (publication.outcome()) {
+                    case DURABLY_QUEUED -> throw new IllegalArgumentException(
+                            "Direct publication cannot return DURABLY_QUEUED");
                     case BROKER_ACKNOWLEDGED -> CommandStatus.ACCEPTED;
                     case DEFINITELY_NOT_PUBLISHED -> CommandStatus.RETRYABLE;
                     case AMBIGUOUS -> CommandStatus.UNRESOLVED;

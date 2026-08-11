@@ -29,9 +29,12 @@ public interface AdmissionReconciliationMapper {
     List<IdempotencyRow> findAllOrderIdempotency();
 
     @Select("""
-            SELECT command_id, status, transport_cause, updated_at, dead_lettered_at
-            FROM order_command_ledger
-            WHERE activity_sku_id = #{skuId}
+            SELECT c.command_id, c.status, c.transport_cause, c.updated_at, c.dead_lettered_at,
+                   o.status AS outbox_status, o.result_code AS outbox_result_code,
+                   o.lease_until AS outbox_lease_until
+            FROM order_command_ledger c
+            LEFT JOIN order_command_outbox o ON o.command_id = c.command_id
+            WHERE c.activity_sku_id = #{skuId}
             """)
     List<CommandAdmissionRow> findCommands(String skuId);
 }

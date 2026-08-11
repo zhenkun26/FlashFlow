@@ -13,6 +13,7 @@ public final class DatabaseFixture {
     }
 
     public void reset() {
+        jdbc.update("DELETE FROM order_command_outbox");
         jdbc.update("DELETE FROM order_command_ledger");
         jdbc.update("DELETE FROM compensation_case");
         jdbc.update("DELETE FROM payment_callback_event");

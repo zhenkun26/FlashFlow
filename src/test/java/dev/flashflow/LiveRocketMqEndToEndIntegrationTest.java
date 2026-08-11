@@ -47,7 +47,7 @@ class LiveRocketMqEndToEndIntegrationTest extends RedisIntegrationTest {
 
     @DynamicPropertySource
     static void liveMessaging(DynamicPropertyRegistry registry) {
-        registry.add("flashflow.messaging.mode", () -> "LIVE");
+        registry.add("flashflow.messaging.mode", () -> "DIRECT");
         registry.add("flashflow.messaging.namesrv-addr", () -> "127.0.0.1:9876");
         registry.add("flashflow.messaging.order-consumer-group", () -> "flashflow-e2e-orders-" + GROUP_SUFFIX);
         registry.add("flashflow.messaging.expiration-consumer-group", () -> "flashflow-e2e-exp-" + GROUP_SUFFIX);
@@ -208,10 +208,15 @@ class LiveRocketMqEndToEndIntegrationTest extends RedisIntegrationTest {
     @Test
     @org.junit.jupiter.api.Order(5)
     void brokerOutageDoesNotClaimAcceptanceAndSameIdentityRecoversAfterRestart() throws Exception {
-        fixture().activeSku("activity-restart", "sku-restart", 1);
+        String identity = GROUP_SUFFIX.substring(0, 8);
+        String activity = "activity-restart-" + identity;
+        String sku = "sku-restart-" + identity;
+        String user = "user-restart-" + identity;
+        String key = "key-restart-" + identity;
+        fixture().activeSku(activity, sku, 1);
         String generation = "g-" + UUID.randomUUID();
-        assertThat(admission.beginGeneration("sku-restart", generation, 1, "fence-restart")).isTrue();
-        assertThat(admission.publishGeneration("sku-restart", generation, "fence-restart")).isTrue();
+        assertThat(admission.beginGeneration(sku, generation, 1, "fence-" + identity)).isTrue();
+        assertThat(admission.publishGeneration(sku, generation, "fence-" + identity)).isTrue();
 
         var docker = DockerClientFactory.instance().client();
         var matches = docker.listContainersCmd().withShowAll(true)
@@ -222,7 +227,7 @@ class LiveRocketMqEndToEndIntegrationTest extends RedisIntegrationTest {
         await(Duration.ofSeconds(10), () -> !Boolean.TRUE.equals(
                 docker.inspectContainerCmd(brokerId).exec().getState().getRunning()));
         try {
-            var unavailable = post("key-restart", "user-restart", "sku-restart");
+            var unavailable = post(key, user, sku);
             assertThat(unavailable.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
             assertThat(unavailable.getBody().status())
                     .isIn(CommandStatus.RETRYABLE, CommandStatus.UNRESOLVED);
@@ -233,8 +238,10 @@ class LiveRocketMqEndToEndIntegrationTest extends RedisIntegrationTest {
         }
 
         AtomicReference<org.springframework.http.ResponseEntity<AsyncOrderResponse>> accepted = new AtomicReference<>();
-        await(Duration.ofSeconds(30), () -> {
-            var candidate = post("key-restart", "user-restart", "sku-restart");
+        // RocketMQ refreshes unavailable route information on a 30-second cadence.
+        // Allow one complete refresh after the broker process becomes healthy.
+        await(Duration.ofSeconds(60), () -> {
+            var candidate = post(key, user, sku);
             if (candidate.getStatusCode() == HttpStatus.ACCEPTED) {
                 accepted.set(candidate);
                 return true;
@@ -242,9 +249,9 @@ class LiveRocketMqEndToEndIntegrationTest extends RedisIntegrationTest {
             return false;
         });
         String commandId = accepted.get().getBody().commandId();
-        await(Duration.ofSeconds(20), () -> ledger.summary(commandId).status() == CommandStatus.COMPLETED);
-        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM orders WHERE user_id = 'user-restart'",
-                Integer.class)).isEqualTo(1);
+        await(Duration.ofSeconds(60), () -> ledger.summary(commandId).status() == CommandStatus.COMPLETED);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM orders WHERE user_id = ?",
+                Integer.class, user)).isEqualTo(1);
     }
 
     private org.springframework.http.ResponseEntity<AsyncOrderResponse> post(

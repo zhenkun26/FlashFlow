@@ -4,16 +4,23 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.util.function.Supplier;
+import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class FlashFlowMetrics {
     private final MeterRegistry registry;
     private final Timer orderTimer;
+    private final AtomicLong outboxBacklog = new AtomicLong();
+    private final AtomicLong outboxOldestAgeMillis = new AtomicLong();
+    private final AtomicLong outboxUnresolved = new AtomicLong();
 
     public FlashFlowMetrics(MeterRegistry registry) {
         this.registry = registry;
         this.orderTimer = registry.timer("flashflow.order.transaction");
+        registry.gauge("flashflow.messaging.outbox.backlog", outboxBacklog);
+        registry.gauge("flashflow.messaging.outbox.oldest.age.millis", outboxOldestAgeMillis);
+        registry.gauge("flashflow.messaging.outbox.unresolved", outboxUnresolved);
     }
 
     public <T> T timeOrder(Supplier<T> operation) {
@@ -98,5 +105,16 @@ public final class FlashFlowMetrics {
     public void unresolvedWork(String kind, long count) {
         registry.gauge("flashflow.messaging.unresolved", java.util.List.of(
                 io.micrometer.core.instrument.Tag.of("kind", kind)), count);
+    }
+
+    public void outbox(String operation, String outcome) {
+        Counter.builder("flashflow.messaging.outbox")
+                .tag("operation", operation).tag("outcome", outcome).register(registry).increment();
+    }
+
+    public void outboxSnapshot(long backlog, long oldestAgeMillis, long unresolved) {
+        outboxBacklog.set(Math.max(0, backlog));
+        outboxOldestAgeMillis.set(Math.max(0, oldestAgeMillis));
+        outboxUnresolved.set(Math.max(0, unresolved));
     }
 }

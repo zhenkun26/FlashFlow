@@ -7,5 +7,8 @@ public record CommandAdmissionRow(
         String status,
         String transportCause,
         LocalDateTime updatedAt,
-        LocalDateTime deadLetteredAt) {
+        LocalDateTime deadLetteredAt,
+        String outboxStatus,
+        String outboxResultCode,
+        LocalDateTime outboxLeaseUntil) {
 }

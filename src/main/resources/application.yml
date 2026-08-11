@@ -60,6 +60,17 @@ flashflow:
     consume-from: ${FLASHFLOW_ROCKETMQ_CONSUME_FROM:FIRST}
     acknowledgement: SYNC_FLUSH
     injected-fault: ${FLASHFLOW_MESSAGING_INJECTED_FAULT:NONE}
+    outbox:
+      batch-size: ${FLASHFLOW_OUTBOX_BATCH_SIZE:50}
+      poll-interval: ${FLASHFLOW_OUTBOX_POLL_INTERVAL:250ms}
+      lease-duration: ${FLASHFLOW_OUTBOX_LEASE_DURATION:10s}
+      max-attempts: ${FLASHFLOW_OUTBOX_MAX_ATTEMPTS:8}
+      initial-backoff: ${FLASHFLOW_OUTBOX_INITIAL_BACKOFF:500ms}
+      max-backoff: ${FLASHFLOW_OUTBOX_MAX_BACKOFF:30s}
+      lease-owner: ${FLASHFLOW_OUTBOX_LEASE_OWNER:flashflow-v4-local}
+      dispatch-enabled: ${FLASHFLOW_OUTBOX_DISPATCH_ENABLED:true}
+      cleanup-enabled: ${FLASHFLOW_OUTBOX_CLEANUP_ENABLED:false}
+      retention: ${FLASHFLOW_OUTBOX_RETENTION:168h}
 
 management:
   health:

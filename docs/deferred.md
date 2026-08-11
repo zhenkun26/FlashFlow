@@ -1,11 +1,10 @@
-# Deferred after V3
+# Deferred after V4
 
 The following are intentionally absent and require separate OpenSpec changes:
 
-- V4 Transactional Outbox/CDC publication, dispatcher leases, and broker-confirmation recovery. The V2.1 command ledger is deliberately not an Outbox.
-- Automated replay of dead-lettered commands; V3 retains inspectable evidence and requires same-identity operator replay.
+- Debezium/CDC comparison with the polling Transactional Outbox; the application-owned polling path is the V4 implementation under test.
+- Automatic replay of `INVALID` or `EXHAUSTED` Outbox records and automatic replay of dead-lettered commands; replay must preserve the stable identity and re-check MySQL business truth.
 - Automated refund execution and provider reconciliation.
-- Debezium CDC comparison.
 - Multiple order lines, quantity greater than one, seat selection, cart, catalog, coupon, fulfillment, and logistics.
 - Microservice extraction, sharding, Kubernetes, multi-region or high-availability claims.
 

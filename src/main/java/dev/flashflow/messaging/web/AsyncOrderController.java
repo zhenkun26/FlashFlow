@@ -1,7 +1,7 @@
 package dev.flashflow.messaging.web;
 
-import dev.flashflow.messaging.AsyncOrderApplicationService;
 import dev.flashflow.messaging.AsyncOrderSubmission;
+import dev.flashflow.messaging.AsyncOrderSubmissionService;
 import dev.flashflow.messaging.CommandLedgerService;
 import dev.flashflow.messaging.CommandSummary;
 import dev.flashflow.ordering.PlaceOrderCommand;
@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import org.slf4j.MDC;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,12 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Validated
 @RequestMapping("/api/v2")
-@ConditionalOnProperty(prefix = "flashflow.messaging", name = "mode", havingValue = "LIVE")
+@ConditionalOnExpression("'${flashflow.messaging.mode:DISABLED}' == 'DIRECT' or '${flashflow.messaging.mode:DISABLED}' == 'OUTBOX'")
 public class AsyncOrderController {
-    private final AsyncOrderApplicationService orders;
+    private final AsyncOrderSubmissionService orders;
     private final CommandLedgerService ledger;
 
-    public AsyncOrderController(AsyncOrderApplicationService orders, CommandLedgerService ledger) {
+    public AsyncOrderController(AsyncOrderSubmissionService orders, CommandLedgerService ledger) {
         this.orders = orders;
         this.ledger = ledger;
     }

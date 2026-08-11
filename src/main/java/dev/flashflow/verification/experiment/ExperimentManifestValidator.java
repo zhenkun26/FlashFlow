@@ -149,8 +149,9 @@ public final class ExperimentManifestValidator {
             errors.add(prefix + "messaging-live requires live inputs");
             return;
         }
-        if (!"LIVE".equals(live.mode()) || !"5.3.4".equals(live.brokerVersion())) {
-            errors.add(prefix + "live mode and brokerVersion must be pinned");
+        if (!("DIRECT".equals(live.mode()) || "OUTBOX".equals(live.mode()))
+                || !"5.3.4".equals(live.brokerVersion())) {
+            errors.add(prefix + "DIRECT/OUTBOX mode and brokerVersion must be pinned");
         }
         if (live.namesrvAddr() == null || live.namesrvAddr().isBlank()
                 || live.orderTopic() == null || live.orderTopic().isBlank()
@@ -227,6 +228,13 @@ public final class ExperimentManifestValidator {
         }
         if (left.transactionSequence() != right.transactionSequence()) {
             changed.add(ExperimentManifest.Factor.TRANSACTION_SEQUENCE);
+        }
+        String leftMessagingMode = left.messaging() == null || left.messaging().live() == null
+                ? null : left.messaging().live().mode();
+        String rightMessagingMode = right.messaging() == null || right.messaging().live() == null
+                ? null : right.messaging().live().mode();
+        if (!java.util.Objects.equals(leftMessagingMode, rightMessagingMode)) {
+            changed.add(ExperimentManifest.Factor.MESSAGING_MODE);
         }
         if (left.initialStock() != right.initialStock()) changed.add(ExperimentManifest.Factor.STOCK_LEVEL);
         if (left.skuDistribution() != right.skuDistribution() || left.skuCount() != right.skuCount()) {

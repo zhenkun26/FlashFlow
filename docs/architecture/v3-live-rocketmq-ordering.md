@@ -23,7 +23,7 @@ Delayed delivery or scanner
 
 MySQL is the only business source of truth. Redis controls hot-path capacity and RocketMQ transports work; neither can create an order or inventory result. Delivery is at-least-once, so stable command identity and existing idempotency are the correctness mechanism.
 
-V3 direct publication deliberately exposes the preparation-to-Broker crash window. The ledger records identity and observed state but stores no dispatch payload and runs no polling publisher. V4 can add Outbox/CDC without changing the consumer identity contract.
+V3 direct publication deliberately exposes the preparation-to-Broker crash window. The ledger records identity and observed state but stores no dispatch payload and runs no polling publisher. The V4 `OUTBOX` mode adds polling recovery without changing this `DIRECT` control or the consumer identity contract.
 
 Metrics use bounded operation/outcome tags. Raw user IDs and idempotency keys are excluded from Broker keys, metric tags, dead-letter metadata, and retained reports.
 
