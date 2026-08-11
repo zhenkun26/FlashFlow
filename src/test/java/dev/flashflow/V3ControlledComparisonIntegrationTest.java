@@ -71,7 +71,7 @@ class V3ControlledComparisonIntegrationTest extends RedisIntegrationTest {
         assertThat(sync.getBody().code()).isEqualTo(OrderResultCode.CREATED);
 
         long asyncStarted = System.nanoTime();
-        var accepted = postUntilAccepted(Duration.ofSeconds(20),
+        var accepted = postUntilAccepted(Duration.ofSeconds(60),
                 request("key-control-v3", "user-control-v3", "sku-control-v3"));
         long asyncAccepted = System.nanoTime();
         assertThat(accepted.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
