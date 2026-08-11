@@ -1,8 +1,8 @@
 # FlashFlow
 
-FlashFlow 是一个数据库优先的限量下单实验室。V1 建立同步 MySQL/InnoDB 的正确性；V2 引入 Redis Lua 准入（admission）；V2.1 增加与具体传输无关的消息接入点（messaging seam）；V3 启用直接 RocketMQ 下单；当前推进中的 V4 变更增加轮询式事务性 Outbox（Transactional Outbox），实现可恢复的至少一次（at-least-once）发布。MySQL 仍是唯一持久化的业务事实来源（source of truth）。
+FlashFlow（闪电购）是一个把「限量抢购」做到账目不出错的工程实验。V1 用同步 MySQL 下单打底正确性；V2 加入 Redis 抢购闸门；V2.1 打通与传输无关的消息接入点；V3 启用直接 RocketMQ 下单；进行中的 V4 增加轮询式事务性 Outbox，让消息在进程重启或 Broker 故障后也能恢复发布（至少一次投递）。MySQL 始终是唯一可信的账本。
 
-FlashFlow is a database-first limited-stock ordering laboratory. V1 establishes synchronous MySQL/InnoDB correctness; V2 adds Redis Lua admission; V2.1 adds transport-neutral messaging seams; V3 activates direct RocketMQ ordering; the active V4 change adds a polling Transactional Outbox with recoverable at-least-once publication. MySQL remains the sole durable business source of truth.
+FlashFlow is a database-first flash-sale lab where the books never break. V1 establishes synchronous MySQL/InnoDB correctness; V2 adds a Redis admission gate; V2.1 adds transport-neutral messaging seams; V3 activates direct RocketMQ ordering; the in-progress V4 change adds a polling Transactional Outbox so publication recovers after process restarts or Broker outages (at-least-once delivery). MySQL remains the sole durable source of truth.
 
 ## 当前 V3 基线现状与 V4 适用范围 · Current V3 baseline and V4 apply scope
 
