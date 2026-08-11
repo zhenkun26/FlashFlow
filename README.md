@@ -1,8 +1,5 @@
 # FlashFlow
 
-> 中英对照排版：每段先中文后英文，技术术语与代码取值以英文为准。
-> Bilingual layout: each Chinese paragraph is followed by its English counterpart; English terms are authoritative.
-
 FlashFlow 是一个数据库优先的限量下单实验室。V1 建立同步 MySQL/InnoDB 的正确性；V2 引入 Redis Lua 准入（admission）；V2.1 增加与具体传输无关的消息接入点（messaging seam）；V3 启用直接 RocketMQ 下单；当前推进中的 V4 变更增加轮询式事务性 Outbox（Transactional Outbox），实现可恢复的至少一次（at-least-once）发布。MySQL 仍是唯一持久化的业务事实来源（source of truth）。
 
 FlashFlow is a database-first limited-stock ordering laboratory. V1 establishes synchronous MySQL/InnoDB correctness; V2 adds Redis Lua admission; V2.1 adds transport-neutral messaging seams; V3 activates direct RocketMQ ordering; the active V4 change adds a polling Transactional Outbox with recoverable at-least-once publication. MySQL remains the sole durable business source of truth.
