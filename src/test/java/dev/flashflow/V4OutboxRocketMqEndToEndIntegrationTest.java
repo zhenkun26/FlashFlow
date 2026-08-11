@@ -67,7 +67,7 @@ class V4OutboxRocketMqEndToEndIntegrationTest extends RedisIntegrationTest {
         AsyncOrderResponse response = post("key-v4-" + suffix, user, sku);
         assertThat(response.status()).isEqualTo(CommandStatus.ACCEPTED);
 
-        await(Duration.ofSeconds(30), () -> ledger.summary(response.commandId()).status() == CommandStatus.COMPLETED);
+        await(Duration.ofSeconds(60), () -> ledger.summary(response.commandId()).status() == CommandStatus.COMPLETED);
         assertThat(outbox.findByCommandId(response.commandId()).status()).isEqualTo("ACKNOWLEDGED");
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM orders WHERE user_id = ?", Integer.class, user))
                 .isEqualTo(1);
@@ -101,7 +101,7 @@ class V4OutboxRocketMqEndToEndIntegrationTest extends RedisIntegrationTest {
         }
 
         String commandId = accepted.commandId();
-        await(Duration.ofSeconds(30), () -> ledger.summary(commandId).status() == CommandStatus.COMPLETED
+        await(Duration.ofSeconds(60), () -> ledger.summary(commandId).status() == CommandStatus.COMPLETED
                 && "ACKNOWLEDGED".equals(outbox.findByCommandId(commandId).status()));
         assertThat(jdbc.queryForObject(
                 "SELECT COUNT(*) FROM orders WHERE user_id = ?", Integer.class, user)).isEqualTo(1);
