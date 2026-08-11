@@ -57,7 +57,7 @@ services:
     command:
       - >-
         until sh mqadmin clusterList -n rocketmq-namesrv:9876 2>/dev/null | grep -q FlashFlowSpike; do sleep 2; done;
-        for topic in flashflow-order-command-v1 flashflow-expiration-v1 flashflow-order-dead-letter-v1; do
+        for topic in flashflow-order-command-v1 flashflow-order-command-v4-backlog flashflow-expiration-v1 flashflow-order-dead-letter-v1; do
           sh mqadmin updateTopic -n rocketmq-namesrv:9876 -c FlashFlowSpike -t $$topic || exit 1;
         done
 

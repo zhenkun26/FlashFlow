@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +51,10 @@ class V4OutboxBacklogDrainIntegrationTest extends RedisIntegrationTest {
     static void outboxMessaging(DynamicPropertyRegistry registry) {
         registry.add("flashflow.messaging.mode", () -> "OUTBOX");
         registry.add("flashflow.messaging.namesrv-addr", () -> "127.0.0.1:9876");
-        registry.add("flashflow.messaging.order-consumer-group", () -> "flashflow-v4-backlog-orders-" + RUN);
-        registry.add("flashflow.messaging.expiration-consumer-group", () -> "flashflow-v4-backlog-exp-" + RUN);
-        registry.add("flashflow.messaging.consume-from", () -> "LAST");
+        registry.add("flashflow.messaging.order-topic", () -> "flashflow-order-command-v4-backlog");
+        registry.add("flashflow.messaging.order-consumer-group", () -> "flashflow-v4-backlog-orders");
+        registry.add("flashflow.messaging.expiration-consumer-group", () -> "flashflow-v4-backlog-exp");
+        registry.add("flashflow.messaging.consume-from", () -> "FIRST");
         registry.add("flashflow.messaging.outbox.batch-size", () -> 4);
         registry.add("flashflow.messaging.outbox.poll-interval", () -> "100ms");
         registry.add("flashflow.messaging.outbox.initial-backoff", () -> "100ms");
@@ -117,7 +119,8 @@ class V4OutboxBacklogDrainIntegrationTest extends RedisIntegrationTest {
 
         await(Duration.ofSeconds(60), () -> commandIds.stream().allMatch(commandId ->
                 ledger.summary(commandId).status() == CommandStatus.COMPLETED)
-                && acknowledgedCount() == COMMANDS);
+                && acknowledgedCount() == COMMANDS,
+                () -> recoveryDiagnostics(commandIds));
         long drainMillis = Duration.between(recoveryStarted, Instant.now()).toMillis();
         long attempts = jdbc.queryForObject("SELECT COALESCE(SUM(attempt_count), 0) FROM order_command_outbox",
                 Long.class);
@@ -210,6 +213,19 @@ class V4OutboxBacklogDrainIntegrationTest extends RedisIntegrationTest {
                 "SELECT COUNT(*) FROM order_command_outbox WHERE status = 'ACKNOWLEDGED'", Long.class);
     }
 
+    private String recoveryDiagnostics(List<String> commandIds) {
+        var commandStatuses = commandIds.stream()
+                .map(commandId -> commandId.substring(0, 8) + "=" + ledger.summary(commandId).status())
+                .toList();
+        var outboxStatuses = jdbc.queryForList("""
+                SELECT status, COUNT(*) AS row_count
+                FROM order_command_outbox
+                GROUP BY status
+                ORDER BY status
+                """);
+        return "commandStatuses=" + commandStatuses + ", outboxStatuses=" + outboxStatuses;
+    }
+
     private static long percentile(List<Long> values, double percentile) {
         if (values.isEmpty()) return 0;
         List<Long> sorted = values.stream().sorted(Comparator.naturalOrder()).toList();
@@ -218,12 +234,17 @@ class V4OutboxBacklogDrainIntegrationTest extends RedisIntegrationTest {
     }
 
     private static void await(Duration timeout, CheckedBoolean condition) throws Exception {
+        await(timeout, condition, () -> "no diagnostics available");
+    }
+
+    private static void await(Duration timeout, CheckedBoolean condition, Supplier<String> diagnostics)
+            throws Exception {
         Instant deadline = Instant.now().plus(timeout);
         while (Instant.now().isBefore(deadline)) {
             if (condition.get()) return;
             Thread.sleep(100);
         }
-        throw new AssertionError("condition did not pass within " + timeout);
+        throw new AssertionError("condition did not pass within " + timeout + ": " + diagnostics.get());
     }
 
     private record Evidence(

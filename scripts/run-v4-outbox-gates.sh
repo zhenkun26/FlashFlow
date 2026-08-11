@@ -61,6 +61,7 @@ trap finish EXIT
   echo "dispatcherConcurrency=4"
   echo "faultSchedule=producer-ack-loss,consumer-ack-loss,broker-outage,backlog-drain"
   echo "orderTopic=flashflow-order-command-v1"
+  echo "backlogRecoveryTopic=flashflow-order-command-v4-backlog"
   echo "expirationTopic=flashflow-expiration-v1"
   echo "deadLetterTopic=flashflow-order-dead-letter-v1"
 } >"${report_dir}/metadata.properties"
