@@ -10,6 +10,9 @@ public record AsyncOrderSubmission(
         PublicationResolution admissionResolution,
         String cause) {
     public boolean accepted() {
-        return status == CommandStatus.ACCEPTED;
+        return status == CommandStatus.ACCEPTED
+                || status == CommandStatus.PROCESSING
+                || status == CommandStatus.COMPLETED
+                || status == CommandStatus.REJECTED;
     }
 }

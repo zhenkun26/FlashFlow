@@ -52,6 +52,19 @@ class AsyncOrderApplicationServiceTest {
     }
 
     @Test
+    void durableReplayStatesRemainAcceptedWhileUnacceptedStatesReturn503() {
+        for (CommandStatus status : java.util.List.of(
+                CommandStatus.ACCEPTED, CommandStatus.PROCESSING,
+                CommandStatus.COMPLETED, CommandStatus.REJECTED)) {
+            assertThat(submission(status).accepted()).as(status.name()).isTrue();
+        }
+        for (CommandStatus status : java.util.List.of(
+                CommandStatus.PREPARED, CommandStatus.RETRYABLE, CommandStatus.UNRESOLVED)) {
+            assertThat(submission(status).accepted()).as(status.name()).isFalse();
+        }
+    }
+
+    @Test
     void definitiveFailureReleasesWhileAmbiguityQuarantinesAndBothReturn503() {
         Fixture definitive = new Fixture(new PublicationResult(
                 PublicationOutcome.DEFINITELY_NOT_PUBLISHED, "CONNECT_FAILED"));
@@ -101,6 +114,11 @@ class AsyncOrderApplicationServiceTest {
                 new FlashFlowProperties.Expiration(Duration.ofMinutes(10), 100, true),
                 new FlashFlowProperties.Admission(FlashFlowProperties.AdmissionMode.REDIS_LUA,
                         Duration.ofSeconds(30), "v2-1", "01234567890123456789012345678901"));
+    }
+
+    private static AsyncOrderSubmission submission(CommandStatus status) {
+        return new AsyncOrderSubmission("command", status, java.net.URI.create("/status"),
+                PublicationOutcome.BROKER_ACKNOWLEDGED, PublicationResolution.RETAINED, "DURABLE_REPLAY");
     }
 
     private static final class FakeAdmission implements AdmissionPort {

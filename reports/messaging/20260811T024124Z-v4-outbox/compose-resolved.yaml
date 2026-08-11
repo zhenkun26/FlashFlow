@@ -1,0 +1,173 @@
+name: flashflow
+services:
+  mysql:
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+00:00
+      - --transaction-isolation=REPEATABLE-READ
+    environment:
+      MYSQL_DATABASE: flashflow
+      MYSQL_PASSWORD: <redacted-local-default>
+      MYSQL_ROOT_PASSWORD: <redacted-local-default>
+      MYSQL_USER: flashflow
+      TZ: UTC
+    healthcheck:
+      test:
+        - CMD
+        - mysqladmin
+        - ping
+        - -h
+        - 127.0.0.1
+        - -uflashflow
+        - -pflashflow
+      timeout: 3s
+      interval: 5s
+      retries: 20
+      start_period: 15s
+    image: mysql:8.4.6
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 3306
+        published: "3306"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/docker/mysql-data
+        target: /var/lib/mysql
+        bind: {}
+  redis:
+    command:
+      - redis-server
+      - --appendonly
+      - "no"
+      - --maxmemory-policy
+      - noeviction
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      timeout: 3s
+      interval: 5s
+      retries: 20
+      start_period: 5s
+    image: redis:7.4.2-alpine
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 6379
+        published: "6379"
+        protocol: tcp
+  rocketmq-broker:
+    profiles:
+      - messaging-spike
+      - messaging-live
+    command:
+      - sh
+      - -c
+      - mkdir -p /home/rocketmq/logs/rocketmqlogs /home/rocketmq/store && exec sh mqbroker -n rocketmq-namesrv:9876 -c /home/rocketmq/conf/broker.conf --enable-proxy
+    depends_on:
+      rocketmq-namesrv:
+        condition: service_started
+        required: true
+      rocketmq-store-init:
+        condition: service_completed_successfully
+        required: true
+    environment:
+      JAVA_OPT_EXT: -Xms256m -Xmx256m -Xmn128m
+      NAMESRV_ADDR: rocketmq-namesrv:9876
+    image: apache/rocketmq:5.3.4
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 10911
+        published: "10911"
+        protocol: tcp
+      - mode: ingress
+        target: 10909
+        published: "10909"
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        published: "8081"
+        protocol: tcp
+    tmpfs:
+      - /home/rocketmq/logs:uid=3000,gid=3000,mode=0775
+    volumes:
+      - type: bind
+        source: /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/docker/rocketmq/broker.conf
+        target: /home/rocketmq/conf/broker.conf
+        read_only: true
+        bind: {}
+      - type: volume
+        source: rocketmq-store
+        target: /home/rocketmq/store
+        volume: {}
+  rocketmq-namesrv:
+    profiles:
+      - messaging-spike
+      - messaging-live
+    command:
+      - sh
+      - mqnamesrv
+    environment:
+      JAVA_OPT_EXT: -Xms128m -Xmx128m -Xmn64m
+    image: apache/rocketmq:5.3.4
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 9876
+        published: "9876"
+        protocol: tcp
+    tmpfs:
+      - /home/rocketmq/logs
+  rocketmq-store-init:
+    profiles:
+      - messaging-spike
+      - messaging-live
+    command:
+      - mkdir -p /home/rocketmq/store && chown -R 3000:3000 /home/rocketmq/store
+    entrypoint:
+      - sh
+      - -c
+    image: apache/rocketmq:5.3.4
+    networks:
+      default: null
+    user: "0:0"
+    volumes:
+      - type: volume
+        source: rocketmq-store
+        target: /home/rocketmq/store
+        volume: {}
+  rocketmq-topics:
+    profiles:
+      - messaging-live
+    command:
+      - |-
+        until sh mqadmin clusterList -n rocketmq-namesrv:9876 2>/dev/null | grep -q FlashFlowSpike; do sleep 2; done; for topic in flashflow-order-command-v1 flashflow-expiration-v1 flashflow-order-dead-letter-v1; do
+          sh mqadmin updateTopic -n rocketmq-namesrv:9876 -c FlashFlowSpike -t $$topic || exit 1;
+        done
+    depends_on:
+      rocketmq-broker:
+        condition: service_started
+        required: true
+      rocketmq-namesrv:
+        condition: service_started
+        required: true
+    entrypoint:
+      - sh
+      - -c
+    image: apache/rocketmq:5.3.4
+    network_mode: service:rocketmq-broker
+networks:
+  default:
+    name: flashflow_default
+volumes:
+  rocketmq-store:
+    name: flashflow_rocketmq-store
