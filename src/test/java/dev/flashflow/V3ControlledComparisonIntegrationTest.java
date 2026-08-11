@@ -58,32 +58,38 @@ class V3ControlledComparisonIntegrationTest extends RedisIntegrationTest {
 
     @Test
     void separatesSynchronousCompletionFromV3AcceptanceAndCompletion() throws Exception {
-        ready("activity-control-sync", "sku-control-sync");
-        ready("activity-control-v3", "sku-control-v3");
+        String suffix = GROUP_SUFFIX.substring(0, 8);
+        String syncSku = "sku-control-sync-" + suffix;
+        String asyncSku = "sku-control-v3-" + suffix;
+        String syncUser = "user-control-sync-" + suffix;
+        String asyncUser = "user-control-v3-" + suffix;
+        ready("activity-control-sync-" + suffix, syncSku);
+        ready("activity-control-v3-" + suffix, asyncSku);
         double publicationsBefore = metric(
                 "flashflow.messaging.publication", "outcome", "BROKER_ACKNOWLEDGED");
         double deliveriesBefore = metric("flashflow.messaging.delivery", "outcome", "RECEIVED");
 
         long syncStarted = System.nanoTime();
         var sync = http.exchange("/api/v1/orders", HttpMethod.POST,
-                request("key-control-sync", "user-control-sync", "sku-control-sync"), OrderResult.class);
+                request("key-control-sync-" + suffix, syncUser, syncSku), OrderResult.class);
         long syncCompleted = System.nanoTime();
         assertThat(sync.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(sync.getBody().code()).isEqualTo(OrderResultCode.CREATED);
 
         long asyncStarted = System.nanoTime();
         var accepted = postUntilAccepted(Duration.ofSeconds(60),
-                request("key-control-v3", "user-control-v3", "sku-control-v3"));
+                request("key-control-v3-" + suffix, asyncUser, asyncSku));
         long asyncAccepted = System.nanoTime();
         assertThat(accepted.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
+        assertThat(accepted.getBody().cause()).isNotEqualTo("DURABLE_REPLAY");
         String commandId = accepted.getBody().commandId();
         await(Duration.ofSeconds(20), () -> ledger.summary(commandId).status() == CommandStatus.COMPLETED);
         long asyncCompleted = System.nanoTime();
 
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM orders WHERE user_id IN (?, ?)", Integer.class,
-                "user-control-sync", "user-control-v3")).isEqualTo(2);
+                syncUser, asyncUser)).isEqualTo(2);
         assertThat(jdbc.queryForObject("SELECT SUM(available_stock) FROM activity_sku_stock WHERE id IN (?, ?)",
-                Integer.class, "sku-control-sync", "sku-control-v3")).isZero();
+                Integer.class, syncSku, asyncSku)).isZero();
         assertThat(metric("flashflow.messaging.publication", "outcome", "BROKER_ACKNOWLEDGED")
                 - publicationsBefore)
                 .isGreaterThanOrEqualTo(1);

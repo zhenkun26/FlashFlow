@@ -1,0 +1,180 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< dev.flashflow:flashflow >-----------------------
+[INFO] Building FlashFlow 0.1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] 1 problem was encountered while building the effective model for org.javassist:javassist:jar:3.21.0-GA during dependency collection step for project (use -X to see details)
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ flashflow ---
+[INFO] Copying 5 resources from src/main/resources to target/classes
+[INFO] Copying 11 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.0:compile (default-compile) @ flashflow ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ flashflow ---
+[INFO] skip non existing resourceDirectory /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.0:testCompile (default-testCompile) @ flashflow ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 54 source files with javac [debug parameters release 21] to target/test-classes
+[WARNING] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/ExpirationAdmissionFailureIntegrationTest.java:[26,6] org.springframework.boot.test.mock.mockito 中的 org.springframework.boot.test.mock.mockito.MockBean 已过时, 且标记为待删除
+[WARNING] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/ExpirationRollbackIntegrationTest.java:[21,6] org.springframework.boot.test.mock.mockito 中的 org.springframework.boot.test.mock.mockito.MockBean 已过时, 且标记为待删除
+[INFO] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/admission/RedisLuaAdmissionFailureTest.java: /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/admission/RedisLuaAdmissionFailureTest.java使用了未经检查或不安全的操作。
+[INFO] /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow/src/test/java/dev/flashflow/admission/RedisLuaAdmissionFailureTest.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+[INFO] 
+[INFO] --- surefire:3.5.3:test (default-test) @ flashflow ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running dev.flashflow.OutboxAcceptanceIntegrationTest
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+11:02:20.873 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [dev.flashflow.OutboxAcceptanceIntegrationTest]: OutboxAcceptanceIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+11:02:20.932 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration dev.flashflow.FlashFlowApplication for test class dev.flashflow.OutboxAcceptanceIntegrationTest
+11:02:20.975 [main] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+11:02:20.976 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+11:02:20.984 [main] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 1.21.3
+11:02:21.069 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+11:02:21.238 [main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+11:02:21.239 [main] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+11:02:21.251 [main] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+  Server Version: 29.4.1
+  API Version: 1.54
+  Operating System: Docker Desktop
+  Total Memory: 7936 MB
+  Labels: 
+    com.docker.desktop.address=unix:///Users/yuzheng/Library/Containers/com.docker.docker/Data/docker-cli.sock
+11:02:21.341 [main] INFO tc.testcontainers/ryuk:0.12.0 -- Creating container for image: testcontainers/ryuk:0.12.0
+11:02:21.363 [main] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-osxkeychain) does not have credentials for https://index.docker.io/v1/
+11:02:21.416 [main] INFO tc.testcontainers/ryuk:0.12.0 -- Container testcontainers/ryuk:0.12.0 is starting: be618d371795abe3211cb9c0879fcf45d9aa46fc51c0131757caf23035796e66
+11:02:21.541 [main] INFO tc.testcontainers/ryuk:0.12.0 -- Container testcontainers/ryuk:0.12.0 started in PT0.199529S
+11:02:21.547 [main] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+11:02:21.547 [main] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+11:02:21.547 [main] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+11:02:21.549 [main] INFO tc.mysql:8.4.6 -- Creating container for image: mysql:8.4.6
+11:02:21.586 [main] INFO tc.mysql:8.4.6 -- Container mysql:8.4.6 is starting: 3a3d324d868f285f677ae4bf47b4cf276a2fb968f2b2ae957f3e6e20af7bb825
+11:02:21.681 [main] INFO tc.mysql:8.4.6 -- Waiting for database connection to become available at jdbc:mysql://localhost:60349/flashflow using query 'SELECT 1'
+11:02:26.379 [main] INFO tc.mysql:8.4.6 -- Container mysql:8.4.6 started in PT4.830375S
+11:02:26.379 [main] INFO tc.mysql:8.4.6 -- Container is started (JDBC URL: jdbc:mysql://localhost:60349/flashflow)
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.5)
+
+2026-08-11T11:02:26.496+08:00 INFO  d.f.OutboxAcceptanceIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting OutboxAcceptanceIntegrationTest using Java 26.0.2 with PID 78095 (started by yuzheng in /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow)
+2026-08-11T11:02:26.496+08:00 INFO  d.f.OutboxAcceptanceIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - The following 1 profile is active: "test"
+2026-08-11T11:02:26.923+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-08-11T11:02:26.924+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-08-11T11:02:26.943+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Finished Spring Data repository scanning in 11 ms. Found 0 Redis repository interfaces.
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/Users/yuzheng/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.7/byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-08-11T11:02:27.613+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-1 - Starting...
+2026-08-11T11:02:27.695+08:00 INFO  com.zaxxer.hikari.pool.HikariPool request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5ae22651
+2026-08-11T11:02:27.696+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-1 - Start completed.
+2026-08-11T11:02:27.713+08:00 INFO  org.flywaydb.core.FlywayExecutor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Database: jdbc:mysql://localhost:60349/flashflow (MySQL 8.4)
+2026-08-11T11:02:27.732+08:00 WARN  o.f.c.i.database.base.Database request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Flyway upgrade recommended: MySQL 8.4 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2026-08-11T11:02:27.746+08:00 INFO  o.f.c.i.s.JdbcTableSchemaHistory request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Schema history table `flashflow`.`flyway_schema_history` does not exist yet
+2026-08-11T11:02:27.748+08:00 INFO  o.f.core.internal.command.DbValidate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Successfully validated 4 migrations (execution time 00:00.011s)
+2026-08-11T11:02:27.770+08:00 INFO  o.f.c.i.s.JdbcTableSchemaHistory request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Creating Schema History table `flashflow`.`flyway_schema_history` ...
+2026-08-11T11:02:27.808+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Current version of schema `flashflow`: << Empty Schema >>
+2026-08-11T11:02:27.819+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Migrating schema `flashflow` to version "1 - create flashflow v1 schema"
+2026-08-11T11:02:27.939+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Migrating schema `flashflow` to version "2 - create order command ledger"
+2026-08-11T11:02:27.973+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Migrating schema `flashflow` to version "3 - extend order command transport evidence"
+2026-08-11T11:02:28.016+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Migrating schema `flashflow` to version "4 - create order command outbox"
+2026-08-11T11:02:28.036+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Successfully applied 4 migrations to schema `flashflow`, now at version v4 (execution time 00:00.158s)
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::allocateMemory has been called by io.netty.util.internal.PlatformDependent0$2 (file:/Users/yuzheng/.m2/repository/io/netty/netty-common/4.1.124.Final/netty-common-4.1.124.Final.jar)
+WARNING: Please consider reporting this to the maintainers of class io.netty.util.internal.PlatformDependent0$2
+WARNING: sun.misc.Unsafe::allocateMemory will be removed in a future release
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by io.netty.util.internal.NativeLibraryUtil in an unnamed module (file:/Users/yuzheng/.m2/repository/io/netty/netty-common/4.1.124.Final/netty-common-4.1.124.Final.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2026-08-11T11:02:29.202+08:00 INFO  o.s.b.a.e.web.EndpointLinksResolver request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Exposing 2 endpoints beneath base path '/actuator'
+2026-08-11T11:02:29.235+08:00 INFO  d.f.OutboxAcceptanceIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Started OutboxAcceptanceIntegrationTest in 2.842 seconds (process running for 8.63)
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.609 s -- in dev.flashflow.OutboxAcceptanceIntegrationTest
+[INFO] Running dev.flashflow.AdmissionReconciliationIntegrationTest
+2026-08-11T11:02:29.435+08:00 INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Could not detect default configuration classes for test class [dev.flashflow.AdmissionReconciliationIntegrationTest]: AdmissionReconciliationIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-11T11:02:29.437+08:00 INFO  o.s.b.t.c.SpringBootTestContextBootstrapper request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Found @SpringBootConfiguration dev.flashflow.FlashFlowApplication for test class dev.flashflow.AdmissionReconciliationIntegrationTest
+2026-08-11T11:02:29.439+08:00 INFO  tc.redis:7.4.2-alpine request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Creating container for image: redis:7.4.2-alpine
+2026-08-11T11:02:29.498+08:00 INFO  tc.redis:7.4.2-alpine request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Container redis:7.4.2-alpine is starting: 68450119f970e4b27a6fbd69a9ca3a15a1c88067a502b42784a49376ff4d3f60
+2026-08-11T11:02:29.789+08:00 INFO  tc.redis:7.4.2-alpine request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Container redis:7.4.2-alpine started in PT0.350159S
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.5)
+
+2026-08-11T11:02:29.803+08:00 INFO  d.f.AdmissionReconciliationIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting AdmissionReconciliationIntegrationTest using Java 26.0.2 with PID 78095 (started by yuzheng in /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow)
+2026-08-11T11:02:29.803+08:00 INFO  d.f.AdmissionReconciliationIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - The following 1 profile is active: "test"
+2026-08-11T11:02:29.960+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-08-11T11:02:29.960+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-08-11T11:02:29.964+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Finished Spring Data repository scanning in 4 ms. Found 0 Redis repository interfaces.
+2026-08-11T11:02:30.016+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-2 - Starting...
+2026-08-11T11:02:30.027+08:00 INFO  com.zaxxer.hikari.pool.HikariPool request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-2 - Added connection com.mysql.cj.jdbc.ConnectionImpl@13bea51d
+2026-08-11T11:02:30.027+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-2 - Start completed.
+2026-08-11T11:02:30.030+08:00 INFO  org.flywaydb.core.FlywayExecutor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Database: jdbc:mysql://localhost:60349/flashflow (MySQL 8.4)
+2026-08-11T11:02:30.036+08:00 WARN  o.f.c.i.database.base.Database request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Flyway upgrade recommended: MySQL 8.4 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2026-08-11T11:02:30.044+08:00 INFO  o.f.core.internal.command.DbValidate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Successfully validated 4 migrations (execution time 00:00.005s)
+2026-08-11T11:02:30.053+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Current version of schema `flashflow`: 4
+2026-08-11T11:02:30.053+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Schema `flashflow` is up to date. No migration necessary.
+2026-08-11T11:02:30.143+08:00 INFO  o.s.b.a.e.web.EndpointLinksResolver request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Exposing 2 endpoints beneath base path '/actuator'
+2026-08-11T11:02:30.151+08:00 INFO  d.f.AdmissionReconciliationIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Started AdmissionReconciliationIntegrationTest in 0.361 seconds (process running for 9.546)
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.092 s -- in dev.flashflow.AdmissionReconciliationIntegrationTest
+[INFO] Running dev.flashflow.OutboxPersistenceIntegrationTest
+2026-08-11T11:02:30.528+08:00 INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Could not detect default configuration classes for test class [dev.flashflow.OutboxPersistenceIntegrationTest]: OutboxPersistenceIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-11T11:02:30.529+08:00 INFO  o.s.b.t.c.SpringBootTestContextBootstrapper request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Found @SpringBootConfiguration dev.flashflow.FlashFlowApplication for test class dev.flashflow.OutboxPersistenceIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.5)
+
+2026-08-11T11:02:30.540+08:00 INFO  d.f.OutboxPersistenceIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Starting OutboxPersistenceIntegrationTest using Java 26.0.2 with PID 78095 (started by yuzheng in /Users/yuzheng/Computeracy/Zhenkun26-GitHub/FlashFlow)
+2026-08-11T11:02:30.540+08:00 INFO  d.f.OutboxPersistenceIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - The following 1 profile is active: "test"
+2026-08-11T11:02:30.612+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-08-11T11:02:30.612+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-08-11T11:02:30.617+08:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Finished Spring Data repository scanning in 4 ms. Found 0 Redis repository interfaces.
+2026-08-11T11:02:30.659+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-3 - Starting...
+2026-08-11T11:02:30.671+08:00 INFO  com.zaxxer.hikari.pool.HikariPool request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-3 - Added connection com.mysql.cj.jdbc.ConnectionImpl@51173c3a
+2026-08-11T11:02:30.671+08:00 INFO  com.zaxxer.hikari.HikariDataSource request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - HikariPool-3 - Start completed.
+2026-08-11T11:02:30.679+08:00 INFO  org.flywaydb.core.FlywayExecutor request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Database: jdbc:mysql://localhost:60349/flashflow (MySQL 8.4)
+2026-08-11T11:02:30.687+08:00 WARN  o.f.c.i.database.base.Database request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Flyway upgrade recommended: MySQL 8.4 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2026-08-11T11:02:30.693+08:00 INFO  o.f.core.internal.command.DbValidate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Successfully validated 4 migrations (execution time 00:00.005s)
+2026-08-11T11:02:30.700+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Current version of schema `flashflow`: 4
+2026-08-11T11:02:30.701+08:00 INFO  o.f.core.internal.command.DbMigrate request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Schema `flashflow` is up to date. No migration necessary.
+2026-08-11T11:02:30.777+08:00 INFO  o.s.b.a.e.web.EndpointLinksResolver request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Exposing 2 endpoints beneath base path '/actuator'
+2026-08-11T11:02:30.782+08:00 INFO  d.f.OutboxPersistenceIntegrationTest request_id= idempotency_key= order_id= user_id= sku_id= payment_tx= - Started OutboxPersistenceIntegrationTest in 0.252 seconds (process running for 10.177)
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.391 s -- in dev.flashflow.OutboxPersistenceIntegrationTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  12.769 s
+[INFO] Finished at: 2026-08-11T11:02:31+08:00
+[INFO] ------------------------------------------------------------------------
