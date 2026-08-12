@@ -180,3 +180,5 @@ The isolated broker topology probe is reproducible with `scripts/run-rocketmq-sp
 本项目以 MIT 许可证开源，详见 [LICENSE](LICENSE)。
 
 This project is open-sourced under the MIT License — see [LICENSE](LICENSE).
+
+> 本项目由 Vibe Coding 辅助实现落地。Built with Vibe Coding.
