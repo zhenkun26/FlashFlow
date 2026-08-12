@@ -172,3 +172,11 @@ Current execution evidence is recorded in [verification status](docs/verificatio
 独立的 Broker 拓扑探针可通过 `scripts/run-rocketmq-spike.sh` 复现；它只在 `reports/messaging/` 下写入追加式证据，并且绝不在常规应用 profile 中启用消息功能。
 
 The isolated broker topology probe is reproducible with `scripts/run-rocketmq-spike.sh`; it writes append-only evidence below `reports/messaging/` and never enables messaging in the normal application profile.
+
+---
+
+## License / 许可证
+
+本项目以 MIT 许可证开源，详见 [LICENSE](LICENSE)。
+
+This project is open-sourced under the MIT License — see [LICENSE](LICENSE).
