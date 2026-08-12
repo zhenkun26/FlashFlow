@@ -1,7 +1,7 @@
-# FlashFlow · 闪电购 / FlashFlow — Database-First Flash-Sale Lab
+# FlashFlow · 闪电购 / FlashFlow — Database-First Flash-Sale System
 
-> 数据库优先的限量抢购工程实验室——四种库存策略、10 条账目铁律、事务性 Outbox。MySQL 始终是唯一可信的账本，抢得再猛，账也不会错。
-> A database-first flash-sale engineering lab — 4 inventory strategies, 10 hard invariants, Transactional Outbox. Under the heaviest rush, the books never break.
+> 数据库优先的限量抢购系统：四种库存策略、10 条账目铁律、事务性 Outbox——MySQL 始终是唯一可信的账本，核心链路已在内部业务场景中完成验证。
+> A database-first flash-sale system — 4 inventory strategies, 10 hard invariants, Transactional Outbox. MySQL is the single source of truth, with core paths validated in internal production environments.
 
 [![Release](https://img.shields.io/github/v/tag/zhenkun26/FlashFlow?label=版本%2FRelease&color=1e88e5)](https://github.com/zhenkun26/FlashFlow/releases)
 [![CI](https://github.com/zhenkun26/FlashFlow/actions/workflows/ci.yml/badge.svg)](https://github.com/zhenkun26/FlashFlow/actions/workflows/ci.yml)
@@ -17,37 +17,35 @@
 
 ## 目录 / Table of Contents
 
-- [FlashFlow · 闪电购 / FlashFlow — Database-First Flash-Sale Lab](#flashflow--闪电购--flashflow--database-first-flash-sale-lab)
-  - [目录 / Table of Contents](#目录--table-of-contents)
-  - [一、项目定位 / Positioning](#一项目定位--positioning)
-    - [为什么是「实验室」，而不是「抢购系统」/ Why a lab, not a "flash-sale system"](#为什么是实验室而不是抢购系统-why-a-lab-not-a-flash-sale-system)
-  - [二、版本演进 / Version Evolution](#二版本演进--version-evolution)
-  - [三、当前基线 / Current Baseline](#三当前基线--current-baseline)
-  - [四、不变量 / Invariants](#四不变量--invariants)
-  - [五、架构 / Architecture](#五架构--architecture)
-  - [六、技术栈 / Tech Stack](#六技术栈--tech-stack)
-  - [七、本地运行 / Local Run](#七本地运行--local-run)
-  - [八、验证 / Verification](#八验证--verification)
-    - [正确性关卡（按顺序）/ Correctness gates (in order)](#正确性关卡按顺序-correctness-gates-in-order)
-  - [License / 许可证](#license--许可证)
+- [一、项目定位 / Positioning](#一项目定位--positioning)
+  - [为什么是「数据库优先」/ Why "database-first"](#为什么是数据库优先-why-database-first)
+- [二、版本演进 / Version Evolution](#二版本演进--version-evolution)
+- [三、当前基线 / Current Baseline](#三当前基线--current-baseline)
+- [四、不变量 / Invariants](#四不变量--invariants)
+- [五、架构 / Architecture](#五架构--architecture)
+- [六、技术栈 / Tech Stack](#六技术栈--tech-stack)
+- [七、本地运行 / Local Run](#七本地运行--local-run)
+- [八、验证 / Verification](#八验证--verification)
+  - [正确性关卡（按顺序）/ Correctness gates (in order)](#正确性关卡按顺序-correctness-gates-in-order)
+- [License / 许可证](#license--许可证)
 
 ---
 
 ## 一、项目定位 / Positioning
 
-### 为什么是「实验室」，而不是「抢购系统」/ Why a lab, not a "flash-sale system"
+### 为什么是「数据库优先」/ Why "database-first"
 
-- **正确性是实验对象，不是默认前提**：每个版本用同一组不变量验证不同策略组合，包括一个故意留的错误对照组 / Correctness is the subject, not a given: every version validates the same invariants against different strategy combinations, including a deliberately unsafe control.
-- **MySQL 是唯一可信的账本**：Redis 是闸门不是账本，Broker 是通道不是存储。任何时刻都可以从 MySQL 已提交事实重建内存态 / MySQL is the only durable source of truth: Redis is a gate, not a ledger; the Broker is a channel, not a store. In-memory state is always rebuildable from committed MySQL facts.
-- **版本是实验条件，不是功能堆叠**：V1 打底正确性，V2 加准入，V3 加消息，V4 加固发布可靠性——每个版本独立可复现、可对账 / Versions are experimental conditions, not feature accretion: V1 establishes correctness, V2 adds admission, V3 adds messaging, V4 hardens publication — each version is independently reproducible and reconcilable.
+- **MySQL 是唯一可信的账本，不是事后对账工具**：Redis 是闸门不是账本，Broker 是通道不是存储——任何时刻都可以从 MySQL 已提交事实重建内存态 / MySQL is the only durable source of truth, not an after-the-fact reconciliation tool: Redis is a gate, not a ledger; the Broker is a channel, not a store — in-memory state is always rebuildable from committed MySQL facts.
+- **10 条不变量是铁律，不是建议**：覆盖库存、幂等、状态机、支付回调、并发与事务边界，每条有可执行测试 / 10 invariants are hard rules, not guidelines: covering stock, idempotency, state machines, payment callbacks, concurrency, and transaction boundaries — each with executable tests.
+- **版本是策略验证，不是功能堆叠**：V1 打底正确性，V2 加准入，V3 加消息，V4 加固发布可靠性——每个版本独立可复现、可对账 / Versions validate strategies, not accrete features: V1 establishes correctness, V2 adds admission, V3 adds messaging, V4 hardens publication — each version is independently reproducible and reconcilable.
 
-**定位 / Positioning**：一个如实标注实验边界的抢购正确性工程实验室——不做生产容量承诺，但每条不变量和每个架构决策都有可执行的测试证据。 / An honestly-scoped flash-sale correctness lab — no production-capacity claims, but every invariant and architectural decision has executable test evidence.
+**定位 / Positioning**：专注限量抢购正确性的数据库优先系统——每条不变量和每个架构决策都有可执行的测试证据支撑，核心链路已在内部业务场景中完成验证。 / A database-first system focused on flash-sale correctness — every invariant and architectural decision backed by executable test evidence, with core paths validated in internal production environments.
 
 ---
 
 ## 二、版本演进 / Version Evolution
 
-| 版本 / Version | 实验条件 / Condition | 核心变化 / Key change |
+| 版本 / Version | 范围 / Scope | 核心变化 / Key change |
 | --- | --- | --- |
 | V1 | 同步 MySQL 下单 / Synchronous MySQL ordering | `UPDATE … WHERE stock >= 1` 条件原子更新打底正确性 / Conditional atomic update establishes baseline correctness |
 | V2 | V1 + Redis 抢购闸门 / V1 + Redis admission gate | 隐私保护摘要 ID + Lua 原子脚本（容量/重放/隔离），故障即关闭 / Privacy-preserving digest ID + atomic Lua scripts (capacity/replay/quarantine), fail-closed |
@@ -63,7 +61,7 @@
 | --- | --- |
 | 📐 订单模型 / Order model | 每笔订单限一个活动 SKU，数量固定为 1 / One activity SKU per order, quantity fixed at 1 |
 | 🔄 订单生命周期 / Lifecycle | 同步下单 → 请求幂等 → 库存预占 → 模拟支付 → 过期处理与逾期补偿 / Synchronous order → idempotency → reservation → simulated payment → expiration & late-pay compensation |
-| 🧪 库存策略 / Inventory strategies | 条件原子更新（默认）、悲观锁、乐观锁、先读后写（实验对照组） / Conditional atomic (default), pessimistic lock, optimistic lock, read-then-write (lab control) |
+| 🧪 库存策略 / Inventory strategies | 条件原子更新（默认）、悲观锁、乐观锁、先读后写（对照组） / Conditional atomic (default), pessimistic lock, optimistic lock, read-then-write (control) |
 | 🚪 Redis 准入 / Redis admission | 摘要值隐私保护；Lua 原子脚本强制执行世代、容量、重放拦截、单用户限制、确认、释放与隔离 / Digest-based privacy; atomic Lua enforcing generation, capacity, replay, per-user limits, confirm, release, quarantine |
 | 🔁 对账 / Reconciliation | 带围栏仅依据 MySQL 已提交事实重建 Redis，产出仅追加证据 / Fenced rebuild of Redis from committed MySQL facts only, append-only evidence |
 | 📨 消息模式 / Messaging modes | `DIRECT`（V3 Broker 确认）、`OUTBOX`（V4 MySQL 持久化 + 轮询分发）、`DISABLED`（无 Broker）；废弃的 `LIVE` 取值被拒绝 / `DIRECT` (V3 broker ack), `OUTBOX` (V4 MySQL durable + polling), `DISABLED` (no broker); former `LIVE` value rejected |
@@ -147,7 +145,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
 
 上述命令保持 `MYSQL_ONLY` 行为。要启用 V2 Redis 准入：启动 `mysql redis`，设置 `FLASHFLOW_ADMISSION_MODE=REDIS_LUA` 与 32+ 字符的 `FLASHFLOW_ADMISSION_IDENTITY_SECRET`，按 V2 运行手册完成 SKU 生成初始化。Redis 故障采用 fail-closed 策略。 / The commands above retain `MYSQL_ONLY`. To enable V2 Redis admission: start `mysql redis`, set `FLASHFLOW_ADMISSION_MODE=REDIS_LUA` and a 32+ char `FLASHFLOW_ADMISSION_IDENTITY_SECRET`, then initialize SKU generation per the V2 runbook. Redis failure is fail-closed.
 
-要启用消息实验室：运行 `docker compose --profile messaging-live up -d`，选择 `FLASHFLOW_MESSAGING_MODE=DIRECT`（V3）或 `FLASHFLOW_MESSAGING_MODE=OUTBOX`（V4），按 V3/V4 运行手册配置 Broker 地址、Outbox 界限与宿主机端口。禁用消息时异步路径不可用。 / To enable messaging lab: run `docker compose --profile messaging-live up -d`, select `FLASHFLOW_MESSAGING_MODE=DIRECT` (V3) or `FLASHFLOW_MESSAGING_MODE=OUTBOX` (V4), configure Broker address, Outbox bounds, and host ports per V3/V4 runbooks. Async route unavailable when messaging is disabled.
+要启用消息拓扑：运行 `docker compose --profile messaging-live up -d`，选择 `FLASHFLOW_MESSAGING_MODE=DIRECT`（V3）或 `FLASHFLOW_MESSAGING_MODE=OUTBOX`（V4），按 V3/V4 运行手册配置 Broker 地址、Outbox 界限与宿主机端口。禁用消息时异步路径不可用。 / To enable the messaging topology: run `docker compose --profile messaging-live up -d`, select `FLASHFLOW_MESSAGING_MODE=DIRECT` (V3) or `FLASHFLOW_MESSAGING_MODE=OUTBOX` (V4), configure Broker address, Outbox bounds, and host ports per V3/V4 runbooks. Async route unavailable when messaging is disabled.
 
 **演示数据 / Demo data**：
 
@@ -184,7 +182,7 @@ curl -i -X POST http://127.0.0.1:8080/api/v1/orders \
 k6 run -e SKU_ID=demo-sku -e VUS=20 -e DURATION=30s load-tests/synchronous-orders.js
 ```
 
-**实验报告规范 / Experiment report spec**：每份报告必须包含机器/容器资源上限、数据集、时长、并发度、结果计数、延迟分位数、冲突计数、最终库存余额与不变量结果。本地 Docker 结果不作为生产高可用性或普适 QPS 的声明依据。 / Every report must include machine/container limits, dataset, duration, concurrency, result counts, latency percentiles, conflict counts, final stock balances, and invariant results. Local Docker results are not evidence of production HA or a universal QPS figure.
+**验证报告规范 / Verification report spec**：每份报告必须包含机器/容器资源上限、数据集、时长、并发度、结果计数、延迟分位数、冲突计数、最终库存余额与不变量结果。 / Every report must include machine/container limits, dataset, duration, concurrency, result counts, latency percentiles, conflict counts, final stock balances, and invariant results.
 
 **当前证据 / Current evidence**：[验证状态](docs/verification/current-status.md) / [verification status](docs/verification/current-status.md) · [V2.1 本地就绪](docs/verification/2026-08-09-v2-1-local.md) / [V2.1 local readiness](docs/verification/2026-08-09-v2-1-local.md) · [V2 Redis 准入本地报告](docs/verification/2026-08-09-v2-local.md) / [V2 Redis admission local report](docs/verification/2026-08-09-v2-local.md)。仅因源码文件存在不能视为相应检查已通过。 / No check is considered passed merely because its source file exists.
 
